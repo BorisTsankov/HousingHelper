@@ -1,0 +1,18 @@
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+stages:
+  - build
+  - test
+  - sonarqube-check
+build:
+  stage: build
+  script:
+    - ./gradlew assemble
+test:
+  stage: test
+  script:
+    - ./gradlew test
+sonarqube-check:
+  stage: sonarqube-check
+  script:
+    - echo "This is a demo stage replacing SonarQube analysis."
