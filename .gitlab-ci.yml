@@ -1,18 +1,48 @@
+# Runs on a Windows Shell (pwsh) runner and uses gradlew.bat
+# If your runner is tagged (e.g., "windows"), uncomment the default: tags section.
+
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR\\.gradle"   # cache Gradle in workspace on Windows
+
 stages:
   - build
   - test
   - sonarqube-check
+
+# default:
+#   tags: [windows]
+
+cache:
+  key: "$CI_PROJECT_NAME-gradle"
+  paths:
+    - .gradle\wrapper
+    - .gradle\caches
+
+before_script:
+  # Optional: print Java version if JAVA_HOME is configured
+  - 'if (Test-Path -Path "$env:JAVA_HOME\\bin\\java.exe") { & "$env:JAVA_HOME\\bin\\java.exe" -version } else { Write-Host "JAVA_HOME not set or Java not found in JAVA_HOME" }'
+  # Ensure the Gradle wrapper exists
+  - 'if (-not (Test-Path .\\gradlew.bat)) { Write-Error "gradlew.bat not found in repo"; exit 1 }'
+
 build:
   stage: build
   script:
-    - ./gradlew assemble
+    - '& .\gradlew.bat --no-daemon --stacktrace --info clean assemble'
+  artifacts:
+    when: always
+    paths:
+      - build\libs\*.jar
+    expire_in: 1 week
+
 test:
   stage: test
   script:
-    - ./gradlew test
+    - '& .\gradlew.bat --no-daemon --stacktrace test'
+  dependencies:
+    - build
+
 sonarqube-check:
   stage: sonarqube-check
   script:
-    - echo "This is a demo stage replacing SonarQube analysis."
+    - 'Write-Host "This is a demo stage replacing SonarQube analysis."'
