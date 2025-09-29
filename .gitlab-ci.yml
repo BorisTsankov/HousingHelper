@@ -1,168 +1,109 @@
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  # Gradle cache location used by the Windows service account
-  GRADLE_USER_HOME: "C:\\Windows\\System32\\config\\systemprofile\\.gradle"
+  BACKEND_IMAGE: "$CI_REGISTRY_IMAGE/backend"
+  FRONTEND_IMAGE: "$CI_REGISTRY_IMAGE/frontend"
+  COMMIT_TAG: "$CI_COMMIT_SHORT_SHA"
+  LATEST_TAG: "latest"
 
 stages:
   - build
   - test
+  - docker-build
+  - docker-push
   - sonarqube-check
 
-# ---------- Shared setup: Java ----------
-.before_java: &before_java
-  before_script:
-    - |
-      # PowerShell, Java setup
-      Write-Host "CWD          : $PWD"
-      Write-Host "Project dir  : $env:CI_PROJECT_DIR"
-      Set-Location $env:CI_PROJECT_DIR
-
-      $jdk = Get-ChildItem 'C:\Program Files\Eclipse Adoptium' -Directory -Filter 'jdk*' |
-        Sort-Object Name -Descending |
-        Select-Object -First 1 -ExpandProperty FullName
-      if (-not $jdk) { throw "No JDK found under C:\Program Files\Eclipse Adoptium" }
-      $env:JAVA_HOME = $jdk
-      $env:Path = "$env:JAVA_HOME\bin;$env:Path"
-      Write-Host "Using JAVA_HOME = $env:JAVA_HOME"
-      java -version | Write-Host
-
-# ---------- Shared setup: Node ----------
-.before_node: &before_node
-  before_script:
-    - |
-      Write-Host "CWD          : $PWD"
-      Write-Host "Project dir  : $env:CI_PROJECT_DIR"
-      Set-Location $env:CI_PROJECT_DIR
-
-      # Try common Node locations on Windows runners
-      $possibleNode = @(
-        "$env:ProgramFiles\nodejs\node.exe",
-        "$env:ProgramFiles(x86)\nodejs\node.exe",
-        "$env:UserProfile\scoop\apps\nodejs\current\node.exe",
-        "$env:ChocolateyInstall\bin\node.exe"
-      ) | Where-Object { Test-Path $_ } | Select-Object -First 1
-      if ($possibleNode) { $env:Path = (Split-Path $possibleNode) + ";" + $env:Path }
-
-      if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-        throw "Node.js not found on the runner. Install Node (e.g., 'choco install nodejs-lts')."
-      }
-
-      node -v | Write-Host
-      npm -v  | Write-Host
-
-# ----------------- BACKEND (Gradle in back-end/) -----------------
-
-backend:build:
+# ---------- BUILD ----------
+build:
   stage: build
-  <<: *before_java
-  cache:
-    key: "gradle-cache"
-    paths:
-      - $GRADLE_USER_HOME\caches\
-      - $GRADLE_USER_HOME\wrapper\
+  image: gradle:8.7-jdk21-alpine
   script:
-    - |
-      $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'back-end'
-      if (-not (Test-Path (Join-Path $env:PROJECT_DIR 'gradlew.bat'))) {
-        throw "back-end/gradlew.bat not found. Commit the Gradle wrapper into back-end/."
-      }
-      Push-Location $env:PROJECT_DIR
-      & ".\gradlew.bat" --version
-      & ".\gradlew.bat" assemble --stacktrace --info
-      Pop-Location
-  rules:
-    - changes:
-        - back-end/**
-
-backend:test:
-  stage: test
-  needs: ["backend:build"]
-  <<: *before_java
-  cache:
-    key: "gradle-cache"
-    paths:
-      - $GRADLE_USER_HOME\caches\
-      - $GRADLE_USER_HOME\wrapper\
-  script:
-    - |
-      $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'back-end'
-      Push-Location $env:PROJECT_DIR
-      & ".\gradlew.bat" test --stacktrace --info
-      Pop-Location
+    - cd back-end
+    - ./gradlew assemble --no-daemon
   artifacts:
-    when: always
     paths:
-      - back-end/build/reports/tests/
-    expire_in: 1 week
-  rules:
-    - changes:
-        - back-end/**
+      - back-end/build
+    expire_in: 1h
 
-# ----------------- FRONTEND (Node in front-end/) -----------------
-
-frontend:build:
-  stage: build
-  <<: *before_node
-  cache:
-    key: "npm-cache"
-    paths:
-      - front-end\node_modules\
+# ---------- TEST (Backend + Postgres service) ----------
+test:
+  stage: test
+  image: gradle:8.7-jdk21-alpine
+  services:
+    - name: postgres:16
+      alias: postgres
+  variables:
+    POSTGRES_DB: appdb
+    POSTGRES_USER: appuser
+    POSTGRES_PASSWORD: secret
+    # Spring Test will read these if you map them in application-*.yml or @DynamicPropertySource
+    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
+    SPRING_DATASOURCE_USERNAME: appuser
+    SPRING_DATASOURCE_PASSWORD: secret
   script:
-    - |
-      $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'front-end'
-      Push-Location $env:PROJECT_DIR
-      if (-not (Test-Path "package.json")) {
-        throw "front-end/package.json is missing. Add a Node project or disable frontend jobs."
-      }
-      npm ci
-      npm run build
-      Pop-Location
-  rules:
-    - exists:
-        - front-end/package.json
-    - changes:
-        - front-end/**
+    - cd back-end
+    - ./gradlew test --no-daemon
 
+# ---------- (Optional) Frontend build/test ----------
 frontend:test:
   stage: test
-  needs: ["frontend:build"]
-  <<: *before_node
-  cache:
-    key: "npm-cache"
-    paths:
-      - front-end\node_modules\
+  image: node:20-alpine
   script:
-    - |
-      $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'front-end'
-      Push-Location $env:PROJECT_DIR
-      npm test -- --ci
-      Pop-Location
-  artifacts:
-    when: always
-    paths:
-      - front-end/coverage/
-      - front-end/junit.xml
-    expire_in: 1 week
+    - cd front-end
+    - npm ci
+    - npm run build
+    # add: npm test -- --watchAll=false  (if you have tests)
+
+# ---------- DOCKER BUILD (uses DinD only for these jobs) ----------
+backend:docker-build:
+  stage: docker-build
+  image: docker:25
+  services: ["docker:25-dind"]
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_BUILDKIT: "1"
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build -t "$BACKEND_IMAGE:$COMMIT_TAG" back-end
+
+frontend:docker-build:
+  stage: docker-build
+  image: docker:25
+  services: ["docker:25-dind"]
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_BUILDKIT: "1"
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build -t "$FRONTEND_IMAGE:$COMMIT_TAG" front-end
+
+# ---------- PUSH (default branch only) ----------
+backend:docker-push:
+  stage: docker-push
+  image: docker:25
+  services: ["docker:25-dind"]
   rules:
-    - exists:
-        - front-end/package.json
-    - changes:
-        - front-end/**
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker push "$BACKEND_IMAGE:$COMMIT_TAG"
+    - docker tag "$BACKEND_IMAGE:$COMMIT_TAG" "$BACKEND_IMAGE:$LATEST_TAG"
+    - docker push "$BACKEND_IMAGE:$LATEST_TAG"
 
-# --------------- Sonar (placeholder) ----------------
+frontend:docker-push:
+  stage: docker-push
+  image: docker:25
+  services: ["docker:25-dind"]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker push "$FRONTEND_IMAGE:$COMMIT_TAG"
+    - docker tag "$FRONTEND_IMAGE:$COMMIT_TAG" "$FRONTEND_IMAGE:$LATEST_TAG"
+    - docker push "$FRONTEND_IMAGE:$LATEST_TAG"
 
+# ---------- SONAR (placeholder you had) ----------
 sonarqube-check:
   stage: sonarqube-check
-  needs:
-    - job: backend:test
-      optional: true
-    - job: frontend:test
-      optional: true
+  image: alpine:3.20
   script:
-    - echo "Replace with real Sonar steps (scanner, tokens, etc.)"
-  rules:
-    # Run on main regardless, or when either side changes
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - changes:
-        - back-end/**
-        - front-end/**
+    - echo "This is a demo stage replacing SonarQube analysis."
