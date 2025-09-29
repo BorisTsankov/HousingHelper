@@ -1,23 +1,23 @@
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  # Cache dirs (adjust if needed)
+  GRADLE_USER_HOME: "C:\\Windows\\System32\\config\\systemprofile\\.gradle"
+  NPM_CACHE_FOLDER: "$env:LOCALAPPDATA\\npm-cache"
 
 stages:
   - build
   - test
   - sonarqube-check
 
+# Reusable Java + Gradle wrapper detection (monorepo-safe)
 .before_java: &before_java
-  # Ensure this runs on your Windows runner
-  # tags:
-  #   - windows
   before_script:
     - |
-      # PowerShell
+      # --- PowerShell, Java setup ---
       Write-Host "CWD          : $PWD"
       Write-Host "Project dir  : $env:CI_PROJECT_DIR"
       Set-Location $env:CI_PROJECT_DIR
 
-      # JDK discovery (Adoptium)
       $jdk = Get-ChildItem 'C:\Program Files\Eclipse Adoptium' -Directory -Filter 'jdk*' |
         Sort-Object Name -Descending |
         Select-Object -First 1 -ExpandProperty FullName
@@ -25,56 +25,137 @@ stages:
       $env:JAVA_HOME = $jdk
       $env:Path = "$env:JAVA_HOME\bin;$env:Path"
       Write-Host "Using JAVA_HOME = $env:JAVA_HOME"
-      java -version
+      java -version | Write-Host
 
-      # Show what was actually checked out
-      Write-Host "`nTop level files:"; Get-ChildItem -Force | Format-Wide -Auto
-      Write-Host "`nLooking for gradle wrapper files..."
-      $gradlewCandidates = Get-ChildItem -Recurse -Force -File -Filter "gradlew*" | Select-Object -Expand FullName
-      $wrapperProps = Get-ChildItem -Recurse -Force -File -Filter "gradle-wrapper.properties" | Select-Object -Expand FullName
-      $wrapperJar   = Get-ChildItem -Recurse -Force -File -Filter "gradle-wrapper.jar" | Select-Object -Expand FullName
+# Reusable Node detection
+.before_node: &before_node
+  before_script:
+    - |
+      Write-Host "CWD          : $PWD"
+      Write-Host "Project dir  : $env:CI_PROJECT_DIR"
+      Set-Location $env:CI_PROJECT_DIR
 
-      Write-Host "gradlew candidates:`n$($gradlewCandidates -join "`n")"
-      Write-Host "gradle-wrapper.properties:`n$($wrapperProps -join "`n")"
-      Write-Host "gradle-wrapper.jar:`n$($wrapperJar -join "`n")"
+      # Try common Node locations on Windows runners
+      $possibleNode = @(
+        "$env:ProgramFiles\nodejs\node.exe",
+        "$env:ProgramFiles(x86)\nodejs\node.exe",
+        "$env:UserProfile\scoop\apps\nodejs\current\node.exe",
+        "$env:ChocolateyInstall\bin\node.exe"
+      ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 
-      if (-not $gradlewCandidates) {
-        throw "No gradlew/gradlew.bat found anywhere in the repo. Commit the Gradle wrapper (gradlew, gradlew.bat, gradle/wrapper/*)."
+      if ($possibleNode) {
+        $env:Path = (Split-Path $possibleNode) + ";" + $env:Path
       }
 
-      # Prefer Windows .bat
-      $gradlew = $gradlewCandidates | Where-Object { $_.ToLower().EndsWith("gradlew.bat") } | Select-Object -First 1
-      if (-not $gradlew) { $gradlew = $gradlewCandidates | Where-Object { $_.ToLower().EndsWith("gradlew") } | Select-Object -First 1 }
-
-      if (-not (Test-Path $gradlew)) {
-        throw "Found gradlew candidate path but it does not exist: $gradlew"
+      if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+        throw "Node.js not found on the runner. Please install Node (e.g., 'choco install nodejs-lts') and re-run."
       }
 
-      # Ensure wrapper support files exist (helps catch partial checkouts)
-      if (-not $wrapperProps -or -not $wrapperJar) {
-        throw "Gradle wrapper support files missing. Ensure gradle/wrapper/gradle-wrapper.properties and gradle/wrapper/gradle-wrapper.jar are committed."
-      }
+      node -v | Write-Host
+      npm -v  | Write-Host
 
-      $env:GRADLEW = $gradlew
-      Write-Host "Using GRADLEW = $env:GRADLEW"
+# ----------------- BACKEND JOBS (Gradle in back-end/) -----------------
 
-      # Print Gradle version via wrapper
-      & "$env:GRADLEW" --version
-
-build:
+backend:build:
   stage: build
   <<: *before_java
+  cache:
+    key: "gradle-cache"
+    paths:
+      - $GRADLE_USER_HOME\caches\
+      - $GRADLE_USER_HOME\wrapper\
   script:
-    - '& "$env:GRADLEW" assemble --stacktrace --info'
+    - |
+      $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'back-end'
+      if (-not (Test-Path (Join-Path $env:PROJECT_DIR 'gradlew.bat'))) {
+        throw "back-end/gradlew.bat not found. Ensure the wrapper is committed in back-end/."
+      }
+      Push-Location $env:PROJECT_DIR
+      & ".\gradlew.bat" --version
+      & ".\gradlew.bat" assemble --stacktrace --info
+      Pop-Location
+  rules:
+    - changes:
+        - back-end/**
 
-test:
+backend:test:
   stage: test
+  needs: ["backend:build"]
   <<: *before_java
+  cache:
+    key: "gradle-cache"
+    paths:
+      - $GRADLE_USER_HOME\caches\
+      - $GRADLE_USER_HOME\wrapper\
   script:
-    - '& "$env:GRADLEW" test --stacktrace --info'
+    - |
+      $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'back-end'
+      Push-Location $env:PROJECT_DIR
+      & ".\gradlew.bat" test --stacktrace --info
+      Pop-Location
+  artifacts:
+    when: always
+    paths:
+      - back-end/build/reports/tests/
+    expire_in: 1 week
+  rules:
+    - changes:
+        - back-end/**
+
+# ----------------- FRONTEND JOBS (Node in front-end/) -----------------
+
+frontend:build:
+  stage: build
+  <<: *before_node
+  cache:
+    key: "npm-cache"
+    paths:
+      - $NPM_CACHE_FOLDER
+      - front-end\node_modules\
+  script:
+    - |
+      $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'front-end'
+      Push-Location $env:PROJECT_DIR
+
+      # npm ci for reproducible installs
+      npm ci --cache "$env:NPM_CACHE_FOLDER" --prefer-offline
+      npm run build
+      Pop-Location
+  rules:
+    - changes:
+        - front-end/**
+
+frontend:test:
+  stage: test
+  needs: ["frontend:build"]
+  <<: *before_node
+  cache:
+    key: "npm-cache"
+    paths:
+      - $NPM_CACHE_FOLDER
+      - front-end\node_modules\
+  script:
+    - |
+      $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'front-end'
+      Push-Location $env:PROJECT_DIR
+      npm test -- --ci
+      Pop-Location
+  artifacts:
+    when: always
+    paths:
+      - front-end/coverage/
+      - front-end/junit.xml
+    expire_in: 1 week
+  rules:
+    - changes:
+        - front-end/**
+
+# --------------- Sonar (example placeholder) ----------------
 
 sonarqube-check:
   stage: sonarqube-check
-  <<: *before_java
+  needs: ["backend:test", "frontend:test"]
   script:
-    - echo "This is a demo stage replacing SonarQube analysis."
+    - echo "Replace with real Sonar steps (scanner, tokens, etc.)"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
