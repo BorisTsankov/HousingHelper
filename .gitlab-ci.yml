@@ -7,46 +7,71 @@ stages:
   - sonarqube-check
 
 .before_java: &before_java
-  # (Optional) ensure this runs on your Windows runner
+  # Ensure this runs on your Windows runner
   # tags:
   #   - windows
   before_script:
     - |
-      # PowerShell setup for Java
+      # PowerShell
+      Write-Host "CWD          : $PWD"
+      Write-Host "Project dir  : $env:CI_PROJECT_DIR"
+      Set-Location $env:CI_PROJECT_DIR
+
+      # JDK discovery (Adoptium)
       $jdk = Get-ChildItem 'C:\Program Files\Eclipse Adoptium' -Directory -Filter 'jdk*' |
         Sort-Object Name -Descending |
         Select-Object -First 1 -ExpandProperty FullName
-      if (-not $jdk) { throw "No JDK found under C:\ Program Files\Eclipse Adoptium" }
+      if (-not $jdk) { throw "No JDK found under C:\Program Files\Eclipse Adoptium" }
       $env:JAVA_HOME = $jdk
       $env:Path = "$env:JAVA_HOME\bin;$env:Path"
       Write-Host "Using JAVA_HOME = $env:JAVA_HOME"
       java -version
 
-      # Locate the Gradle wrapper (prefer Windows .bat)
-      $proj = $env:CI_PROJECT_DIR
-      if (Test-Path "$proj\gradlew.bat") {
-        $env:GRADLEW = "$proj\gradlew.bat"
-      } elseif (Test-Path "$proj\gradlew") {
-        # Fallback: POSIX script present (less ideal on Windows)
-        $env:GRADLEW = "$proj\gradlew"
-      } else {
-        throw "Gradle wrapper not found. Commit gradlew/gradlew.bat and gradle/wrapper/*"
+      # Show what was actually checked out
+      Write-Host "`nTop level files:"; Get-ChildItem -Force | Format-Wide -Auto
+      Write-Host "`nLooking for gradle wrapper files..."
+      $gradlewCandidates = Get-ChildItem -Recurse -Force -File -Filter "gradlew*" | Select-Object -Expand FullName
+      $wrapperProps = Get-ChildItem -Recurse -Force -File -Filter "gradle-wrapper.properties" | Select-Object -Expand FullName
+      $wrapperJar   = Get-ChildItem -Recurse -Force -File -Filter "gradle-wrapper.jar" | Select-Object -Expand FullName
+
+      Write-Host "gradlew candidates:`n$($gradlewCandidates -join "`n")"
+      Write-Host "gradle-wrapper.properties:`n$($wrapperProps -join "`n")"
+      Write-Host "gradle-wrapper.jar:`n$($wrapperJar -join "`n")"
+
+      if (-not $gradlewCandidates) {
+        throw "No gradlew/gradlew.bat found anywhere in the repo. Commit the Gradle wrapper (gradlew, gradlew.bat, gradle/wrapper/*)."
       }
 
-      # Show Gradle version
-      & $env:GRADLEW --version
+      # Prefer Windows .bat
+      $gradlew = $gradlewCandidates | Where-Object { $_.ToLower().EndsWith("gradlew.bat") } | Select-Object -First 1
+      if (-not $gradlew) { $gradlew = $gradlewCandidates | Where-Object { $_.ToLower().EndsWith("gradlew") } | Select-Object -First 1 }
+
+      if (-not (Test-Path $gradlew)) {
+        throw "Found gradlew candidate path but it does not exist: $gradlew"
+      }
+
+      # Ensure wrapper support files exist (helps catch partial checkouts)
+      if (-not $wrapperProps -or -not $wrapperJar) {
+        throw "Gradle wrapper support files missing. Ensure gradle/wrapper/gradle-wrapper.properties and gradle/wrapper/gradle-wrapper.jar are committed."
+      }
+
+      $env:GRADLEW = $gradlew
+      Write-Host "Using GRADLEW = $env:GRADLEW"
+
+      # Print Gradle version via wrapper
+      & "$env:GRADLEW" --version
 
 build:
   stage: build
   <<: *before_java
   script:
-    - '& $env:GRADLEW assemble'
+    - '& "$env:GRADLEW" assemble --stacktrace --info'
 
 test:
   stage: test
   <<: *before_java
   script:
-    - '& $env:GRADLEW test'
+    - '& "$env:GRADLEW" test --stacktrace --info'
 
 sonarqube-check:
   stage: sonarqube-check
