@@ -1,19 +1,18 @@
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  # Cache dirs (adjust if needed)
+  # Gradle cache location used by the Windows service account
   GRADLE_USER_HOME: "C:\\Windows\\System32\\config\\systemprofile\\.gradle"
-  NPM_CACHE_FOLDER: "$env:LOCALAPPDATA\\npm-cache"
 
 stages:
   - build
   - test
   - sonarqube-check
 
-# Reusable Java + Gradle wrapper detection (monorepo-safe)
+# ---------- Shared setup: Java ----------
 .before_java: &before_java
   before_script:
     - |
-      # --- PowerShell, Java setup ---
+      # PowerShell, Java setup
       Write-Host "CWD          : $PWD"
       Write-Host "Project dir  : $env:CI_PROJECT_DIR"
       Set-Location $env:CI_PROJECT_DIR
@@ -27,7 +26,7 @@ stages:
       Write-Host "Using JAVA_HOME = $env:JAVA_HOME"
       java -version | Write-Host
 
-# Reusable Node detection
+# ---------- Shared setup: Node ----------
 .before_node: &before_node
   before_script:
     - |
@@ -42,19 +41,16 @@ stages:
         "$env:UserProfile\scoop\apps\nodejs\current\node.exe",
         "$env:ChocolateyInstall\bin\node.exe"
       ) | Where-Object { Test-Path $_ } | Select-Object -First 1
-
-      if ($possibleNode) {
-        $env:Path = (Split-Path $possibleNode) + ";" + $env:Path
-      }
+      if ($possibleNode) { $env:Path = (Split-Path $possibleNode) + ";" + $env:Path }
 
       if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-        throw "Node.js not found on the runner. Please install Node (e.g., 'choco install nodejs-lts') and re-run."
+        throw "Node.js not found on the runner. Install Node (e.g., 'choco install nodejs-lts')."
       }
 
       node -v | Write-Host
       npm -v  | Write-Host
 
-# ----------------- BACKEND JOBS (Gradle in back-end/) -----------------
+# ----------------- BACKEND (Gradle in back-end/) -----------------
 
 backend:build:
   stage: build
@@ -68,7 +64,7 @@ backend:build:
     - |
       $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'back-end'
       if (-not (Test-Path (Join-Path $env:PROJECT_DIR 'gradlew.bat'))) {
-        throw "back-end/gradlew.bat not found. Ensure the wrapper is committed in back-end/."
+        throw "back-end/gradlew.bat not found. Commit the Gradle wrapper into back-end/."
       }
       Push-Location $env:PROJECT_DIR
       & ".\gradlew.bat" --version
@@ -102,7 +98,7 @@ backend:test:
     - changes:
         - back-end/**
 
-# ----------------- FRONTEND JOBS (Node in front-end/) -----------------
+# ----------------- FRONTEND (Node in front-end/) -----------------
 
 frontend:build:
   stage: build
@@ -110,18 +106,20 @@ frontend:build:
   cache:
     key: "npm-cache"
     paths:
-      - $NPM_CACHE_FOLDER
       - front-end\node_modules\
   script:
     - |
       $env:PROJECT_DIR = Join-Path $env:CI_PROJECT_DIR 'front-end'
       Push-Location $env:PROJECT_DIR
-
-      # npm ci for reproducible installs
-      npm ci --cache "$env:NPM_CACHE_FOLDER" --prefer-offline
+      if (-not (Test-Path "package.json")) {
+        throw "front-end/package.json is missing. Add a Node project or disable frontend jobs."
+      }
+      npm ci
       npm run build
       Pop-Location
   rules:
+    - exists:
+        - front-end/package.json
     - changes:
         - front-end/**
 
@@ -132,7 +130,6 @@ frontend:test:
   cache:
     key: "npm-cache"
     paths:
-      - $NPM_CACHE_FOLDER
       - front-end\node_modules\
   script:
     - |
@@ -147,15 +144,25 @@ frontend:test:
       - front-end/junit.xml
     expire_in: 1 week
   rules:
+    - exists:
+        - front-end/package.json
     - changes:
         - front-end/**
 
-# --------------- Sonar (example placeholder) ----------------
+# --------------- Sonar (placeholder) ----------------
 
 sonarqube-check:
   stage: sonarqube-check
-  needs: ["backend:test", "frontend:test"]
+  needs:
+    - job: backend:test
+      optional: true
+    - job: frontend:test
+      optional: true
   script:
     - echo "Replace with real Sonar steps (scanner, tokens, etc.)"
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    # Run on main regardless, or when either side changes
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - changes:
+        - back-end/**
+        - front-end/**
