@@ -1,17 +1,16 @@
-# ---- build ----
-FROM gradle:8.7-jdk21-alpine AS build
+# ---- Build stage ----
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
-COPY build.gradle settings.gradle gradlew* ./
-COPY gradle ./gradle
-RUN ./gradlew --no-daemon build -x test || return 0
-COPY . .
-RUN ./gradlew --no-daemon clean bootJar
+COPY backend/gradlew backend/gradle ./
+COPY backend/build.gradle backend/settings.gradle ./
+COPY backend/src ./src
+RUN chmod +x ./gradlew && ./gradlew clean bootJar --no-daemon
 
-# ---- run ----
-FROM eclipse-temurin:21-jre-alpine
+# ---- Runtime stage ----
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-ENV JAVA_OPTS="-Xms256m -Xmx512m"
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+# Copy final fat jar
+COPY --from=build /app/build/libs/*.jar app.jar
+# Expose your app port
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=5s CMD wget -qO- http://localhost:8080/actuator/health || exit 1
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["java","-jar","/app/app.jar"]

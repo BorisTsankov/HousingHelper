@@ -1,109 +1,165 @@
-variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  BACKEND_IMAGE: "$CI_REGISTRY_IMAGE/backend"
-  FRONTEND_IMAGE: "$CI_REGISTRY_IMAGE/frontend"
-  COMMIT_TAG: "$CI_COMMIT_SHORT_SHA"
-  LATEST_TAG: "latest"
-
 stages:
-  - build
+  - lint
   - test
-  - docker-build
-  - docker-push
-  - sonarqube-check
+  - build
+  - package
+  - deploy
 
-# ---------- BUILD ----------
-build:
-  stage: build
-  image: gradle:8.7-jdk21-alpine
-  script:
-    - cd back-end
-    - ./gradlew assemble --no-daemon
-  artifacts:
+# -------- Common anchors (DRY) --------
+.default-docker:
+  image: alpine:3.20
+  before_script:
+    - apk add --no-cache bash curl git coreutils
+
+# Frontend base image (Node 18 LTS)
+.node:
+  image: node:18-bullseye
+  cache:
+    key:
+      files:
+        - frontend/package-lock.json
     paths:
-      - back-end/build
-    expire_in: 1h
+      - frontend/node_modules/
+  before_script:
+    - cd frontend
+    - node -v
+    - npm ci
 
-# ---------- TEST (Backend + Postgres service) ----------
-test:
-  stage: test
-  image: gradle:8.7-jdk21-alpine
-  services:
-    - name: postgres:16
-      alias: postgres
+# Backend base image (Temurin JDK 21 + Gradle wrapper)
+.gradle:
+  image: eclipse-temurin:21-jdk
   variables:
-    POSTGRES_DB: appdb
-    POSTGRES_USER: appuser
-    POSTGRES_PASSWORD: secret
-    # Spring Test will read these if you map them in application-*.yml or @DynamicPropertySource
-    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
-    SPRING_DATASOURCE_USERNAME: appuser
-    SPRING_DATASOURCE_PASSWORD: secret
-  script:
-    - cd back-end
-    - ./gradlew test --no-daemon
+    GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  cache:
+    key:
+      files:
+        - backend/gradle/wrapper/gradle-wrapper.properties
+        - backend/build.gradle
+        - backend/settings.gradle
+      prefix: gradle-cache
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches
+  before_script:
+    - cd backend
+    - java -version
+    - chmod +x ./gradlew
 
-# ---------- (Optional) Frontend build/test ----------
+# -------- FRONTEND JOBS --------
+frontend:lint:
+  stage: lint
+  extends: [.node]
+  rules:
+    - changes:
+        - frontend/**/*
+  script:
+    - npm run lint
+
 frontend:test:
   stage: test
-  image: node:20-alpine
+  extends: [.node]
+  needs: ["frontend:lint"]
+  rules:
+    - changes:
+        - frontend/**/*
   script:
-    - cd front-end
-    - npm ci
+    - npm test -- --ci --watchAll=false
+
+frontend:build:
+  stage: build
+  extends: [.node]
+  needs: ["frontend:test"]
+  rules:
+    - changes:
+        - frontend/**/*
+  script:
     - npm run build
-    # add: npm test -- --watchAll=false  (if you have tests)
+  artifacts:
+    paths:
+      - frontend/build
+    expire_in: 3 days
 
-# ---------- DOCKER BUILD (uses DinD only for these jobs) ----------
-backend:docker-build:
-  stage: docker-build
-  image: docker:25
-  services: ["docker:25-dind"]
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_BUILDKIT: "1"
-  script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker build -t "$BACKEND_IMAGE:$COMMIT_TAG" back-end
-
-frontend:docker-build:
-  stage: docker-build
-  image: docker:25
-  services: ["docker:25-dind"]
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_BUILDKIT: "1"
-  script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker build -t "$FRONTEND_IMAGE:$COMMIT_TAG" front-end
-
-# ---------- PUSH (default branch only) ----------
-backend:docker-push:
-  stage: docker-push
-  image: docker:25
-  services: ["docker:25-dind"]
+# Optional: build a Docker image for the frontend (static file server, Nginx, etc.)
+frontend:package:
+  stage: package
+  extends: [.default-docker]
+  needs: ["frontend:build"]
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH
+      changes:
+        - frontend/**/*
+  variables:
+    IMAGE_NAME: "$CI_REGISTRY_IMAGE/frontend"
+    IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
   script:
+    - echo "Logging in to GitLab Registry"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker push "$BACKEND_IMAGE:$COMMIT_TAG"
-    - docker tag "$BACKEND_IMAGE:$COMMIT_TAG" "$BACKEND_IMAGE:$LATEST_TAG"
-    - docker push "$BACKEND_IMAGE:$LATEST_TAG"
+    - docker build -t "$IMAGE_NAME:$IMAGE_TAG" -f frontend/Dockerfile .
+    - docker push "$IMAGE_NAME:$IMAGE_TAG"
 
-frontend:docker-push:
-  stage: docker-push
-  image: docker:25
-  services: ["docker:25-dind"]
+# -------- BACKEND JOBS --------
+backend:lint:
+  stage: lint
+  extends: [.gradle]
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - changes:
+        - backend/**/*
   script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker push "$FRONTEND_IMAGE:$COMMIT_TAG"
-    - docker tag "$FRONTEND_IMAGE:$COMMIT_TAG" "$FRONTEND_IMAGE:$LATEST_TAG"
-    - docker push "$FRONTEND_IMAGE:$LATEST_TAG"
+    # If you use Spotless/Checkstyle/PMD; adjust accordingly
+    - ./gradlew spotlessCheck || ./gradlew checkstyleMain checkstyleTest
 
-# ---------- SONAR (placeholder you had) ----------
-sonarqube-check:
-  stage: sonarqube-check
-  image: alpine:3.20
+backend:test:
+  stage: test
+  extends: [.gradle]
+  needs: ["backend:lint"]
+  rules:
+    - changes:
+        - backend/**/*
   script:
-    - echo "This is a demo stage replacing SonarQube analysis."
+    - ./gradlew test
+  artifacts:
+    when: always
+    reports:
+      junit: backend/build/test-results/test/*.xml
+
+backend:build:
+  stage: build
+  extends: [.gradle]
+  needs: ["backend:test"]
+  rules:
+    - changes:
+        - backend/**/*
+  script:
+    - ./gradlew clean bootJar
+  artifacts:
+    paths:
+      - backend/build/libs/*.jar
+    expire_in: 3 days
+
+# Optional: build a Docker image for the backend
+backend:package:
+  stage: package
+  extends: [.default-docker]
+  needs: ["backend:build"]
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      changes:
+        - backend/**/*
+  variables:
+    IMAGE_NAME: "$CI_REGISTRY_IMAGE/backend"
+    IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+  script:
+    - echo "Logging in to GitLab Registry"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build -t "$IMAGE_NAME:$IMAGE_TAG" -f backend/Dockerfile .
+    - docker push "$IMAGE_NAME:$IMAGE_TAG"
+
+# -------- Optional deploy placeholders --------
+deploy:staging:
+  stage: deploy
+  extends: [.default-docker]
+  needs: ["backend:package", "frontend:package"]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  script:
+    - echo "Deploy your images $CI_REGISTRY_IMAGE/backend and /frontend to staging here (kubectl/ssh/ansible/etc.)"
