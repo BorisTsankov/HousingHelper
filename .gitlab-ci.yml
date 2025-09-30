@@ -35,7 +35,6 @@ stages:
       files:
         - backend/gradle/wrapper/gradle-wrapper.properties
         - backend/build.gradle
-        - backend/settings.gradle
       prefix: gradle-cache
     paths:
       - .gradle/wrapper
