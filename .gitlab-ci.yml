@@ -157,8 +157,12 @@ backend:package:
 deploy:staging:
   stage: deploy
   extends: [.default-docker]
-  needs: ["backend:package", "frontend:package"]
+  needs:
+    - job: backend:package
+      optional: true
+    - job: frontend:package
+      optional: true
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   script:
-    - echo "Deploy your images $CI_REGISTRY_IMAGE/backend and /frontend to staging here (kubectl/ssh/ansible/etc.)"
+    - echo "Deploy images if they were built"
