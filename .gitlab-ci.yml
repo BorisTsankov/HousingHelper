@@ -34,7 +34,7 @@ stages:
     key:
       files:
         - backend/gradle/wrapper/gradle-wrapper.properties
-        - backend/build.gradle
+        - backend/build.gradle         # (max 2 files in key)
       prefix: gradle-cache
     paths:
       - .gradle/wrapper
@@ -44,13 +44,10 @@ stages:
     - java -version
     - chmod +x ./gradlew
 
-# -------- FRONTEND JOBS --------
+# ==================== FRONTEND ====================
 frontend:lint:
   stage: lint
   extends: [.node]
-  rules:
-    - changes:
-        - frontend/**/*
   script:
     - npm run lint
 
@@ -58,9 +55,6 @@ frontend:test:
   stage: test
   extends: [.node]
   needs: ["frontend:lint"]
-  rules:
-    - changes:
-        - frontend/**/*
   script:
     - npm test -- --ci --watchAll=false
 
@@ -68,9 +62,6 @@ frontend:build:
   stage: build
   extends: [.node]
   needs: ["frontend:test"]
-  rules:
-    - changes:
-        - frontend/**/*
   script:
     - npm run build
   artifacts:
@@ -78,42 +69,35 @@ frontend:build:
       - frontend/build
     expire_in: 3 days
 
-# Optional: build a Docker image for the frontend (static file server, Nginx, etc.)
+# Build & push image only on main and tags
 frontend:package:
   stage: package
   extends: [.default-docker]
   needs: ["frontend:build"]
   rules:
-    - if: $CI_COMMIT_BRANCH
-      changes:
-        - frontend/**/*
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_TAG'   # any tag
+    - when: never
   variables:
     IMAGE_NAME: "$CI_REGISTRY_IMAGE/frontend"
     IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
   script:
-    - echo "Logging in to GitLab Registry"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - docker build -t "$IMAGE_NAME:$IMAGE_TAG" -f frontend/Dockerfile .
     - docker push "$IMAGE_NAME:$IMAGE_TAG"
 
-# -------- BACKEND JOBS --------
+# ==================== BACKEND ====================
 backend:lint:
   stage: lint
   extends: [.gradle]
-  rules:
-    - changes:
-        - backend/**/*
   script:
-    # If you use Spotless/Checkstyle/PMD; adjust accordingly
+    # Adjust to your linters; Spotless/Checkstyle examples:
     - ./gradlew spotlessCheck || ./gradlew checkstyleMain checkstyleTest
 
 backend:test:
   stage: test
   extends: [.gradle]
   needs: ["backend:lint"]
-  rules:
-    - changes:
-        - backend/**/*
   script:
     - ./gradlew test
   artifacts:
@@ -125,9 +109,6 @@ backend:build:
   stage: build
   extends: [.gradle]
   needs: ["backend:test"]
-  rules:
-    - changes:
-        - backend/**/*
   script:
     - ./gradlew clean bootJar
   artifacts:
@@ -135,34 +116,32 @@ backend:build:
       - backend/build/libs/*.jar
     expire_in: 3 days
 
-# Optional: build a Docker image for the backend
+# Build & push image only on main and tags
 backend:package:
   stage: package
   extends: [.default-docker]
   needs: ["backend:build"]
   rules:
-    - if: $CI_COMMIT_BRANCH
-      changes:
-        - backend/**/*
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_TAG'   # any tag
+    - when: never
   variables:
     IMAGE_NAME: "$CI_REGISTRY_IMAGE/backend"
     IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
   script:
-    - echo "Logging in to GitLab Registry"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - docker build -t "$IMAGE_NAME:$IMAGE_TAG" -f backend/Dockerfile .
     - docker push "$IMAGE_NAME:$IMAGE_TAG"
 
-# -------- Optional deploy placeholders --------
+# ==================== DEPLOY ====================
 deploy:staging:
   stage: deploy
   extends: [.default-docker]
   needs:
-    - job: backend:package
-      optional: true
-    - job: frontend:package
-      optional: true
+    - backend:package
+    - frontend:package
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - when: never
   script:
-    - echo "Deploy images if they were built"
+    - echo "Deploy images $CI_REGISTRY_IMAGE/backend and $CI_REGISTRY_IMAGE/frontend to staging..."
