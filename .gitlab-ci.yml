@@ -8,7 +8,7 @@ stages:
 
 # ---------- shared anchors ----------
 .default-node:
-  image: node:20-bullseye   # ← Node 20 to satisfy vite/react-router engines
+  image: node:20-bullseye   # Node 20 to satisfy vite/react-router engines
   cache:
     key: npm-cache
     paths:
@@ -19,9 +19,27 @@ stages:
     - npm ci
 
 .default-gradle:
-  image: eclipse-temurin:17-jdk   # ← JDK 17 to match Gradle toolchain requirement
+  image: eclipse-temurin:17-jdk   # JDK 17 to match Gradle toolchain requirement
+  services:
+    - name: postgres:16-alpine
+      alias: postgres
   variables:
     GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+    # Postgres service credentials
+    POSTGRES_DB: appdb
+    POSTGRES_USER: app
+    POSTGRES_PASSWORD: secret
+
+    # Spring points to the Postgres service via Docker DNS
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/appdb"
+    SPRING_DATASOURCE_USERNAME: "app"
+    SPRING_DATASOURCE_PASSWORD: "secret"
+
+    # Keep if Flyway is configured separately; remove if it reuses the datasource
+    SPRING_FLYWAY_URL: "jdbc:postgresql://postgres:5432/appdb"
+    SPRING_FLYWAY_USER: "app"
+    SPRING_FLYWAY_PASSWORD: "secret"
   cache:
     key: gradle-cache
     paths:
@@ -31,6 +49,9 @@ stages:
     - cd back-end
     - java -version
     - chmod +x ./gradlew
+    # Wait for Postgres to accept connections
+    - apt-get update -y >/dev/null && apt-get install -y postgresql-client >/dev/null
+    - until pg_isready -h postgres -p 5432 -U "$POSTGRES_USER"; do echo "Waiting for Postgres..."; sleep 1; done
 
 # ================= FRONT-END =================
 build:frontend:
@@ -40,7 +61,7 @@ build:frontend:
     - npm run build
   artifacts:
     paths:
-      - front-end/dist    # ← vite default output
+      - front-end/dist   # Vite default output
     expire_in: 3 days
 
 test:frontend:
