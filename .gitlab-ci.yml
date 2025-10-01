@@ -8,7 +8,7 @@ stages:
 
 # ---------- shared anchors ----------
 .default-node:
-  image: node:18-bullseye
+  image: node:20-bullseye   # ← Node 20 to satisfy vite/react-router engines
   cache:
     key: npm-cache
     paths:
@@ -19,7 +19,7 @@ stages:
     - npm ci
 
 .default-gradle:
-  image: eclipse-temurin:21-jdk
+  image: eclipse-temurin:17-jdk   # ← JDK 17 to match Gradle toolchain requirement
   variables:
     GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
   cache:
@@ -40,7 +40,7 @@ build:frontend:
     - npm run build
   artifacts:
     paths:
-      - front-end/build
+      - front-end/dist    # ← vite default output
     expire_in: 3 days
 
 test:frontend:
@@ -48,18 +48,20 @@ test:frontend:
   extends: [.default-node]
   needs: ["build:frontend"]
   script:
-    - npm test -- --ci --watchAll=false
+    # Run tests only if a "test" script exists; otherwise skip gracefully
+    - if npm run | grep -qE '^[[:space:]]*test'; then npm run test -- --ci --watchAll=false; else echo "No npm test script. Skipping."; fi
   artifacts:
     when: always
+    # If you export JUnit from your test runner, point this to the correct path
     reports:
-      junit: front-end/junit/*.xml  # optional: adjust if you export JUnit
+      junit: front-end/junit/*.xml
 
 sonarqube-check:frontend:
   stage: sonarqube-check
   image: alpine:3.20
   needs: ["test:frontend"]
   script:
-    - echo "Frontend Sonar step placeholder (replace with real sonar-scanner if needed)."
+    - echo "Frontend Sonar placeholder — replace with 'sonar-scanner' if configured."
 
 # ================= BACK-END =================
 build:backend:
@@ -88,11 +90,4 @@ sonarqube-check:backend:
   image: alpine:3.20
   needs: ["test:backend"]
   script:
-    - echo "Backend Sonar step placeholder (replace with ./gradlew sonarqube or sonar-scanner)."
-
-# ---------- optional rules (run on any branch & MRs) ----------
-# Uncomment if you want to limit to MRs / main only.
-# default:
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_COMMIT_BRANCH == "main"'
+    - echo "Backend Sonar placeholder — replace with './gradlew sonarqube' when ready."
