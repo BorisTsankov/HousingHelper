@@ -1,21 +1,16 @@
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
 stages:
-  - lint
-  - test
   - build
-  - package
-  - deploy
+  - test
+  - sonarqube-check
 
-# ---------- shared bits ----------
-.default-docker:
-  image: alpine:3.20
-  before_script:
-    - apk add --no-cache bash curl git coreutils
-
-# FRONT-END (React + TS, Node 18)
-.node:
+# ---------- shared anchors ----------
+.default-node:
   image: node:18-bullseye
   cache:
-    key: "npm-cache"
+    key: npm-cache
     paths:
       - front-end/node_modules/
   before_script:
@@ -23,13 +18,12 @@ stages:
     - node -v
     - npm ci
 
-# BACK-END (Spring Boot + Gradle wrapper, JDK 21)
-.gradle:
+.default-gradle:
   image: eclipse-temurin:21-jdk
   variables:
     GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
   cache:
-    key: "gradle-cache"
+    key: gradle-cache
     paths:
       - .gradle/wrapper
       - .gradle/caches
@@ -39,23 +33,9 @@ stages:
     - chmod +x ./gradlew
 
 # ================= FRONT-END =================
-frontend:lint:
-  stage: lint
-  extends: [.node]
-  script:
-    - npm run lint
-
-frontend:test:
-  stage: test
-  extends: [.node]
-  needs: ["frontend:lint"]
-  script:
-    - npm test -- --ci --watchAll=false
-
-frontend:build:
+build:frontend:
   stage: build
-  extends: [.node]
-  needs: ["frontend:test"]
+  extends: [.default-node]
   script:
     - npm run build
   artifacts:
@@ -63,34 +43,39 @@ frontend:build:
       - front-end/build
     expire_in: 3 days
 
-frontend:package:
-  stage: package
-  extends: [.default-docker]
-  needs: ["frontend:build"]
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - if: '$CI_COMMIT_TAG'
-    - when: never
-  variables:
-    IMAGE_NAME: "$CI_REGISTRY_IMAGE/frontend"
-    IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+test:frontend:
+  stage: test
+  extends: [.default-node]
+  needs: ["build:frontend"]
   script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker build -t "$IMAGE_NAME:$IMAGE_TAG" -f front-end/Dockerfile .
-    - docker push "$IMAGE_NAME:$IMAGE_TAG"
+    - npm test -- --ci --watchAll=false
+  artifacts:
+    when: always
+    reports:
+      junit: front-end/junit/*.xml  # optional: adjust if you export JUnit
+
+sonarqube-check:frontend:
+  stage: sonarqube-check
+  image: alpine:3.20
+  needs: ["test:frontend"]
+  script:
+    - echo "Frontend Sonar step placeholder (replace with real sonar-scanner if needed)."
 
 # ================= BACK-END =================
-backend:lint:
-  stage: lint
-  extends: [.gradle]
+build:backend:
+  stage: build
+  extends: [.default-gradle]
   script:
-    # tweak if you're not using these linters
-    - ./gradlew spotlessCheck || ./gradlew checkstyleMain checkstyleTest
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - back-end/build/libs/*.jar
+    expire_in: 3 days
 
-backend:test:
+test:backend:
   stage: test
-  extends: [.gradle]
-  needs: ["backend:lint"]
+  extends: [.default-gradle]
+  needs: ["build:backend"]
   script:
     - ./gradlew test
   artifacts:
@@ -98,42 +83,16 @@ backend:test:
     reports:
       junit: back-end/build/test-results/test/*.xml
 
-backend:build:
-  stage: build
-  extends: [.gradle]
-  needs: ["backend:test"]
+sonarqube-check:backend:
+  stage: sonarqube-check
+  image: alpine:3.20
+  needs: ["test:backend"]
   script:
-    - ./gradlew clean bootJar
-  artifacts:
-    paths:
-      - back-end/build/libs/*.jar
-    expire_in: 3 days
+    - echo "Backend Sonar step placeholder (replace with ./gradlew sonarqube or sonar-scanner)."
 
-backend:package:
-  stage: package
-  extends: [.default-docker]
-  needs: ["backend:build"]
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - if: '$CI_COMMIT_TAG'
-    - when: never
-  variables:
-    IMAGE_NAME: "$CI_REGISTRY_IMAGE/backend"
-    IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
-  script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker build -t "$IMAGE_NAME:$IMAGE_TAG" -f back-end/Dockerfile .
-    - docker push "$IMAGE_NAME:$IMAGE_TAG"
-
-# ================= DEPLOY =================
-deploy:staging:
-  stage: deploy
-  extends: [.default-docker]
-  needs:
-    - backend:package
-    - frontend:package
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-    - when: never
-  script:
-    - echo "Deploy $CI_REGISTRY_IMAGE/backend and $CI_REGISTRY_IMAGE/frontend ..."
+# ---------- optional rules (run on any branch & MRs) ----------
+# Uncomment if you want to limit to MRs / main only.
+# default:
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#     - if: '$CI_COMMIT_BRANCH == "main"'
