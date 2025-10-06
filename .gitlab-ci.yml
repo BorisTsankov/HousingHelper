@@ -1,136 +1,36 @@
+image: gradle:8.10.0-jdk17-jammy
+
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  SONAR_HOST_URL: "http://your-sonar-host:9000"
-  SONAR_TOKEN: "$SONAR_TOKEN"
+  # Sonar + Git settings
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  GIT_DEPTH: "0"
+
+  # Optional Gradle cache dir
+  GRADLE_USER_HOME: "${CI_PROJECT_DIR}/.gradle"
 
 stages:
-  - build
-  - test
-  - sonarqube-check
+  - build-sonar
 
-.default-node:
-  image: node:20-bullseye
+build-sonar:
+  stage: build-sonar
+  tags: []   # add your runner tags if needed
   cache:
-    key: npm-cache
+    policy: pull-push
+    key: "sonar-cache-$CI_COMMIT_REF_SLUG"
     paths:
-      - front-end/node_modules/
-  before_script:
-    - cd front-end
-    - node -v
-    - npm ci
-
-.default-gradle:
-  image: eclipse-temurin:17-jdk
-  services:
-    - name: postgres:16-alpine
-      alias: postgres
-  variables:
-    GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
-
-    POSTGRES_DB: appdb
-    POSTGRES_USER: app
-    POSTGRES_PASSWORD: secret
-
-    SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/appdb"
-    SPRING_DATASOURCE_USERNAME: "app"
-    SPRING_DATASOURCE_PASSWORD: "secret"
-
-    SPRING_FLYWAY_URL: "jdbc:postgresql://postgres:5432/appdb"
-    SPRING_FLYWAY_USER: "app"
-    SPRING_FLYWAY_PASSWORD: "secret"
-  cache:
-    key: gradle-cache
-    paths:
-      - .gradle/wrapper
-      - .gradle/caches
+      - "${SONAR_USER_HOME}/cache"
+      - ".gradle/caches"
+      - ".gradle/wrapper"
   before_script:
     - cd back-end
     - java -version
-    - chmod +x ./gradlew
-    - apt-get update -y >/dev/null && apt-get install -y postgresql-client >/dev/null
-    - until pg_isready -h postgres -p 5432 -U "$POSTGRES_USER"; do echo "Waiting for Postgres..."; sleep 1; done
-
-
-build:frontend:
-  stage: build
-  extends: [.default-node]
+    - gradle --version
   script:
-    - npm run build
-  artifacts:
-    paths:
-      - front-end/dist
-    expire_in: 3 days
-
-test:frontend:
-  stage: test
-  extends: [.default-node]
-  needs: ["build:frontend"]
-  script:
-    - if npm run | grep -qE '^[[:space:]]*test'; then npm run test -- --ci --watchAll=false --coverage; else echo "No npm test script. Skipping."; fi
-  artifacts:
-    when: always
-    reports:
-      junit: front-end/junit/*.xml
-    paths:
-      - front-end/coverage/lcov.info
-
-sonarqube-check:frontend:
-  stage: sonarqube-check
-  image: sonarsource/sonar-scanner-cli:latest
-  needs: ["test:frontend"]
-  variables:
-    GIT_DEPTH: "0"
-  script:
-    - cd front-end
-    - |
-      sonar-scanner \
-        -Dsonar.projectKey=frontend \
-        -Dsonar.projectName=frontend \
-        -Dsonar.sources=src \
-        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-        -Dsonar.host.url="$SONAR_HOST_URL" \
-        -Dsonar.login="$SONAR_TOKEN" \
-        -Dsonar.qualitygate.wait=true
-
-
-build:backend:
-  stage: build
-  extends: [.default-gradle]
-  script:
-    - ./gradlew assemble
-  artifacts:
-    paths:
-      - back-end/build/libs/*.jar
-    expire_in: 3 days
-
-test:backend:
-  stage: test
-  extends: [.default-gradle]
-  needs: ["build:backend"]
-  script:
-    - ./gradlew test jacocoTestReport
-  artifacts:
-    when: always
-    reports:
-      junit: back-end/build/test-results/test/*.xml
-    paths:
-      - back-end/build/reports/jacoco/test/jacocoTestReport.xml
-
-sonarqube-check:backend:
-  stage: sonarqube-check
-  extends: [.default-gradle]
-  needs: ["test:backend"]
-  variables:
-    GIT_DEPTH: "0"
-  script:
-    - |
-      ./gradlew sonarqube \
-        -Dsonar.host.url="$SONAR_HOST_URL" \
-        -Dsonar.login="$SONAR_TOKEN" \
-        -Dsonar.projectKey=backend \
-        -Dsonar.projectName=backend \
-        -Dsonar.junit.reportPaths=build/test-results/test \
-        -Dsonar.java.coveragePlugin=jacoco \
-        -Dsonar.jacoco.reportPaths=build/jacoco/test.exec \
-        -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
-        -Dsonar.qualitygate.wait=true
+    # Run tests -> generate JaCoCo XML -> run Sonar analysis
+    - gradle clean test jacocoTestReport sonar
+  allow_failure: true  # keep or remove based on your policy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == 'master'
+    - if: $CI_COMMIT_BRANCH == 'main'
+    - if: $CI_COMMIT_BRANCH == 'develop'

@@ -16,9 +16,7 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -41,7 +39,6 @@ test {
 }
 
 jacoco {
-    // optional but explicit
     toolVersion = "0.8.12"
 }
 
@@ -54,13 +51,25 @@ tasks.jacocoTestReport {
     }
 }
 
-// Keep project identity here; pass credentials/host via CI variables/CLI
-sonarqube {
+// New plugin DSL (v6+) — uses the 'sonar' task
+sonar {
     properties {
+        // Project identity
         property "sonar.projectKey", "I547859_housinghelper_ae8e7364-5047-4633-b1b8-b09df4130bef"
         property "sonar.projectName", "HousingHelper"
-        // Optional local hints (CI passes these anyway):
-        // property "sonar.junit.reportPaths", "build/test-results/test"
-        // property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+
+        // Quality Gate blocking in CI
+        property "sonar.qualitygate.wait", "true"
+
+        // Reports
+        property "sonar.junit.reportPaths", "build/test-results/test"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+
+        // Read host/token from CI environment
+        property "sonar.host.url", System.getenv("SONAR_HOST_URL")
+        // For plugin 6.x, prefer 'sonar.token'. If not set, scanners also honor SONAR_TOKEN env.
+        if (System.getenv("SONAR_TOKEN") != null) {
+            property "sonar.token", System.getenv("SONAR_TOKEN")
+        }
     }
 }
