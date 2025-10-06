@@ -1,7 +1,9 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.sonarqube' version '6.3.1.5724'
 }
 
 group = 'nl.fontys.s3'
@@ -22,29 +24,43 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // Flyway: core at compile time, database module only at runtime
+    // Flyway
     implementation 'org.flywaydb:flyway-core:11.7.2'
     runtimeOnly   'org.flywaydb:flyway-database-postgresql:11.7.2'
 
-    // JDBC driver only at runtime
+    // JDBC driver
     runtimeOnly 'org.postgresql:postgresql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
-plugins {
-    id "org.sonarqube" version "6.3.1.5724"
+jacoco {
+    // optional but explicit
+    toolVersion = "0.8.12"
 }
 
-sonar {
+tasks.jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true   // Sonar needs XML
+        html.required = true
+        csv.required = false
+    }
+}
+
+// Keep project identity here; pass credentials/host via CI variables/CLI
+sonarqube {
     properties {
         property "sonar.projectKey", "I547859_housinghelper_ae8e7364-5047-4633-b1b8-b09df4130bef"
         property "sonar.projectName", "HousingHelper"
-        property "sonar.qualitygate.wait", true
+        // Optional local hints (CI passes these anyway):
+        // property "sonar.junit.reportPaths", "build/test-results/test"
+        // property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
     }
 }

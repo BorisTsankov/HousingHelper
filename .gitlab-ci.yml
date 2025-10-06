@@ -1,7 +1,6 @@
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  # Set these in GitLab → Settings → CI/CD → Variables (masked & protected as needed)
-  SONAR_HOST_URL: "http://your-sonar-host:9000"   # e.g., http://sonar.yourdomain.tld:9000
+  SONAR_HOST_URL: "http://your-sonar-host:9000"
   SONAR_TOKEN: "$SONAR_TOKEN"
 
 stages:
@@ -9,7 +8,6 @@ stages:
   - test
   - sonarqube-check
 
-# ---------- shared anchors ----------
 .default-node:
   image: node:20-bullseye
   cache:
@@ -52,7 +50,7 @@ stages:
     - apt-get update -y >/dev/null && apt-get install -y postgresql-client >/dev/null
     - until pg_isready -h postgres -p 5432 -U "$POSTGRES_USER"; do echo "Waiting for Postgres..."; sleep 1; done
 
-# ================= FRONT-END =================
+
 build:frontend:
   stage: build
   extends: [.default-node]
@@ -68,7 +66,6 @@ test:frontend:
   extends: [.default-node]
   needs: ["build:frontend"]
   script:
-    # If you use Vitest/Jest, enable coverage so Sonar can pick up LCOV
     - if npm run | grep -qE '^[[:space:]]*test'; then npm run test -- --ci --watchAll=false --coverage; else echo "No npm test script. Skipping."; fi
   artifacts:
     when: always
@@ -82,7 +79,7 @@ sonarqube-check:frontend:
   image: sonarsource/sonar-scanner-cli:latest
   needs: ["test:frontend"]
   variables:
-    GIT_DEPTH: "0"   # allow scanner to compute blame info
+    GIT_DEPTH: "0"
   script:
     - cd front-end
     - |
@@ -95,7 +92,7 @@ sonarqube-check:frontend:
         -Dsonar.login="$SONAR_TOKEN" \
         -Dsonar.qualitygate.wait=true
 
-# ================= BACK-END =================
+
 build:backend:
   stage: build
   extends: [.default-gradle]
