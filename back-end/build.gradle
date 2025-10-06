@@ -6,14 +6,8 @@ plugins {
     id 'org.sonarqube' version '6.3.1.5724'
 }
 
-group = 'nl.fontys.s3'
-version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
-
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+    toolchain { languageVersion = JavaLanguageVersion.of(17) }
 }
 
 repositories { mavenCentral() }
@@ -22,15 +16,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // Flyway
     implementation 'org.flywaydb:flyway-core:11.7.2'
     runtimeOnly   'org.flywaydb:flyway-database-postgresql:11.7.2'
-
-    // JDBC driver
     runtimeOnly 'org.postgresql:postgresql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Fast CI: H2 for unit tests (DB-free)
+    testImplementation 'com.h2database:h2'
 }
 
 test {
@@ -45,29 +39,22 @@ jacoco {
 tasks.jacocoTestReport {
     dependsOn test
     reports {
-        xml.required = true   // Sonar needs XML
+        xml.required = true
         html.required = true
         csv.required = false
     }
 }
 
-// New plugin DSL (v6+) — uses the 'sonar' task
 sonar {
     properties {
-        // Project identity
         property "sonar.projectKey", "I547859_housinghelper_ae8e7364-5047-4633-b1b8-b09df4130bef"
         property "sonar.projectName", "HousingHelper"
-
-        // Quality Gate blocking in CI
         property "sonar.qualitygate.wait", "true"
 
-        // Reports
         property "sonar.junit.reportPaths", "build/test-results/test"
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
 
-        // Read host/token from CI environment
         property "sonar.host.url", System.getenv("SONAR_HOST_URL")
-        // For plugin 6.x, prefer 'sonar.token'. If not set, scanners also honor SONAR_TOKEN env.
         if (System.getenv("SONAR_TOKEN") != null) {
             property "sonar.token", System.getenv("SONAR_TOKEN")
         }
