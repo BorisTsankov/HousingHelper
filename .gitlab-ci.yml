@@ -1,5 +1,8 @@
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  # Set these in GitLab → Settings → CI/CD → Variables (masked & protected as needed)
+  SONAR_HOST_URL: "http://your-sonar-host:9000"   # e.g., http://sonar.yourdomain.tld:9000
+  SONAR_TOKEN: "$SONAR_TOKEN"
 
 stages:
   - build
@@ -8,7 +11,7 @@ stages:
 
 # ---------- shared anchors ----------
 .default-node:
-  image: node:20-bullseye   # Node 20 to satisfy vite/react-router engines
+  image: node:20-bullseye
   cache:
     key: npm-cache
     paths:
@@ -19,24 +22,21 @@ stages:
     - npm ci
 
 .default-gradle:
-  image: eclipse-temurin:17-jdk   # JDK 17 to match Gradle toolchain requirement
+  image: eclipse-temurin:17-jdk
   services:
     - name: postgres:16-alpine
       alias: postgres
   variables:
     GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
 
-    # Postgres service credentials
     POSTGRES_DB: appdb
     POSTGRES_USER: app
     POSTGRES_PASSWORD: secret
 
-    # Spring points to the Postgres service via Docker DNS
     SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/appdb"
     SPRING_DATASOURCE_USERNAME: "app"
     SPRING_DATASOURCE_PASSWORD: "secret"
 
-    # Keep if Flyway is configured separately; remove if it reuses the datasource
     SPRING_FLYWAY_URL: "jdbc:postgresql://postgres:5432/appdb"
     SPRING_FLYWAY_USER: "app"
     SPRING_FLYWAY_PASSWORD: "secret"
@@ -49,7 +49,6 @@ stages:
     - cd back-end
     - java -version
     - chmod +x ./gradlew
-    # Wait for Postgres to accept connections
     - apt-get update -y >/dev/null && apt-get install -y postgresql-client >/dev/null
     - until pg_isready -h postgres -p 5432 -U "$POSTGRES_USER"; do echo "Waiting for Postgres..."; sleep 1; done
 
@@ -61,7 +60,7 @@ build:frontend:
     - npm run build
   artifacts:
     paths:
-      - front-end/dist   # Vite default output
+      - front-end/dist
     expire_in: 3 days
 
 test:frontend:
@@ -69,20 +68,32 @@ test:frontend:
   extends: [.default-node]
   needs: ["build:frontend"]
   script:
-    # Run tests only if a "test" script exists; otherwise skip gracefully
-    - if npm run | grep -qE '^[[:space:]]*test'; then npm run test -- --ci --watchAll=false; else echo "No npm test script. Skipping."; fi
+    # If you use Vitest/Jest, enable coverage so Sonar can pick up LCOV
+    - if npm run | grep -qE '^[[:space:]]*test'; then npm run test -- --ci --watchAll=false --coverage; else echo "No npm test script. Skipping."; fi
   artifacts:
     when: always
-    # If you export JUnit from your test runner, point this to the correct path
     reports:
       junit: front-end/junit/*.xml
+    paths:
+      - front-end/coverage/lcov.info
 
 sonarqube-check:frontend:
   stage: sonarqube-check
-  image: alpine:3.20
+  image: sonarsource/sonar-scanner-cli:latest
   needs: ["test:frontend"]
+  variables:
+    GIT_DEPTH: "0"   # allow scanner to compute blame info
   script:
-    - echo "Frontend Sonar placeholder — replace with 'sonar-scanner' if configured."
+    - cd front-end
+    - |
+      sonar-scanner \
+        -Dsonar.projectKey=frontend \
+        -Dsonar.projectName=frontend \
+        -Dsonar.sources=src \
+        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+        -Dsonar.host.url="$SONAR_HOST_URL" \
+        -Dsonar.login="$SONAR_TOKEN" \
+        -Dsonar.qualitygate.wait=true
 
 # ================= BACK-END =================
 build:backend:
@@ -100,15 +111,29 @@ test:backend:
   extends: [.default-gradle]
   needs: ["build:backend"]
   script:
-    - ./gradlew test
+    - ./gradlew test jacocoTestReport
   artifacts:
     when: always
     reports:
       junit: back-end/build/test-results/test/*.xml
+    paths:
+      - back-end/build/reports/jacoco/test/jacocoTestReport.xml
 
 sonarqube-check:backend:
   stage: sonarqube-check
-  image: alpine:3.20
+  extends: [.default-gradle]
   needs: ["test:backend"]
+  variables:
+    GIT_DEPTH: "0"
   script:
-    - echo "Backend Sonar placeholder — replace with './gradlew sonarqube' when ready."
+    - |
+      ./gradlew sonarqube \
+        -Dsonar.host.url="$SONAR_HOST_URL" \
+        -Dsonar.login="$SONAR_TOKEN" \
+        -Dsonar.projectKey=backend \
+        -Dsonar.projectName=backend \
+        -Dsonar.junit.reportPaths=build/test-results/test \
+        -Dsonar.java.coveragePlugin=jacoco \
+        -Dsonar.jacoco.reportPaths=build/jacoco/test.exec \
+        -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
+        -Dsonar.qualitygate.wait=true

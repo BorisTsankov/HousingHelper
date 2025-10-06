@@ -36,3 +36,15 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+plugins {
+    id "org.sonarqube" version "6.3.1.5724"
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "I547859_housinghelper_ae8e7364-5047-4633-b1b8-b09df4130bef"
+        property "sonar.projectName", "HousingHelper"
+        property "sonar.qualitygate.wait", true
+    }
+}
