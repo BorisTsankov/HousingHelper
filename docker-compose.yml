@@ -1,8 +1,24 @@
+# docker-compose.yml
 version: "3.9"
+
+name: housinghelper
+
+networks:
+  default:
+    name: housinghelper_default
+
+volumes:
+  app_pgdata:
+  sonar_pgdata:
+  sonar_data:
+  sonar_extensions:
+  sonar_logs:
+  runner_config:
+
 services:
   postgres:
-    image: postgres:16
-    container_name: pg_local
+    image: postgres:16-alpine
+    container_name: hh-postgres
     environment:
       POSTGRES_DB: appdb
       POSTGRES_USER: appuser
@@ -10,7 +26,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - app_pgdata:/var/lib/postgresql/data
 
   backend:
     build:
@@ -19,18 +35,46 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: secret
-    depends_on:
-      - postgres
+    depends_on: [postgres]
     ports:
       - "8080:8080"
 
   frontend:
     build:
       context: ./front-end
-    depends_on:
-      - backend
+    depends_on: [backend]
     ports:
       - "3000:80"
 
-volumes:
-  pgdata:
+  sonar_db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    volumes:
+      - sonar_pgdata:/var/lib/postgresql/data
+
+  sonarqube:
+    image: sonarqube:community
+    depends_on: [sonar_db]
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonar_db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_extensions:/opt/sonarqube/extensions
+      - sonar_logs:/opt/sonarqube/logs
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    container_name: gitlab-runner
+    restart: unless-stopped
+    # docker-in-docker is NOT used; we mount host docker socket
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - runner_config:/etc/gitlab-runner
+    # no ports needed
