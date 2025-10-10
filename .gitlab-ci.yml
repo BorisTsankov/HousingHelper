@@ -53,6 +53,7 @@ sonar:frontend:
   needs: ["test:frontend"]
   variables:
     SONAR_SCANNER_OPTS: "-Dsonar.qualitygate.wait=true"
+    SONAR_TOKEN: "$SONAR_TOKEN_FRONT"     # <<< map FRONT token here
   before_script:
     - cd front-end
     - |
@@ -84,6 +85,7 @@ sonar:frontend:
         -Dsonar.host.url="${SONAR_HOST_URL}" \
         -Dsonar.token="${SONAR_TOKEN}" \
         -Dsonar.qualitygate.wait=true
+
 
 
 # ---------- BACKEND ----------
@@ -128,6 +130,8 @@ sonar:backend:
   stage: sonar
   extends: .default-gradle
   needs: ["test:backend"]
+  variables:
+    SONAR_TOKEN: "$SONAR_TOKEN_BACK"      # <<< map BACK token here
   before_script:
     - cd back-end
     - |
@@ -156,7 +160,6 @@ sonar:backend:
         -Dsonar.projectKey="${BACKEND_SONAR_PROJECT_KEY}" \
         -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
         -Dsonar.java.binaries=build/classes/java/main,build/classes/kotlin/main
-
 
 # ---------- OPTIONAL: Integration tests with real Postgres ----------
 integration-test:backend:
