@@ -1,10 +1,12 @@
 import { Routes, Route } from "react-router-dom";
-import Register from "./Register";
+import Register from "./pages/Register";
+import Home from "./pages/Home"
 
 export default function App() {
     return (
         <Routes>
             <Route path="/register" element={<Register />} />
+            <Route path="/" element={<Home />} />
         </Routes>
     );
 }
