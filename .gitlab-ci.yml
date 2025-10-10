@@ -50,26 +50,21 @@ test:frontend:
 sonar:frontend:
   stage: sonar
   image: sonarsource/sonar-scanner-cli:latest
-  services:
-    - name: sonarqube:10.6-community
-      alias: sonarqube
   needs: ["test:frontend"]
   variables:
     SONAR_SCANNER_OPTS: "-Dsonar.qualitygate.wait=true"
-    SONAR_HOST_URL: "http://sonarqube:9000"
-    # SONAR_TOKEN must be set in CI/CD variables
   before_script:
     - cd front-end
     - |
       set -euo pipefail
-      echo "Checking SonarQube at ${SONAR_HOST_URL}..."
-      for i in $(seq 1 60); do
-        if curl -sf "${SONAR_HOST_URL}/api/system/health" | grep -q '"status":"GREEN"'; then
+      echo "Using SONAR_HOST_URL=${SONAR_HOST_URL}"
+      for i in $(seq 1 180); do
+        if curl -sf --retry 5 --retry-connrefused -u "${SONAR_TOKEN}:" \
+           "${SONAR_HOST_URL}/api/system/health" | grep -q '"status":"GREEN"'; then
           echo "SonarQube is healthy."; break
         fi
-        echo "Waiting for SonarQube... ($i/60)"; sleep 2
-        if [ "$i" -eq 60 ]; then
-          echo "SonarQube did not become healthy in time"; exit 1; fi
+        echo "Waiting for SonarQube... ($i/180)"; sleep 2
+        [ "$i" -eq 180 ] && { echo "SonarQube did not become healthy in time"; exit 1; }
       done
     - |
       set -euo pipefail
@@ -89,12 +84,6 @@ sonar:frontend:
         -Dsonar.host.url="${SONAR_HOST_URL}" \
         -Dsonar.token="${SONAR_TOKEN}" \
         -Dsonar.qualitygate.wait=true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_BRANCH == 'main'
-    - if: $CI_COMMIT_BRANCH == 'master'
-    - if: $CI_COMMIT_BRANCH == 'develop'
-
 
 
 # ---------- BACKEND ----------
@@ -138,25 +127,19 @@ test:backend:
 sonar:backend:
   stage: sonar
   extends: .default-gradle
-  services:
-    - name: sonarqube:10.6-community
-      alias: sonarqube
   needs: ["test:backend"]
-  variables:
-    SONAR_HOST_URL: "http://sonarqube:9000"
-    # SONAR_TOKEN must be set in CI/CD variables
   before_script:
     - cd back-end
     - |
       set -euo pipefail
-      echo "Checking SonarQube at ${SONAR_HOST_URL}..."
-      for i in $(seq 1 60); do
-        if curl -sf "${SONAR_HOST_URL}/api/system/health" | grep -q '"status":"GREEN"'; then
+      echo "Using SONAR_HOST_URL=${SONAR_HOST_URL}"
+      for i in $(seq 1 180); do
+        if curl -sf --retry 5 --retry-connrefused -u "${SONAR_TOKEN}:" \
+           "${SONAR_HOST_URL}/api/system/health" | grep -q '"status":"GREEN"'; then
           echo "SonarQube is healthy."; break
         fi
-        echo "Waiting for SonarQube... ($i/60)"; sleep 2
-        if [ "$i" -eq 60 ]; then
-          echo "SonarQube did not become healthy in time"; exit 1; fi
+        echo "Waiting for SonarQube... ($i/180)"; sleep 2
+        [ "$i" -eq 180 ] && { echo "SonarQube did not become healthy in time"; exit 1; }
       done
     - |
       set -euo pipefail
@@ -167,18 +150,12 @@ sonar:backend:
   script:
     - |
       set -euo pipefail
-      gradle --no-daemon clean build jacocoTestReport sonar \
+      gradle --no-daemon clean build jacocoTestReport sonarqube \
         -Dsonar.host.url="${SONAR_HOST_URL}" \
         -Dsonar.token="${SONAR_TOKEN}" \
         -Dsonar.projectKey="${BACKEND_SONAR_PROJECT_KEY}" \
         -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
         -Dsonar.java.binaries=build/classes/java/main,build/classes/kotlin/main
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_BRANCH == 'main'
-    - if: $CI_COMMIT_BRANCH == 'master'
-    - if: $CI_COMMIT_BRANCH == 'develop'
-
 
 
 # ---------- OPTIONAL: Integration tests with real Postgres ----------
