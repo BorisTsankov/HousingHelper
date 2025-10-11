@@ -53,7 +53,7 @@ sonar:frontend:
   needs: ["test:frontend"]
   variables:
     SONAR_SCANNER_OPTS: "-Dsonar.qualitygate.wait=true"
-    SONAR_TOKEN: "$SONAR_TOKEN_FRONT"     # <<< map FRONT token here
+    SONAR_TOKEN: "$SONAR_USER_TOKEN"     # <<< map FRONT token here
   before_script:
     - cd front-end
     - |
@@ -131,7 +131,7 @@ sonar:backend:
   extends: .default-gradle
   needs: ["test:backend"]
   variables:
-    SONAR_TOKEN: "$SONAR_TOKEN_BACK"      # <<< map BACK token here
+    SONAR_TOKEN: "$SONAR_USER_TOKEN"      # <<< map BACK token here
   before_script:
     - apk add --no-cache curl >/dev/null 2>&1 || true
     - echo "SONAR_HOST_URL=$SONAR_HOST_URL"
