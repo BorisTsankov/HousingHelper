@@ -53,22 +53,24 @@ sonar:frontend:
   needs: ["test:frontend"]
   variables:
     SONAR_SCANNER_OPTS: "-Dsonar.qualitygate.wait=true"
-    SONAR_TOKEN: "$SONAR_USER_TOKEN"     # <<< map FRONT token here
+    SONAR_TOKEN: "$SONAR_USER_TOKEN"   # user token
   before_script:
     - cd front-end
     - |
       set -euo pipefail
       echo "Using SONAR_HOST_URL=${SONAR_HOST_URL}"
+      # Wait for SonarQube to be UP (public endpoint, no auth)
       for i in $(seq 1 20); do
-        if curl -sf --retry 5 --retry-connrefused -u "${SONAR_TOKEN}:" \
-           "${SONAR_HOST_URL}/api/system/health" | grep -q '"status":"GREEN"'; then
-          echo "SonarQube is healthy."; break
+        if curl -sf --retry 5 --retry-connrefused \
+           "${SONAR_HOST_URL}/api/system/status" | grep -q '"status":"UP"'; then
+          echo "SonarQube is UP."; break
         fi
         echo "Waiting for SonarQube... ($i/20)"; sleep 2
-        [ "$i" -eq 20 ] && { echo "SonarQube did not become healthy in time"; exit 1; }
+        [ "$i" -eq 20 ] && { echo "SonarQube did not become UP in time"; exit 1; }
       done
     - |
       set -euo pipefail
+      # Project visibility with auth (requires Browse)
       curl -sf -u "${SONAR_TOKEN}:" \
         "${SONAR_HOST_URL}/api/projects/search?projects=${FRONTEND_SONAR_PROJECT_KEY}" \
         | grep -q "\"key\":\"${FRONTEND_SONAR_PROJECT_KEY}\"" \
@@ -131,26 +133,25 @@ sonar:backend:
   extends: .default-gradle
   needs: ["test:backend"]
   variables:
-    SONAR_TOKEN: "$SONAR_USER_TOKEN"      # <<< map BACK token here
+    SONAR_TOKEN: "$SONAR_USER_TOKEN"   # user token
   before_script:
     - apk add --no-cache curl >/dev/null 2>&1 || true
-    - echo "SONAR_HOST_URL=$SONAR_HOST_URL"
-    - curl -sf "$SONAR_HOST_URL/api/system/health" || { echo "Sonar unreachable"; exit 1; }
-    - cd front-end   # or back-end in the backend job
     - cd back-end
     - |
       set -euo pipefail
       echo "Using SONAR_HOST_URL=${SONAR_HOST_URL}"
+      # Wait for SonarQube to be UP (public endpoint, no auth)
       for i in $(seq 1 20); do
-        if curl -sf --retry 5 --retry-connrefused -u "${SONAR_TOKEN}:" \
-           "${SONAR_HOST_URL}/api/system/health" | grep -q '"status":"GREEN"'; then
-          echo "SonarQube is healthy."; break
+        if curl -sf --retry 5 --retry-connrefused \
+           "${SONAR_HOST_URL}/api/system/status" | grep -q '"status":"UP"'; then
+          echo "SonarQube is UP."; break
         fi
         echo "Waiting for SonarQube... ($i/20)"; sleep 2
-        [ "$i" -eq 20 ] && { echo "SonarQube did not become healthy in time"; exit 1; }
+        [ "$i" -eq 20 ] && { echo "SonarQube did not become UP in time"; exit 1; }
       done
     - |
       set -euo pipefail
+      # Project visibility with auth (requires Browse)
       curl -sf -u "${SONAR_TOKEN}:" \
         "${SONAR_HOST_URL}/api/projects/search?projects=${BACKEND_SONAR_PROJECT_KEY}" \
         | grep -q "\"key\":\"${BACKEND_SONAR_PROJECT_KEY}\"" \
@@ -164,6 +165,7 @@ sonar:backend:
         -Dsonar.projectKey="${BACKEND_SONAR_PROJECT_KEY}" \
         -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
         -Dsonar.java.binaries=build/classes/java/main,build/classes/kotlin/main
+
 
 # ---------- OPTIONAL: Integration tests with real Postgres ----------
 integration-test:backend:
