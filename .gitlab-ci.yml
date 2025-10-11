@@ -133,6 +133,10 @@ sonar:backend:
   variables:
     SONAR_TOKEN: "$SONAR_TOKEN_BACK"      # <<< map BACK token here
   before_script:
+    - apk add --no-cache curl >/dev/null 2>&1 || true
+    - echo "SONAR_HOST_URL=$SONAR_HOST_URL"
+    - curl -sf "$SONAR_HOST_URL/api/system/health" || { echo "Sonar unreachable"; exit 1; }
+    - cd front-end   # or back-end in the backend job
     - cd back-end
     - |
       set -euo pipefail
@@ -188,6 +192,10 @@ integration-test:backend:
       - ".gradle/caches"
       - ".gradle/wrapper"
   before_script:
+    - apk add --no-cache curl >/dev/null 2>&1 || true
+    - echo "SONAR_HOST_URL=$SONAR_HOST_URL"
+    - curl -sf "$SONAR_HOST_URL/api/system/health" || { echo "Sonar unreachable"; exit 1; }
+    - cd back-end   # or back-end in the backend job
     - apt-get update -y >/dev/null && apt-get install -y postgresql-client >/dev/null
     - until pg_isready -h postgres -p 5432 -U "$POSTGRES_USER"; do echo "Waiting for Postgres..."; sleep 1; done
     - cd back-end
