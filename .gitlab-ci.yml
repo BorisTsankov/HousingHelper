@@ -171,6 +171,15 @@ sonar:backend:
         -Dsonar.java.binaries=build/classes/java/main,build/classes/kotlin/main
 
 
+debug:net:
+  image: busybox:1.36
+  script:
+    - echo "Expect to resolve 'sonarqube' on ci-net"
+    - cat /etc/resolv.conf || true
+    - cat /etc/hosts || true
+    - nslookup sonarqube || ping -c 1 sonarqube || true
+
+      
 
 # ---------- OPTIONAL: Integration tests with real Postgres ----------
 integration-test:backend:
