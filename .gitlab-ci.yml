@@ -54,31 +54,49 @@ test:frontend:
     paths:
       - front-end/coverage/lcov.info
 
+
+sonar:whoami:
+  stage: sonar
+  image: curlimages/curl:8.10.1
+  variables:
+    SONAR_TOKEN: "$SONAR_USER_TOKEN"
+  script: |
+    set -euo pipefail
+    echo "Host: ${SONAR_HOST_URL}"
+    echo "Validate token:"
+    curl -s -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/authentication/validate"; echo
+    echo "Current user:"
+    curl -s -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/users/current"; echo
+    echo "Frontend visible? (HTTP 200 expected)"
+    curl -s -o /dev/null -w "%{http_code}\n" -u "${SONAR_TOKEN}:" \
+      "${SONAR_HOST_URL}/api/components/show?component=${FRONTEND_SONAR_PROJECT_KEY}"
+    echo "Backend visible? (HTTP 200 expected)"
+    curl -s -o /dev/null -w "%{http_code}\n" -u "${SONAR_TOKEN}:" \
+      "${SONAR_HOST_URL}/api/components/show?component=${BACKEND_SONAR_PROJECT_KEY}"
+
+
 # ---------- Sonar SMOKE CHECK (tiny, fast) ----------
 sonar:smoke:
   stage: sonar
   image: curlimages/curl:8.10.1
   variables:
     SONAR_TOKEN: "$SONAR_USER_TOKEN"
-  script:
-    - |
-      set -euo pipefail
-      echo "Pinging SonarQube at ${SONAR_HOST_URL}"
-      # 1) basic status (no auth)
-      STATUS_JSON="$(curl -sS --connect-timeout 3 --retry 2 --retry-connrefused "${SONAR_HOST_URL}/api/system/status")"
-      echo "Status: ${STATUS_JSON:-<no response>}"
-      echo "$STATUS_JSON" | grep -q '"status":"UP"' || { echo "SonarQube not UP"; exit 1; }
-      # 2) auth validation with token
-      AUTH_JSON="$(curl -sS -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/authentication/validate")"
-      echo "$AUTH_JSON" | grep -q '"valid":true' || { echo "Sonar token invalid or missing rights"; exit 1; }
-      # 3) token can see both projects (visibility check)
-      curl -sf -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/projects/search?projects=${FRONTEND_SONAR_PROJECT_KEY}" \
-        | grep -q "\"key\":\"${FRONTEND_SONAR_PROJECT_KEY}\"" \
-        || { echo "Token cannot see frontend project ${FRONTEND_SONAR_PROJECT_KEY}"; exit 1; }
-      curl -sf -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/projects/search?projects=${BACKEND_SONAR_PROJECT_KEY}" \
-        | grep -q "\"key\":\"${BACKEND_SONAR_PROJECT_KEY}\"" \
-        || { echo "Token cannot see backend project ${BACKEND_SONAR_PROJECT_KEY}"; exit 1; }
-      echo "Sonar smoke check OK ✅"
+  script: |
+    set -euo pipefail
+    curl -sf "${SONAR_HOST_URL}/api/system/status" | grep -q '"status":"UP"'
+    curl -sf -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/authentication/validate" | grep -q '"valid":true'
+
+    check () {
+      local key="$1"
+      code=$(curl -s -o /dev/null -w "%{http_code}" -u "${SONAR_TOKEN}:" \
+        "${SONAR_HOST_URL}/api/components/show?component=${key}")
+      test "$code" = "200" || { echo "Token cannot browse ${key} (HTTP $code)"; exit 1; }
+    }
+
+    check "${FRONTEND_SONAR_PROJECT_KEY}"
+    check "${BACKEND_SONAR_PROJECT_KEY}"
+    echo "Sonar smoke check OK ✅"
+
 
 # ---------- FRONTEND SONAR ----------
 sonar:frontend:
