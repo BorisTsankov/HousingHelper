@@ -166,6 +166,22 @@ sonar:backend:
         -Dsonar.projectKey="${BACKEND_SONAR_PROJECT_KEY}" \
         -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
         -Dsonar.java.binaries=build/classes/java/main,build/classes/kotlin/main
+      
+
+sonar:list-keys:
+  image: curlimages/curl:8.10.1
+  stage: sonar
+  variables:
+    SONAR_TOKEN: "$SONAR_USER_TOKEN"
+  script:
+    - |
+      set -euo pipefail
+      echo "Who am I?"
+      curl -sS -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/users/current"; echo
+      echo "Project keys visible to this token:"
+      curl -sS -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/projects/search?ps=500" \
+        | sed -n 's/.*"key":"\([^"]*\)".*/\1/p' | sort -u | head -n 200
+
 
 debug:net:
   image: busybox:1.36
