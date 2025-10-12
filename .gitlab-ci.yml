@@ -53,24 +53,26 @@ sonar:frontend:
   needs: ["test:frontend"]
   variables:
     SONAR_SCANNER_OPTS: "-Dsonar.qualitygate.wait=true"
-    SONAR_TOKEN: "$SONAR_USER_TOKEN"   # user token
+    SONAR_TOKEN: "$SONAR_USER_TOKEN"
   before_script:
     - cd front-end
     - |
       set -euo pipefail
       echo "Using SONAR_HOST_URL=${SONAR_HOST_URL}"
-      # Wait for SonarQube to be UP (public endpoint, no auth)
-      for i in $(seq 1 20); do
-        if curl -sf --retry 5 --retry-connrefused \
-           "${SONAR_HOST_URL}/api/system/status" | grep -q '"status":"UP"'; then
-          echo "SonarQube is UP."; break
-        fi
-        echo "Waiting for SonarQube... ($i/20)"; sleep 2
-        [ "$i" -eq 20 ] && { echo "SonarQube did not become UP in time"; exit 1; }
+      echo "Status (first ping):"
+      curl -sSv "${SONAR_HOST_URL}/api/system/status" || true
+      echo "Waiting for SonarQube to be UP..."
+      for i in $(seq 1 60); do
+        OUT="$(curl -s --connect-timeout 2 --retry 2 --retry-connrefused \
+              "${SONAR_HOST_URL}/api/system/status" || true)"
+        echo "($i/60) ${OUT:-<no response>}"
+        echo "$OUT" | grep -q '"status":"UP"' && { echo "SonarQube is UP."; break; }
+        sleep 2
+        [ "$i" -eq 60 ] && { echo "SonarQube did not become UP in time"; exit 1; }
       done
     - |
       set -euo pipefail
-      # Project visibility with auth (requires Browse)
+      # Project visibility (requires Browse for the token user if project is Private)
       curl -sf -u "${SONAR_TOKEN}:" \
         "${SONAR_HOST_URL}/api/projects/search?projects=${FRONTEND_SONAR_PROJECT_KEY}" \
         | grep -q "\"key\":\"${FRONTEND_SONAR_PROJECT_KEY}\"" \
@@ -87,6 +89,7 @@ sonar:frontend:
         -Dsonar.host.url="${SONAR_HOST_URL}" \
         -Dsonar.token="${SONAR_TOKEN}" \
         -Dsonar.qualitygate.wait=true
+
 
 
 
@@ -133,25 +136,26 @@ sonar:backend:
   extends: .default-gradle
   needs: ["test:backend"]
   variables:
-    SONAR_TOKEN: "$SONAR_USER_TOKEN"   # user token
+    SONAR_TOKEN: "$SONAR_USER_TOKEN"
   before_script:
     - apk add --no-cache curl >/dev/null 2>&1 || true
     - cd back-end
     - |
       set -euo pipefail
       echo "Using SONAR_HOST_URL=${SONAR_HOST_URL}"
-      # Wait for SonarQube to be UP (public endpoint, no auth)
-      for i in $(seq 1 20); do
-        if curl -sf --retry 5 --retry-connrefused \
-           "${SONAR_HOST_URL}/api/system/status" | grep -q '"status":"UP"'; then
-          echo "SonarQube is UP."; break
-        fi
-        echo "Waiting for SonarQube... ($i/20)"; sleep 2
-        [ "$i" -eq 20 ] && { echo "SonarQube did not become UP in time"; exit 1; }
+      echo "Status (first ping):"
+      curl -sSv "${SONAR_HOST_URL}/api/system/status" || true
+      echo "Waiting for SonarQube to be UP..."
+      for i in $(seq 1 60); do
+        OUT="$(curl -s --connect-timeout 2 --retry 2 --retry-connrefused \
+              "${SONAR_HOST_URL}/api/system/status" || true)"
+        echo "($i/60) ${OUT:-<no response>}"
+        echo "$OUT" | grep -q '"status":"UP"' && { echo "SonarQube is UP."; break; }
+        sleep 2
+        [ "$i" -eq 60 ] && { echo "SonarQube did not become UP in time"; exit 1; }
       done
     - |
       set -euo pipefail
-      # Project visibility with auth (requires Browse)
       curl -sf -u "${SONAR_TOKEN}:" \
         "${SONAR_HOST_URL}/api/projects/search?projects=${BACKEND_SONAR_PROJECT_KEY}" \
         | grep -q "\"key\":\"${BACKEND_SONAR_PROJECT_KEY}\"" \
@@ -165,6 +169,7 @@ sonar:backend:
         -Dsonar.projectKey="${BACKEND_SONAR_PROJECT_KEY}" \
         -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
         -Dsonar.java.binaries=build/classes/java/main,build/classes/kotlin/main
+
 
 
 # ---------- OPTIONAL: Integration tests with real Postgres ----------
@@ -196,7 +201,7 @@ integration-test:backend:
   before_script:
     - apk add --no-cache curl >/dev/null 2>&1 || true
     - echo "SONAR_HOST_URL=$SONAR_HOST_URL"
-    - curl -sf "$SONAR_HOST_URL/api/system/health" || { echo "Sonar unreachable"; exit 1; }
+    - curl -sf "$SONAR_HOST_URL/api/system/status" | grep -q '"status":"UP"' || { echo "Sonar not UP"; exit 1; }
     - cd back-end   # or back-end in the backend job
     - apt-get update -y >/dev/null && apt-get install -y postgresql-client >/dev/null
     - until pg_isready -h postgres -p 5432 -U "$POSTGRES_USER"; do echo "Waiting for Postgres..."; sleep 1; done
