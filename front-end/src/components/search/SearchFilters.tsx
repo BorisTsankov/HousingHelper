@@ -1,6 +1,6 @@
 import { Select } from "../ui/Select";
+import type { Filters } from "../../types/filters";
 
-export type Filters = { type?: string; price?: string; location?: string };
 type Props = { value: Filters; onChange: (f: Filters) => void };
 
 export const SearchFilters: React.FC<Props> = ({ value, onChange }) => {
