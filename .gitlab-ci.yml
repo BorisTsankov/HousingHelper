@@ -113,8 +113,7 @@ sonar:frontend:
       files:
         - back-end/gradle/wrapper/gradle-wrapper.properties
         - back-end/build.gradle
-        - back-end/settings.gradle
-        - back-end/gradle.properties
+
     paths:
       - ".gradle/caches"
       - ".gradle/wrapper"
