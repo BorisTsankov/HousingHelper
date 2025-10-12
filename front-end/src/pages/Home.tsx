@@ -2,7 +2,7 @@ import React from "react";
 import Page from "../components/layout/Page";
 import { Section } from "../components/ui/Section";
 import { SearchBar } from "../components/search/SearchBar";
-import { SearchFilters, Filters } from "../components/search/SearchFilters";
+import type { SearchFilters, Filters } from "../components/search/SearchFilters";
 import { PropertyGallery } from "../components/gallery/PropertyGallery";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
