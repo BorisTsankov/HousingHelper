@@ -172,19 +172,19 @@ sonar:backend:
   variables:
     SONAR_TOKEN: "$SONAR_USER_TOKEN"
   before_script:
-    # gradle:8.10.0-jdk17-jammy is Debian/Ubuntu-based -> use apt-get
     - apt-get update -y >/dev/null && apt-get install -y curl >/dev/null
     - cd back-end
-  script:
-    - |
-      set -euo pipefail
-      gradle --no-daemon --build-cache --parallel clean build jacocoTestReport sonarqube \
-        -Dsonar.host.url="${SONAR_HOST_URL}" \
-        -Dsonar.token="${SONAR_TOKEN}" \
-        -Dsonar.projectKey="${BACKEND_SONAR_PROJECT_KEY}" \
-        -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
-        -Dsonar.java.binaries=build/classes/java/main,build/classes/kotlin/main
-      
+  script: |
+    set -euo pipefail
+    gradle --no-daemon --build-cache --parallel clean build jacocoTestReport sonar \
+      -Dsonar.host.url="${SONAR_HOST_URL}" \
+      -Dsonar.token="${SONAR_TOKEN}" \
+      -Dsonar.projectKey="${BACKEND_SONAR_PROJECT_KEY}" \
+      -Dsonar.sources=src/main/java \
+      -Dsonar.tests=src/test/java \
+      -Dsonar.java.binaries=build/classes/java/main \
+      -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+
 
 sonar:list-keys:
   image: curlimages/curl:8.10.1
