@@ -1,5 +1,5 @@
 import React from "react";
-import { Property } from "../../types/property";
+import type { Property } from "../../types/property";
 import { PropertyCard } from "./PropertyCard";
 
 type Props = { items: Property[] };

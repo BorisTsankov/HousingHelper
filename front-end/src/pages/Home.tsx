@@ -6,7 +6,7 @@ import { SearchFilters, Filters } from "../components/search/SearchFilters";
 import { PropertyGallery } from "../components/gallery/PropertyGallery";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import { Property } from "../types/property";
+import type { Property } from "../types/property";
 
 const Home: React.FC = () => {
   const [filters, setFilters] = React.useState<Filters>({});

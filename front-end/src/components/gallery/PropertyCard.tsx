@@ -1,5 +1,5 @@
 import React from "react";
-import { Property } from "../../types/property";
+import type { Property } from "../../types/property";
 
 export const PropertyCard: React.FC<{ item: Property }> = ({ item }) => (
   <figure className="overflow-hidden rounded-3xl border border-slate-200 shadow-sm">
