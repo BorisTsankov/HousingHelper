@@ -13,40 +13,58 @@ import type { Property } from "../types/property";
 
 const Home: React.FC = () => {
   const [filters, setFilters] = React.useState<Filters>({});
+  const [properties, setProperties] = React.useState<Property[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const properties: Property[] = [
-    {
-      id: "1",
-      title: "Modern Apartment in City Center",
-      image: "https://via.placeholder.com/400x250?text=Apartment",
-      price: "€1200/mo",
-      location: "Eindhoven",
-    },
-    {
-      id: "2",
-      title: "Cozy Studio Near Fontys",
-      image: "https://via.placeholder.com/400x250?text=Studio",
-      price: "€850/mo",
-      location: "Eindhoven North",
-    },
-    {
-      id: "3",
-      title: "Spacious Loft with Balcony",
-      image: "https://via.placeholder.com/400x250?text=Loft",
-      price: "€1500/mo",
-      location: "Strijp-S",
-    },
-  ];
+    React.useEffect(() => {
+      const loadFeatured = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const res = await fetch(`/api/listings/featured?limit=12`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data: Property[] = await res.json();
+          setProperties(data);
+        } catch (e: any) {
+          setError(e?.message ?? "Failed to load listings");
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadFeatured();
+    }, []);
+
+    // Hook up the SearchBar
+    const handleSearch = async (q: string) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const url = q?.trim()
+          ? `/api/listings/search?q=${encodeURIComponent(q.trim())}&limit=24`
+          : `/api/listings/featured?limit=12`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: Property[] = await res.json();
+        setProperties(data);
+      } catch (e: any) {
+        setError(e?.message ?? "Search failed");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   return (
 
     <Page>
       <Navbar />
 
-      <Section title="Find Your Dream Home" center>
+    <Section title="Find Your Dream Home" center>
         <div className="mx-auto max-w-4xl px-4">
-          <SearchBar onSearch={(q) => console.log({ q, filters })} />
+          <SearchBar onSearch={(q) => handleSearch(q)} />
           <div className="mt-4">
+            {/* Filters are wired for later. If you want them active,
+                read values from `filters` and include them in the fetch URL. */}
             <SearchFilters value={filters} onChange={setFilters} />
           </div>
         </div>
@@ -54,7 +72,9 @@ const Home: React.FC = () => {
 
       <Section title="Featured Listings">
         <div className="mx-auto max-w-5xl px-4">
-          <PropertyGallery items={properties} />
+        {loading && <p>Loading...</p>}
+        {!loading && <p className="text-red-600">Error: {error}</p>}
+        {!loading && !error && <PropertyGallery items={properties} />}
         </div>
       </Section>
 
