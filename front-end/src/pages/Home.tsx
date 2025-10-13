@@ -73,7 +73,6 @@ const Home: React.FC = () => {
       <Section title="Featured Listings">
         <div className="mx-auto max-w-5xl px-4">
         {loading && <p>Loading...</p>}
-        {!loading && <p className="text-red-600">Error: {error}</p>}
         {!loading && !error && <PropertyGallery items={properties} />}
         </div>
       </Section>
