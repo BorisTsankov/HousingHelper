@@ -43,10 +43,10 @@ build:frontend:
 test:frontend:
   stage: test
   extends: .default-node
-  needs: [ "build:frontend" ]
+  needs: ["build:frontend"]
   script:
-    # if there's a test script, run it in CI mode without watch; use coverage output
-    - if npm run | grep -qE '^[[:space:]]*test'; then npm run test -- --ci --watchAll=false --coverage; else echo "No npm test script. Skipping."; fi
+    - if npm run | grep -qE '^[[:space:]]*test'; then npm run test; else echo "No npm test script. Skipping." && exit 1; fi
+    - test -f coverage/lcov.info || { echo "coverage/lcov.info missing"; exit 1; }
   artifacts:
     when: always
     reports:
