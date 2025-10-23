@@ -19,7 +19,6 @@ public class ListingPriceHistory {
     @Column(name = "rent_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal rentAmount;
 
-    // getters/setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

@@ -17,7 +17,6 @@ public class RentPeriod {
     @Column(nullable = false)
     private boolean isActive = true;
 
-    // getters/setters
     public Short getId() { return id; }
     public void setId(Short id) { this.id = id; }
 

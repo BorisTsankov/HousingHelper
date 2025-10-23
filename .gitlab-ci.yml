@@ -3,7 +3,7 @@ stages:
   - build
   - test
   - sonar
-  - integration-test  # optional, runs only if you trigger it
+  - integration-test
 
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
@@ -12,11 +12,10 @@ variables:
   FRONTEND_SONAR_PROJECT_KEY: "I547859_housinghelper_ae8e7364-5047-4633-b1b8-b09df4130bef"
   BACKEND_SONAR_PROJECT_KEY: "I547859_housinghelper_backend"
 
-# ---------- FRONTEND ----------
+#FRONTEND
 .default-node:
   image: node:20-bullseye
   cache:
-    # Faster & more stable cache reuse across branches based on lockfile
     key:
       files:
         - front-end/package-lock.json
@@ -26,7 +25,6 @@ variables:
   before_script:
     - cd front-end
     - node -v
-    # use a local npm cache + skip audit/fund for speed
     - npm config set cache .npm --location=project
     - npm ci --no-audit --no-fund
 
@@ -75,7 +73,7 @@ sonar:whoami:
       "${SONAR_HOST_URL}/api/components/show?component=${BACKEND_SONAR_PROJECT_KEY}"
 
 
-# ---------- Sonar SMOKE CHECK (tiny, fast) ----------
+#Sonar SMOKE CHECK
 sonar:smoke:
   stage: sonar
   image: curlimages/curl:8.10.1
@@ -98,7 +96,7 @@ sonar:smoke:
     echo "Sonar smoke check OK ✅"
 
 
-# ---------- FRONTEND SONAR ----------
+#FRONTEND SONAR
 sonar:frontend:
   stage: sonar
   image: sonarsource/sonar-scanner-cli:latest
@@ -122,7 +120,7 @@ sonar:frontend:
         -Dsonar.token="${SONAR_TOKEN}" \
         -Dsonar.qualitygate.wait=true
 
-# ---------- BACKEND ----------
+#BACKEND
 .default-gradle:
   image: gradle:8.10.0-jdk17-jammy
   cache:
@@ -145,7 +143,6 @@ build:backend:
   stage: build
   extends: .default-gradle
   script:
-    # enable build cache & parallel to speed up
     - gradle --no-daemon --build-cache --parallel assemble
   artifacts:
     paths:
@@ -209,7 +206,7 @@ debug:net:
     - cat /etc/hosts || true
     - nslookup sonarqube || ping -c 1 sonarqube || true
 
-# ---------- OPTIONAL: Integration tests with real Postgres ----------
+# optional: Integration tests with real Postgres
 integration-test:backend:
   stage: integration-test
   image: gradle:8.10.0-jdk17-jammy

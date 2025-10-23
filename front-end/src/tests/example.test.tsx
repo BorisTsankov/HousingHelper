@@ -13,18 +13,14 @@ describe('PropertyCard', () => {
   it('renders property details correctly', () => {
     render(<PropertyCard item={mockProperty} />)
 
-    // ✅ heading
     expect(
       screen.getByRole('heading', { name: /cozy apartment/i })
     ).toBeInTheDocument()
 
-    // ✅ location
     expect(screen.getByText(/eindhoven, netherlands/i)).toBeInTheDocument()
 
-    // ✅ price
     expect(screen.getByText(/€1200 \/ month/i)).toBeInTheDocument()
 
-    // ✅ image attributes
     const img = screen.getByRole('img', { name: /cozy apartment/i })
     expect(img).toHaveAttribute('src', mockProperty.image)
     expect(img).toHaveAttribute('alt', mockProperty.title)

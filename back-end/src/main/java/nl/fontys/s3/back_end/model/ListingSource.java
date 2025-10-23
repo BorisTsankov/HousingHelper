@@ -17,7 +17,6 @@ public class ListingSource {
     @Column(nullable = false)
     private boolean isActive = true;
 
-    // getters/setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

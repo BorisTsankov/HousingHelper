@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // optional: keep TS path aliases in sync
       '@': path.resolve(__dirname, 'src'),
     },
   },
@@ -14,12 +13,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/tests/setup.ts'],
-    css: true, // lets you import CSS in components during tests
-    // optional: tighten which files are tests
+    css: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {
-      provider: 'v8',               // fast & built-in; Node 20+ recommended
-      reporter: ['text', 'lcov'],   // add 'html' if you want a browsable report
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
       reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
       exclude: [

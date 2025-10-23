@@ -23,7 +23,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Fast CI: H2 for unit tests (DB-free)
     testImplementation 'com.h2database:h2'
 }
 
