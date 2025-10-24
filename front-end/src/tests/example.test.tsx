@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import { PropertyCard } from '../components/gallery/PropertyCard' // adjust path if needed
+import { PropertyCard } from '../components/gallery/PropertyCard'
 
 describe('PropertyCard', () => {
   const mockProperty = {
