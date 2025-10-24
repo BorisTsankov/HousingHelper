@@ -15,6 +15,12 @@ export default defineConfig({
     setupFiles: ['./src/tests/setup.ts'],
     css: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+
+    reporters: [
+      'default',
+      ['junit', { outputFile: 'junit/junit.xml' }],
+    ],
+
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
