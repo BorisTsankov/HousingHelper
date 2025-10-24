@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="1" failures="0" errors="0" time="0.2224358">
+    <testsuite name="src/tests/example.test.tsx" timestamp="2025-10-24T08:53:02.990Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="0" errors="0" skipped="0" time="0.2224358">
+        <testcase classname="src/tests/example.test.tsx" name="PropertyCard &gt; renders property details correctly" time="0.2202949">
+        </testcase>
+    </testsuite>
+</testsuites>

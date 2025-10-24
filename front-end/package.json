@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
+
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "pretest": "node -e \"require('fs').mkdirSync('./junit',{recursive:true})\"",
+    "test": "vitest run --coverage --reporter=default --reporter=junit --outputFile=./junit/junit.xml"
   },
   "dependencies": {
     "lucide-react": "^0.545.0",
