@@ -5,7 +5,6 @@ import nl.fontys.s3.back_end.dto.PropertyDto;
 import nl.fontys.s3.back_end.mapper.PropertyMapper;
 import nl.fontys.s3.back_end.model.Listing;
 import nl.fontys.s3.back_end.repository.ListingRepository;
-import nl.fontys.s3.back_end.service.ListingService;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

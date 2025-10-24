@@ -1,5 +1,5 @@
 import React from "react";
-import { Facebook, Twitter, Linkedin } from "lucide-react";
+import { Facebook, Instagram, Linkedin } from "lucide-react";
 import { Container } from "../ui/Container";
 
 const Footer: React.FC = () => {
@@ -12,13 +12,13 @@ const Footer: React.FC = () => {
           </p>
 
           <div className="mt-4 flex justify-center gap-6 text-slate-600">
-            <a href="#" aria-label="Facebook" className="hover:text-blue-600">
+            <a href="https://www.facebook.com/boris.tsankov.77" aria-label="Facebook" className="hover:text-blue-600">
               <Facebook className="h-5 w-5" />
             </a>
-            <a href="#" aria-label="Twitter" className="hover:text-blue-600">
-              <Twitter className="h-5 w-5" />
+            <a href="https://www.instagram.com/borists_" aria-label="Instagram" className="hover:text-blue-600">
+              <Instagram className="h-5 w-5" />
             </a>
-            <a href="#" aria-label="LinkedIn" className="hover:text-blue-600">
+            <a href="https://www.linkedin.com/in/boris-tsankov-profile" aria-label="LinkedIn" className="hover:text-blue-600">
               <Linkedin className="h-5 w-5" />
             </a>
           </div>
