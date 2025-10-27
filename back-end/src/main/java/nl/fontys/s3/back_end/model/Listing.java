@@ -74,23 +74,12 @@ public class Listing {
     @Column(name = "minimum_lease_months")
     private Integer minimumLeaseMonths;
 
-    @Column(length = 2)
-    private String country;
-
-    @Column(length = 120)
-    private String city;
-
-    @Column(length = 16)
-    private String postalCode;
-
-    @Column(length = 160)
-    private String street;
-
-    @Column(length = 32)
-    private String houseNumber;
-
-    @Column(length = 32)
-    private String unit;
+    @Column(length = 2)   private String country;
+    @Column(length = 120) private String city;
+    @Column(length = 16)  private String postalCode;
+    @Column(length = 160) private String street;
+    @Column(length = 32)  private String houseNumber;
+    @Column(length = 32)  private String unit;
 
     private Double lat;
     private Double lon;
@@ -101,23 +90,14 @@ public class Listing {
     @Column(name = "photos_count")
     private Integer photosCount;
 
-    @Column(name = "landlord_type", length = 16)
-    private String landlordType; // "AGENCY" or "PRIVATE"
-
-    @Column(name = "contact_email_hash", length = 64)
-    private String contactEmailHash;
-
-    @Column(name = "contact_phone_hash", length = 64)
-    private String contactPhoneHash;
+    @ManyToOne @JoinColumn(name = "agency_id")
+    private Agency agency;
 
     @Column(name = "content_hash", nullable = false, length = 64)
     private String contentHash;
 
     @Column(name = "ingest_job_id")
     private Long ingestJobId;
-
-    // getters/setters
-
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -215,19 +195,12 @@ public class Listing {
     public Integer getPhotosCount() { return photosCount; }
     public void setPhotosCount(Integer photosCount) { this.photosCount = photosCount; }
 
-    public String getLandlordType() { return landlordType; }
-    public void setLandlordType(String landlordType) { this.landlordType = landlordType; }
-
-    public String getContactEmailHash() { return contactEmailHash; }
-    public void setContactEmailHash(String contactEmailHash) { this.contactEmailHash = contactEmailHash; }
-
-    public String getContactPhoneHash() { return contactPhoneHash; }
-    public void setContactPhoneHash(String contactPhoneHash) { this.contactPhoneHash = contactPhoneHash; }
+    public Agency getAgency() { return agency; }
+    public void setAgency(Agency agency) { this.agency = agency; }
 
     public String getContentHash() { return contentHash; }
     public void setContentHash(String contentHash) { this.contentHash = contentHash; }
 
     public Long getIngestJobId() { return ingestJobId; }
     public void setIngestJobId(Long ingestJobId) { this.ingestJobId = ingestJobId; }
-
 }
