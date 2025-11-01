@@ -1,5 +1,5 @@
 export type Filters = {
-  type?: string;
-  price?: string;
-  location?: string;
+  type?: "Apartment" | "House" | "Studio" | "";
+  price?: "" | "$500 - $1,000" | "$1,000 - $1,500" | "$2,500+";
+  location?: "" | "Eindhoven" | "Rotterdam" | "Amsterdam";
 };

@@ -35,7 +35,6 @@ const Home: React.FC = () => {
       loadFeatured();
     }, []);
 
-    // Hook up the SearchBar
     const handleSearch = async (q: string) => {
       try {
         setLoading(true);
@@ -63,8 +62,6 @@ const Home: React.FC = () => {
         <div className="mx-auto max-w-4xl px-4">
           <SearchBar onSearch={(q) => handleSearch(q)} />
           <div className="mt-4">
-            {/* Filters are wired for later. If you want them active,
-                read values from `filters` and include them in the fetch URL. */}
             <SearchFilters value={filters} onChange={setFilters} />
           </div>
         </div>

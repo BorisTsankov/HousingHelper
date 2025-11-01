@@ -6,10 +6,15 @@ import nl.fontys.s3.back_end.mapper.PropertyMapper;
 import nl.fontys.s3.back_end.model.Listing;
 import nl.fontys.s3.back_end.repository.ListingRepository;
 
+import nl.fontys.s3.back_end.spec.ListingsSpec;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.*;
+
 
 import java.util.List;
 
@@ -23,18 +28,38 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public List<PropertyDto> getFeatured(int limit) {
-        // "Featured" = latest listings by lastSeenAt; if you prefer firstSeenAt, swap the field
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "lastSeenAt"));
-        List<Listing> results = listingRepository.findAllBy(pageable);
-        return results.stream().map(PropertyMapper::toPropertyDto).toList();
+        return listingRepository.findAll(pageable)
+                .map(PropertyMapper::toPropertyDto)
+                .getContent();
     }
 
     @Override
     public List<PropertyDto> search(String q, int limit) {
-        String query = (q == null) ? "" : q.trim();
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "lastSeenAt"));
-        List<Listing> results =
-                listingRepository.findByTitleContainingIgnoreCaseOrCityContainingIgnoreCase(query, query, pageable);
-        return results.stream().map(PropertyMapper::toPropertyDto).toList();
+        Specification<Listing> spec = Specification.where(ListingsSpec.containsText(q));
+        return listingRepository.findAll(spec, pageable)
+                .map(PropertyMapper::toPropertyDto)
+                .getContent();
+    }
+
+    @Override
+    public Page<PropertyDto> list(
+            String q,
+            String type,
+            String city,
+            Integer minPrice,
+            Integer maxPrice,
+            Pageable pageable
+    ) {
+        Specification<Listing> spec = Specification
+                .where(ListingsSpec.containsText(q))
+                .and(ListingsSpec.typeEquals(type))
+                .and(ListingsSpec.cityEquals(city))
+                .and(ListingsSpec.minPrice(minPrice))
+                .and(ListingsSpec.maxPrice(maxPrice));
+
+        return listingRepository.findAll(spec, pageable)
+                .map(PropertyMapper::toPropertyDto);
     }
 }

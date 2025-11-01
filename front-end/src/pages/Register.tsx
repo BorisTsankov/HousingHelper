@@ -15,7 +15,7 @@ export default function Register() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
             });
-            if (res.ok) setMessage("Registration successful ✅");
+            if (res.ok) setMessage("Registration successful");
             else setMessage("Error: " + (await res.text()));
         } catch (err) {
             setMessage("Network error: " + err);
