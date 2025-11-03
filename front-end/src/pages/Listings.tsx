@@ -114,7 +114,10 @@ const Listings: React.FC = () => {
                   <select
                     className="border rounded-md px-2 py-1 text-sm"
                     value={size}
-                    onChange={(e) => { setPage(0); setSize(Number(e.target.value)); }}
+                    onChange={(e) => {
+                        setPage(0);
+                        setSize(Number(e.target.value));
+                        }}
                     disabled={loading}
                   >
                     <option value={12}>12</option>

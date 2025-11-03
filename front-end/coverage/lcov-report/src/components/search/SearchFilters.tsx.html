@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -91,70 +91,91 @@
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
 <a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Select } from "../ui/Select";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Select } from "../ui/Select";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
 import type { Filters } from "../../types/filters";
 &nbsp;
-type Props = { value: Filters; onChange: (f: Filters) =&gt; void };
+type Props = {
+    value: Filters;
+    onChange: (f: Filters) =&gt; void };
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const SearchFilters: React.FC&lt;Props&gt; = ({ value, onChange }) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  const update = (k: keyof Filters) =&gt; (e: React.ChangeEvent&lt;HTMLSelectElement&gt;) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >    onChange({ ...value, [k]: e.target.value });</span>
+<span class="cstat-no" title="statement not covered" >    onChange({ ...value, [k]: e.target.value as any });</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
 <span class="cstat-no" title="statement not covered" >    &lt;div className="grid grid-cols-1 gap-3 sm:grid-cols-3"&gt;</span>
 <span class="cstat-no" title="statement not covered" >      &lt;Select value={value.type ?? ""} onChange={update("type")}&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option value="" disabled&gt;Property Type&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Apartment&lt;/option&gt;&lt;option&gt;House&lt;/option&gt;&lt;option&gt;Studio&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option value=""&gt;Property Type&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Apartment&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;House&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Studio&lt;/option&gt;</span>
       &lt;/Select&gt;
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      &lt;Select value={value.price ?? ""} onChange={update("price")}&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option value="" disabled&gt;Price Range&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;$500 - $1,000&lt;/option&gt;&lt;option&gt;$1,000 - $1,500&lt;/option&gt;&lt;option&gt;$2,500+&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option value=""&gt;Price Range&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;$500 - $1,000&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;$1,000 - $1,500&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;$2,500+&lt;/option&gt;</span>
       &lt;/Select&gt;
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      &lt;Select value={value.location ?? ""} onChange={update("location")}&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option value="" disabled&gt;Location&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Eindhoven&lt;/option&gt;&lt;option&gt;Rotterdam&lt;/option&gt;&lt;option&gt;Amsterdam&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option value=""&gt;Location&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Eindhoven&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Rotterdam&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Amsterdam&lt;/option&gt;</span>
       &lt;/Select&gt;
     &lt;/div&gt;
   );
-<span class="cstat-no" title="statement not covered" >};</span>
-&nbsp;</pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >};</span></pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-24T14:09:28.015Z
+                at 2025-11-03T15:48:06.676Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

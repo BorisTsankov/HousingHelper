@@ -13,9 +13,9 @@ public class UserController {
     public UserController(UserRepository repo) { this.repo = repo; }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRegistrationDto dto) {
+    public ResponseEntity<User> register(@RequestBody UserRegistrationDto dto) {
         if (repo.findByEmail(dto.email()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email already in use");
+            return ResponseEntity.badRequest().build();
         }
         User user = new User(dto.email(), dto.name(), dto.password());
         return ResponseEntity.ok(repo.save(user));

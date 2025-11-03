@@ -12,21 +12,40 @@ public final class PropertyMapper {
 
     public static PropertyDto toPropertyDto(Listing l) {
 
-        String price = l.getRentAmount() == null
-                ? "Price on request"
-                : NumberFormat.getCurrencyInstance(Locale.GERMANY)
-                .format(l.getRentAmount()) + "/mo";
+        String price;
+        if(l.getRentAmount() == null){
+            price = "Price on request";
+        }
+        else{
+            price = NumberFormat.getCurrencyInstance(Locale.GERMANY).format(l.getRentAmount()) + "/mo";
+        }
 
-        String title = (l.getTitle() != null && !l.getTitle().isBlank())
-                ? l.getTitle()
-                : "Listing #" + l.getId();
+        String title;
+        if(l.getTitle() != null && !l.getTitle().isBlank()){
+            title = l.getTitle();
+        }
+        else {
+            title = "Listing#" + l.getId();
+        }
 
-        String location = l.getCity() != null ? l.getCity()
-                : (l.getCountry() != null ? l.getCountry() : "Unknown");
+        String location;
+        if(l.getCity() != null) {
+            location=l.getCity();
+        }
+        else if(l.getCountry() != null) {
+            location = l.getCountry();
+        }
+        else {
+            location = "Unknown";
+        }
 
-        String image = (l.getPrimaryPhotoUrl() != null && !l.getPrimaryPhotoUrl().isBlank())
-                ? l.getPrimaryPhotoUrl()
-                : "https://via.placeholder.com/400x250?text=No+Image";
+        String image;
+        if(l.getPrimaryPhotoUrl() != null && !l.getPrimaryPhotoUrl().isBlank()){
+            image = l.getPrimaryPhotoUrl();
+        }
+        else {
+            image = "https://via.placeholder.com/400x250?text=No+Image";
+        }
 
         return new PropertyDto(
                 String.valueOf(l.getId()),

@@ -1,11 +1,9 @@
-// src/main/java/nl/fontys/s3/back_end/service/ListingServiceImpl.java
 package nl.fontys.s3.back_end.service;
 
 import nl.fontys.s3.back_end.dto.PropertyDto;
 import nl.fontys.s3.back_end.mapper.PropertyMapper;
 import nl.fontys.s3.back_end.model.Listing;
 import nl.fontys.s3.back_end.repository.ListingRepository;
-
 import nl.fontys.s3.back_end.spec.ListingsSpec;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,8 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.*;
-
 
 import java.util.List;
 
@@ -37,7 +33,7 @@ public class ListingServiceImpl implements ListingService {
     @Override
     public List<PropertyDto> search(String q, int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "lastSeenAt"));
-        Specification<Listing> spec = Specification.where(ListingsSpec.containsText(q));
+        Specification<Listing> spec = ListingsSpec.containsText(q);
         return listingRepository.findAll(spec, pageable)
                 .map(PropertyMapper::toPropertyDto)
                 .getContent();
@@ -52,8 +48,7 @@ public class ListingServiceImpl implements ListingService {
             Integer maxPrice,
             Pageable pageable
     ) {
-        Specification<Listing> spec = Specification
-                .where(ListingsSpec.containsText(q))
+        Specification<Listing> spec = ListingsSpec.containsText(q)
                 .and(ListingsSpec.typeEquals(type))
                 .and(ListingsSpec.cityEquals(city))
                 .and(ListingsSpec.minPrice(minPrice))
