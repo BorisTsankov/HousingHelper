@@ -1,5 +1,16 @@
 export type Filters = {
-  type?: "Apartment" | "House" | "Studio" | "";
-  price?: "" | "$500 - $1,000" | "$1,000 - $1,500" | "$2,500+";
-  location?: "" | "Eindhoven" | "Rotterdam" | "Amsterdam";
+  // shared (home + listings)
+  type?: string;
+  city?: string;
+  minPrice?: number;
+  maxPrice?: number;
+
+  // advanced (listings only)
+  bedroomsMin?: number;
+  bathroomsMin?: number;
+  furnished?: "yes" | "no" | "";
+  petsAllowed?: "yes" | "no" | "";
+  areaMin?: number;
+  areaMax?: number;
+  availableFrom?: string; // ISO date YYYY-MM-DD
 };

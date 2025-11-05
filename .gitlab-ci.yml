@@ -41,7 +41,6 @@ test:frontend:
   extends: .default-node
   needs: ["build:frontend"]
   script:
-#    - if npm run | grep -qE '^[[:space:]]*test'; then npm run test; else echo "No npm test script. Skipping." && exit 1; fi
     - test -f coverage/lcov.info || { echo "coverage/lcov.info missing"; exit 1; }
   artifacts:
     when: always
@@ -157,7 +156,7 @@ test:backend:
       junit: back-end/build/test-results/test/*.xml
     paths:
       - back-end/build/reports/jacoco/test/jacocoTestReport.xml
-      - back-end/build/classes/java/main   # so sonar has binaries without rebuilding
+      - back-end/build/classes/java/main
 
 
 sonar:backend:

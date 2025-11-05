@@ -4,5 +4,8 @@ import java.util.List;
 
 public record ListingsResponse<T>(
         List<T> items,
-        long total
-) { }
+        long total,
+        int page,
+        int pageSize,
+        boolean hasNext
+) {}

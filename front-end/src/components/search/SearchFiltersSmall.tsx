@@ -1,35 +1,36 @@
+import React from "react";
 import { Select } from "../ui/Select";
 import type { Filters } from "../../types/filters";
+import type { FilterGroup } from "../../types/filterOptions";
 
-type Props = {
-    value: Filters;
-    onChange: (f: Filters) => void };
+type Props = { value: Filters; onChange: (f: Filters) => void; options: FilterGroup };
 
-export const SearchFilters: React.FC<Props> = ({ value, onChange }) => {
-  const update = (k: keyof Filters) => (e: React.ChangeEvent<HTMLSelectElement>) =>
-    onChange({ ...value, [k]: e.target.value as any });
+export const SearchFiltersSmall: React.FC<Props> = ({ value, onChange, options }) => {
+  const set = (patch: Partial<Filters>) => onChange({ ...value, ...patch });
+  const selectedPriceLabel =
+    options.priceBuckets.find(b => b.min === value.minPrice && b.max === value.maxPrice)?.label ?? "";
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-      <Select value={value.type ?? ""} onChange={update("type")}>
+      <Select value={value.type ?? ""} onChange={(e) => set({ type: e.target.value || undefined })}>
         <option value="">Property Type</option>
-        <option>Apartment</option>
-        <option>House</option>
-        <option>Studio</option>
+        {options.types.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </Select>
 
-      <Select value={value.price ?? ""} onChange={update("price")}>
+      <Select
+        value={selectedPriceLabel}
+        onChange={(e) => {
+          const bucket = options.priceBuckets.find(b => b.label === e.target.value);
+          set({ minPrice: bucket?.min ?? undefined, maxPrice: bucket?.max ?? undefined });
+        }}
+      >
         <option value="">Price Range</option>
-        <option>$500 - $1,000</option>
-        <option>$1,000 - $1,500</option>
-        <option>$2,500+</option>
+        {options.priceBuckets.map(b => <option key={b.label} value={b.label}>{b.label}</option>)}
       </Select>
 
-      <Select value={value.location ?? ""} onChange={update("location")}>
+      <Select value={value.city ?? ""} onChange={(e) => set({ city: e.target.value || undefined })}>
         <option value="">Location</option>
-        <option>Eindhoven</option>
-        <option>Rotterdam</option>
-        <option>Amsterdam</option>
+        {options.cities.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </Select>
     </div>
   );
