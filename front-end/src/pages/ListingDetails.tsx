@@ -1,164 +1,216 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Page from "../components/layout/Page";
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
-import { Section } from "../components/ui/Section";
-import { Link } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import type {Property} from "type";
 
-type Listing = {
-  id: string | number;
-  title?: string;
-  description?: string;
-  price?: number;
-  address?: string;
-  city?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  sizeSqm?: number;
-  type?: string;
-  furnished?: boolean;
-  petsAllowed?: boolean;
-  imageUrl?: string;            // primary image
-  images?: string[];            // gallery
-  latitude?: number;
-  longitude?: number;
-};
 
-const ListingDetails: React.FC = () => {
+const API_BASE = "/api/listings";
+
+function formatMoney(n?: number | null) {
+  if (n == null) return null;
+  try {
+    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(n);
+  } catch {
+    return `${n}`;
+  }
+}
+
+function joinAddress(p: Property) {
+  const parts = [p.street, p.houseNumber, p.unit].filter(Boolean).join(" ");
+  const cityLine = [p.postalCode, p.city].filter(Boolean).join(" ");
+  const country = p.country ?? undefined;
+  return [parts || undefined, cityLine || undefined, country].filter(Boolean).join(", ");
+}
+
+export default function ListingDetails() {
   const { id } = useParams<{ id: string }>();
-  const nav = useNavigate();
+  const [data, setData] = useState<Property | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [data, setData] = React.useState<Listing | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    const c = new AbortController();
-    (async () => {
+  useEffect(() => {
+    let aborted = false;
+    async function run() {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch(`/api/listings/${id}`, { signal: c.signal });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json: Listing = await res.json();
-        setData(json);
+        const res = await fetch(`${API_BASE}/${id}`);
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `HTTP ${res.status}`);
+        }
+        const json: Property = await res.json();
+        if (!aborted) setData(json);
       } catch (e: any) {
-        if (e?.name !== "AbortError") setError(e?.message ?? "Failed to load listing");
+        if (!aborted) setError(e?.message ?? "Failed to load listing");
       } finally {
-        setLoading(false);
+        if (!aborted) setLoading(false);
       }
-    })();
-    return () => c.abort();
+    }
+    if (id) run();
+    return () => {
+      aborted = true;
+    };
   }, [id]);
 
-  return (
-    <Page>
-      <Navbar />
+  const address = useMemo(() => (data ? joinAddress(data) : ""), [data]);
+  const price = data?.displayPrice ?? data?.price ?? undefined;
+  const deposit = data?.displayDeposit ?? formatMoney(data?.deposit ?? null) ?? undefined;
 
-      <Section>
-        <div className="mx-auto w-full max-w-5xl px-4">
-          <button
-            onClick={() => nav(-1)}
-            className="mb-4 rounded-md border px-3 py-1.5 text-sm hover:bg-gray-50"
-          >
-            ← Back
-          </button>
-
-          {loading && <div className="rounded-lg border p-6">Loading…</div>}
-          {!loading && error && <div className="rounded-lg border border-red-300 bg-red-50 p-6 text-red-800">{error}</div>}
-          {!loading && !error && !data && (
-            <div className="rounded-lg border bg-gray-50 p-6">Listing not found.</div>
-          )}
-
-          {!loading && !error && data && (
-            <div className="space-y-8">
-              {/* Title + price */}
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold">{data.title ?? "Listing"}</h1>
-                  <p className="opacity-70">{[data.address, data.city].filter(Boolean).join(", ")}</p>
-                </div>
-                {typeof data.price === "number" && (
-                  <div className="text-2xl font-extrabold">€{data.price.toLocaleString()}</div>
-                )}
-              </div>
-
-              {/* Gallery */}
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {(data.images?.length ? data.images : [data.imageUrl].filter(Boolean)).map((src, i) => (
-                  <div key={i} className="aspect-[16/10] overflow-hidden rounded-xl">
-                    <img src={src!} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
-                  </div>
-                ))}
-              </div>
-
-              {/* Facts */}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <Fact label="Type" value={data.type} />
-                <Fact label="Bedrooms" value={num(data.bedrooms)} />
-                <Fact label="Bathrooms" value={num(data.bathrooms)} />
-                <Fact label="Size" value={data.sizeSqm ? `${data.sizeSqm} m²` : undefined} />
-                <Fact label="Furnished" value={bool(data.furnished)} />
-                <Fact label="Pets Allowed" value={bool(data.petsAllowed)} />
-              </div>
-
-              {/* Description */}
-              {data.description && (
-                <div className="rounded-xl border bg-white p-6">
-                  <h2 className="mb-2 text-xl font-semibold">Description</h2>
-                  <p className="whitespace-pre-wrap leading-relaxed">{data.description}</p>
-                </div>
-              )}
-
-              {/* Map (static link placeholder) */}
-              {(data.latitude && data.longitude) && (
-                <div className="rounded-xl border p-4">
-                  <h2 className="mb-3 text-lg font-semibold">Location</h2>
-                  <a
-                    className="text-blue-600 underline"
-                    href={`https://www.google.com/maps?q=${data.latitude},${data.longitude}`}
-                    target="_blank" rel="noreferrer"
-                  >
-                    View on Google Maps
-                  </a>
-                </div>
-              )}
-
-              {/* Contact / Apply */}
-              <div className="flex flex-wrap items-center gap-3">
-                <button className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700">
-                  Contact Agent
-                </button>
-                <button className="rounded-lg border px-5 py-2.5 hover:bg-gray-50">
-                  Schedule a Viewing
-                </button>
-              </div>
-            </div>
-          )}
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-6xl p-4 animate-pulse">
+        <div className="h-8 w-64 bg-gray-200 rounded mb-4" />
+        <div className="h-64 w-full bg-gray-200 rounded mb-6" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="h-24 bg-gray-200 rounded" />
+          <div className="h-24 bg-gray-200 rounded" />
+          <div className="h-24 bg-gray-200 rounded" />
         </div>
-      </Section>
+      </div>
+    );
+  }
 
-      <Footer />
-    </Page>
-  );
-};
+  if (error) {
+    return (
+      <div className="mx-auto max-w-3xl p-4">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+          <h2 className="text-lg font-semibold text-red-700">Could not load listing</h2>
+          <p className="text-red-700/80 mt-1">{error}</p>
+          <Link to="/" className="inline-block mt-3 underline">Go back</Link>
+        </div>
+      </div>
+    );
+  }
 
-function Fact({ label, value }: { label: string; value?: string }) {
-  if (!value) return null;
+  if (!data) return null;
+
   return (
-    <div className="rounded-xl border bg-white p-4">
-      <div className="text-sm opacity-60">{label}</div>
-      <div className="text-lg font-semibold">{value}</div>
+    <div className="mx-auto max-w-6xl p-4">
+      <div className="mb-3 flex items-center gap-2 text-sm text-gray-500">
+        <Link to="/" className="underline">Home</Link>
+        <span>/</span>
+        <span>Listing #{data.id}</span>
+      </div>
+
+      <div className="flex flex-col md:flex-row md:items-start gap-6">
+        {/* Image */}
+        <div className="md:w-2/3 w-full">
+          <img
+            src={data.image}
+            alt={data.title}
+            className="w-full h-auto rounded-2xl shadow-sm object-cover"
+          />
+          {data.photosCount ? (
+            <div className="mt-2 text-xs text-gray-500">Photos: {data.photosCount}</div>
+          ) : null}
+        </div>
+
+        {/* Summary card */}
+        <aside className="md:w-1/3 w-full">
+          <div className="rounded-2xl border p-4 shadow-sm">
+            <h1 className="text-2xl font-semibold leading-tight">{data.title}</h1>
+            <div className="mt-2 text-gray-600">{address || data.location}</div>
+
+            <div className="mt-4 grid grid-cols-1 gap-2 text-sm">
+              {price && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Rent</span>
+                  <span className="font-medium">{price}</span>
+                </div>
+              )}
+              {data.rentPeriod && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Period</span>
+                  <span>{data.rentPeriod}</span>
+                </div>
+              )}
+              {deposit && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Deposit</span>
+                  <span>{deposit}</span>
+                </div>
+              )}
+              {data.status && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Status</span>
+                  <span>{data.status}</span>
+                </div>
+              )}
+            </div>
+
+            {data.canonicalUrl && (
+              <a
+                href={data.canonicalUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-flex w-full items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium hover:bg-gray-50"
+              >
+                View Source Listing
+              </a>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      {/* Details grid */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <DetailCard label="Property type" value={data.propertyType} />
+        <DetailCard label="Furnishing" value={data.furnishingType} />
+        <DetailCard label="Energy label" value={data.energyLabel} />
+        <DetailCard label="Area" value={data.areaM2 ? `${data.areaM2} m²` : undefined} />
+        <DetailCard label="Rooms" value={numOrDash(data.rooms)} />
+        <DetailCard label="Bedrooms" value={numOrDash(data.bedrooms)} />
+        <DetailCard label="Bathrooms" value={numOrDash(data.bathrooms)} />
+        <DetailCard label="Available from" value={dateOrDash(data.availableFrom)} />
+        <DetailCard label="Available until" value={dateOrDash(data.availableUntil)} />
+        <DetailCard label="Min. lease" value={data.minimumLeaseMonths ? `${data.minimumLeaseMonths} months` : undefined} />
+      </div>
+
+      {data.description && (
+        <div className="mt-6 rounded-2xl border p-4">
+          <h2 className="text-lg font-semibold">Description</h2>
+          <p className="mt-2 whitespace-pre-line text-gray-700">{data.description}</p>
+        </div>
+      )}
+
+      {(data.lat != null && data.lon != null) && (
+        <div className="mt-6 rounded-2xl border p-4">
+          <h2 className="text-lg font-semibold">Location</h2>
+          <p className="text-gray-600">{address || data.location}</p>
+          <a
+            href={`https://www.google.com/maps?q=${data.lat},${data.lon}`}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-block underline"
+          >
+            Open in Google Maps
+          </a>
+        </div>
+      )}
     </div>
   );
 }
 
-function num(n?: number) {
-  return typeof n === "number" ? String(n) : undefined;
-}
-function bool(b?: boolean) {
-  return typeof b === "boolean" ? (b ? "Yes" : "No") : undefined;
+function DetailCard({ label, value }: { label: string; value?: string | number | null }) {
+  if (value == null || value === "") return null;
+  return (
+    <div className="rounded-2xl border p-4">
+      <div className="text-sm text-gray-500">{label}</div>
+      <div className="mt-1 text-base font-medium">{value}</div>
+    </div>
+  );
 }
 
-export default ListingDetails;
+function numOrDash(v?: number | null) {
+  return v != null ? `${v}` : undefined;
+}
+
+function dateOrDash(v?: string | null) {
+  if (!v) return undefined;
+  try {
+    const d = new Date(v);
+    return d.toLocaleDateString();
+  } catch {
+    return v;
+  }
+}

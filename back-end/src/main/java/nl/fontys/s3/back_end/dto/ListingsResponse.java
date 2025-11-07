@@ -7,5 +7,5 @@ public record ListingsResponse<T>(
         long total,
         int page,
         int pageSize,
-        boolean hasNext
+        int totalPages
 ) {}

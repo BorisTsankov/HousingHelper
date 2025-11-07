@@ -1,6 +1,5 @@
 package nl.fontys.s3.back_end.controller;
 import nl.fontys.s3.back_end.dto.*;
-import nl.fontys.s3.back_end.model.Listing;
 import nl.fontys.s3.back_end.service.ListingService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,9 +25,11 @@ public class ListingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ListingDetailsDto> getOne(@PathVariable long id) {
-        return ResponseEntity.ok(listingService.getById(id));
+    public ResponseEntity<PropertyDto> getOne(@PathVariable long id) {
+        PropertyDto property = listingService.getById(id);
+        return ResponseEntity.ok(property);
     }
+
 
     @GetMapping
     public ResponseEntity<ListingsResponse<PropertyDto>> list(
@@ -38,11 +39,10 @@ public class ListingController {
             @RequestParam(required = false) Integer minPrice,
             @RequestParam(required = false) Integer maxPrice,
 
-            // advanced (listings page)
             @RequestParam(required = false) Integer bedroomsMin,
             @RequestParam(required = false) Integer bathroomsMin,
-            @RequestParam(required = false) String furnished,    // "yes" | "no"
-            @RequestParam(required = false) String petsAllowed,  // "yes" | "no"
+            @RequestParam(required = false) String furnished,
+            @RequestParam(required = false) String petsAllowed,
             @RequestParam(required = false) Integer areaMin,
             @RequestParam(required = false) Integer areaMax,
             @RequestParam(required = false)
@@ -62,12 +62,18 @@ public class ListingController {
         );
 
         Page<PropertyDto> page = listingService.list(criteria, safePageable);
-        return ResponseEntity.ok(new ListingsResponse<>(page.getContent(), page.getTotalElements()));
+        return ResponseEntity.ok(new ListingsResponse<>(
+                page.getContent(),
+                page.getTotalElements(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages()
+        ));
     }
 
     @GetMapping("/filters")
     public ResponseEntity<FilterGroup> filters(@RequestParam(defaultValue = "home") String scope) {
-        // In real life: fetch distinct values from DB or config
+        // TODO: should fetch valued from db
         List<FilterOption> types = List.of(
                 new FilterOption("Apartment", "apartment"),
                 new FilterOption("House", "house"),
@@ -107,7 +113,6 @@ public class ListingController {
             return ResponseEntity.ok(new FilterGroup(types, cities, price, bedrooms, bathrooms, furnished, pets));
         }
 
-        // home scope: advanced lists empty
         return ResponseEntity.ok(new FilterGroup(types, cities, price,
                 List.of(), List.of(), List.of(), List.of()));
     }

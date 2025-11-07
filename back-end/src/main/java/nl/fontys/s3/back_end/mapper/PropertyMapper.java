@@ -3,57 +3,94 @@ package nl.fontys.s3.back_end.mapper;
 import nl.fontys.s3.back_end.dto.PropertyDto;
 import nl.fontys.s3.back_end.model.Listing;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
 
 public final class PropertyMapper {
-    private PropertyMapper() {
+    private PropertyMapper() {}
+
+    private static String fmtCurrency(BigDecimal amount) {
+        if (amount == null) return null;
+        return NumberFormat.getCurrencyInstance(Locale.GERMANY).format(amount);
     }
 
     public static PropertyDto toPropertyDto(Listing l) {
+        String title = (l.getTitle() != null && !l.getTitle().isBlank())
+                ? l.getTitle()
+                : "Listing#" + l.getId();
 
-        String price;
-        if(l.getRentAmount() == null){
-            price = "Price on request";
-        }
-        else{
-            price = NumberFormat.getCurrencyInstance(Locale.GERMANY).format(l.getRentAmount()) + "/mo";
-        }
-
-        String title;
-        if(l.getTitle() != null && !l.getTitle().isBlank()){
-            title = l.getTitle();
-        }
-        else {
-            title = "Listing#" + l.getId();
-        }
+        String image = (l.getPrimaryPhotoUrl() != null && !l.getPrimaryPhotoUrl().isBlank())
+                ? l.getPrimaryPhotoUrl()
+                : "https://via.placeholder.com/400x250?text=No+Image";
 
         String location;
-        if(l.getCity() != null) {
-            location=l.getCity();
-        }
-        else if(l.getCountry() != null) {
+        if (l.getCity() != null && !l.getCity().isBlank()) {
+            location = l.getCity();
+        } else if (l.getCountry() != null && !l.getCountry().isBlank()) {
             location = l.getCountry();
-        }
-        else {
+        } else {
             location = "Unknown";
         }
 
-        String image;
-        if(l.getPrimaryPhotoUrl() != null && !l.getPrimaryPhotoUrl().isBlank()){
-            image = l.getPrimaryPhotoUrl();
-        }
-        else {
-            image = "https://via.placeholder.com/400x250?text=No+Image";
-        }
+        String displayPrice = (l.getRentAmount() == null)
+                ? "Price on request"
+                : fmtCurrency(l.getRentAmount()) + "/mo";
+
+        String displayDeposit = (l.getDeposit() == null)
+                ? null
+                : fmtCurrency(l.getDeposit());
+
+        String rentPeriod = (l.getRentPeriod() != null) ? l.getRentPeriod().getLabel() : null;
+        String propertyType = (l.getPropertyType() != null) ? l.getPropertyType().getLabel() : null;
+        String furnishingType = (l.getFurnishingType() != null) ? l.getFurnishingType().getLabel() : null;
+        String status = (l.getStatus() != null) ? l.getStatus().getLabel() : null;
+        String source = (l.getSource() != null) ? l.getSource().getLabel() : null;
 
         return new PropertyDto(
                 String.valueOf(l.getId()),
                 title,
                 image,
-                price,
-                location
+                displayPrice,
+                location,
+
+                displayPrice,
+                displayDeposit,
+
+                l.getRentAmount(),
+                rentPeriod,
+                l.getDeposit(),
+
+                l.getDescription(),
+                status,
+                propertyType,
+                furnishingType,
+                l.getEnergyLabel(),
+
+                l.getAreaM2(),
+                l.getRooms(),
+                l.getBedrooms(),
+                l.getBathrooms(),
+
+                l.getAvailableFrom(),
+                l.getAvailableUntil(),
+                l.getMinimumLeaseMonths(),
+
+                l.getCountry(),
+                l.getCity(),
+                l.getPostalCode(),
+                l.getStreet(),
+                l.getHouseNumber(),
+                l.getUnit(),
+
+                l.getLat(),
+                l.getLon(),
+
+                l.getPhotosCount(),
+                l.getCanonicalUrl(),
+
+                l.getExternalId(),
+                source
         );
     }
 }
-
