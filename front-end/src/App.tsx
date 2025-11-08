@@ -3,6 +3,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home"
 import Listings from "./pages/Listings"
 import ListingDetails from "./pages/ListingDetails"
+import Map from "./pages/Map"
 
 export default function App() {
     return (
