@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/15</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/15</span>
             </div>
         
             
@@ -81,41 +81,56 @@
 <a name='L16'></a><a href='#L16'>16</a>
 <a name='L17'></a><a href='#L17'>17</a>
 <a name='L18'></a><a href='#L18'>18</a>
-<a name='L19'></a><a href='#L19'>19</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import React from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >import { Link } from "react-router-dom"; // ✅ you need this import</span>
 import type { Property } from "../../types/property";
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const PropertyCard: React.FC&lt;{ item: Property }&gt; = ({ item }) =&gt; (</span>
-<span class="cstat-no" title="statement not covered" >  &lt;figure className="overflow-hidden rounded-3xl border border-slate-200 shadow-sm"&gt;</span>
-<span class="cstat-no" title="statement not covered" >    &lt;img</span>
-<span class="cstat-no" title="statement not covered" >      src={item.image}</span>
-<span class="cstat-no" title="statement not covered" >      alt={item.title}</span>
-<span class="cstat-no" title="statement not covered" >      className="h-64 w-full object-cover transition-transform duration-300 hover:scale-105"</span>
-<span class="cstat-no" title="statement not covered" >      loading="lazy"</span>
-    /&gt;
-<span class="cstat-no" title="statement not covered" >    &lt;figcaption className="p-4"&gt;</span>
-<span class="cstat-no" title="statement not covered" >      &lt;h3 className="text-lg font-semibold text-slate-800"&gt;{item.title}&lt;/h3&gt;</span>
-<span class="cstat-no" title="statement not covered" >      &lt;p className="text-slate-600 text-sm"&gt;{item.location}&lt;/p&gt;</span>
-<span class="cstat-no" title="statement not covered" >      &lt;p className="text-blue-600 font-semibold mt-2"&gt;{item.price}&lt;/p&gt;</span>
-    &lt;/figcaption&gt;
-  &lt;/figure&gt;
+<span class="cstat-no" title="statement not covered" >  &lt;Link to={`/listings/${item.id}`} className="block group"&gt;</span>
+<span class="cstat-no" title="statement not covered" >    &lt;figure className="overflow-hidden rounded-3xl border border-slate-200 shadow-sm transition hover:shadow-md"&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;img</span>
+<span class="cstat-no" title="statement not covered" >        src={item.image}</span>
+<span class="cstat-no" title="statement not covered" >        alt={item.title}</span>
+<span class="cstat-no" title="statement not covered" >        className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"</span>
+<span class="cstat-no" title="statement not covered" >        loading="lazy"</span>
+      /&gt;
+<span class="cstat-no" title="statement not covered" >      &lt;figcaption className="p-4 bg-white"&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;h3 className="text-lg font-semibold text-slate-800 group-hover:text-blue-600 transition"&gt;</span>
+<span class="cstat-no" title="statement not covered" >          {item.title}</span>
+        &lt;/h3&gt;
+<span class="cstat-no" title="statement not covered" >        &lt;p className="text-slate-600 text-sm"&gt;{item.location}&lt;/p&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;p className="text-blue-600 font-semibold mt-2"&gt;{item.price}&lt;/p&gt;</span>
+      &lt;/figcaption&gt;
+    &lt;/figure&gt;
+  &lt;/Link&gt;
 );
 &nbsp;</pre></td></tr></table></pre>
 
@@ -124,7 +139,7 @@ import type { Property } from "../../types/property";
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-04T15:01:45.422Z
+                at 2025-11-08T11:23:43.646Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

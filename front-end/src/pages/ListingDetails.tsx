@@ -1,7 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import type {Property} from "type";
-
+import {
+  MapPin,
+  Bed,
+  Bath,
+  Ruler,
+  Euro,
+  ShieldCheck,
+  Home as HomeIcon,
+  ExternalLink,
+  ImageIcon,
+  Calendar,
+} from "lucide-react";
+import Navbar from "../components/layout/Navbar";
+import type { Property } from "type";
 
 const API_BASE = "/api/listings";
 
@@ -19,6 +31,20 @@ function joinAddress(p: Property) {
   const cityLine = [p.postalCode, p.city].filter(Boolean).join(" ");
   const country = p.country ?? undefined;
   return [parts || undefined, cityLine || undefined, country].filter(Boolean).join(", ");
+}
+
+function numOrUndef(v?: number | null) {
+  return v != null ? `${v}` : undefined;
+}
+
+function dateOrUndef(v?: string | null) {
+  if (!v) return undefined;
+  try {
+    const d = new Date(v);
+    return d.toLocaleDateString();
+  } catch {
+    return v;
+  }
 }
 
 export default function ListingDetails() {
@@ -58,159 +84,191 @@ export default function ListingDetails() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl p-4 animate-pulse">
-        <div className="h-8 w-64 bg-gray-200 rounded mb-4" />
-        <div className="h-64 w-full bg-gray-200 rounded mb-6" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="h-24 bg-gray-200 rounded" />
-          <div className="h-24 bg-gray-200 rounded" />
-          <div className="h-24 bg-gray-200 rounded" />
+      <>
+        <Navbar />
+        <div className="mx-auto max-w-6xl p-4 animate-pulse">
+          <div className="h-6 w-40 rounded bg-gray-200/80 mb-3" />
+          <div className="h-9 w-80 rounded bg-gray-200/80 mb-4" />
+          <div className="aspect-[16/10] w-full rounded-2xl bg-gray-200/80 mb-6" />
+          <div className="h-24 rounded-2xl bg-gray-200/80" />
         </div>
-      </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="mx-auto max-w-3xl p-4">
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-          <h2 className="text-lg font-semibold text-red-700">Could not load listing</h2>
-          <p className="text-red-700/80 mt-1">{error}</p>
-          <Link to="/" className="inline-block mt-3 underline">Go back</Link>
+      <>
+        <Navbar />
+        <div className="mx-auto max-w-3xl p-4">
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+            <h2 className="text-lg font-semibold text-red-700">Could not load listing</h2>
+            <p className="text-red-700/80 mt-1">{error}</p>
+            <Link to="/" className="inline-flex items-center gap-1 mt-3 underline">
+              <HomeIcon className="h-4 w-4" /> Go back
+            </Link>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (!data) return null;
 
   return (
-    <div className="mx-auto max-w-6xl p-4">
-      <div className="mb-3 flex items-center gap-2 text-sm text-gray-500">
-        <Link to="/" className="underline">Home</Link>
-        <span>/</span>
-        <span>Listing #{data.id}</span>
-      </div>
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-b from-white via-white to-gray-50">
+        <div className="mx-auto max-w-6xl p-4 md:p-6">
 
-      <div className="flex flex-col md:flex-row md:items-start gap-6">
-        {/* Image */}
-        <div className="md:w-2/3 w-full">
-          <img
-            src={data.image}
-            alt={data.title}
-            className="w-full h-auto rounded-2xl shadow-sm object-cover"
-          />
-          {data.photosCount ? (
-            <div className="mt-2 text-xs text-gray-500">Photos: {data.photosCount}</div>
-          ) : null}
-        </div>
+          <div className="flex flex-col md:flex-row md:items-start gap-6">
+            <div className="md:w-2/3 w-full">
+              <div className="relative overflow-hidden rounded-2xl shadow-sm">
+                <img src={data.image} alt={data.title} className="w-full h-full object-cover aspect-[16/10]" />
+                {Boolean(data.photosCount) && (
+                  <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+                    <ImageIcon className="h-3.5 w-3.5" /> {data.photosCount}
+                  </div>
+                )}
+              </div>
 
-        {/* Summary card */}
-        <aside className="md:w-1/3 w-full">
-          <div className="rounded-2xl border p-4 shadow-sm">
-            <h1 className="text-2xl font-semibold leading-tight">{data.title}</h1>
-            <div className="mt-2 text-gray-600">{address || data.location}</div>
-
-            <div className="mt-4 grid grid-cols-1 gap-2 text-sm">
-              {price && (
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Rent</span>
-                  <span className="font-medium">{price}</span>
-                </div>
-              )}
-              {data.rentPeriod && (
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Period</span>
-                  <span>{data.rentPeriod}</span>
-                </div>
-              )}
-              {deposit && (
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Deposit</span>
-                  <span>{deposit}</span>
-                </div>
-              )}
-              {data.status && (
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Status</span>
-                  <span>{data.status}</span>
-                </div>
-              )}
+              <FactsBar price={price} areaM2={data?.areaM2} bedrooms={data?.bedrooms} bathrooms={data?.bathrooms} />
             </div>
 
-            {data.canonicalUrl && (
-              <a
-                href={data.canonicalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-flex w-full items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium hover:bg-gray-50"
-              >
-                View Source Listing
-              </a>
-            )}
+            <aside className="md:w-1/3 w-full md:sticky md:top-6">
+              <SectionCard className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <h1 className="text-2xl font-semibold leading-tight tracking-tight">{data.title}</h1>
+                  {data.status && (
+                    <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium text-gray-700">
+                      <ShieldCheck className="mr-1 h-3.5 w-3.5" /> {data.status}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-2 flex items-start gap-2 text-gray-600">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span className="leading-relaxed">{address || data.location}</span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-2 text-sm">
+                  {price && <Row label="Rent" value={price} />}
+                  {data.rentPeriod && <Row label="Period" value={data.rentPeriod} />}
+                  {deposit && <Row label="Deposit" value={deposit} />}
+                  {data.minimumLeaseMonths && <Row label="Min. lease" value={`${data.minimumLeaseMonths} months`} />}
+                  {data.availableFrom && <Row label="Available from" value={dateOrUndef(data.availableFrom)} />}
+                  {data.availableUntil && <Row label="Available until" value={dateOrUndef(data.availableUntil)} />}
+                </div>
+
+                {data.canonicalUrl && (
+                  <a
+                    href={data.canonicalUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium hover:bg-gray-50"
+                  >
+                    <ExternalLink className="h-4 w-4" /> View Source Listing
+                  </a>
+                )}
+              </SectionCard>
+            </aside>
           </div>
-        </aside>
-      </div>
 
-      {/* Details grid */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <DetailCard label="Property type" value={data.propertyType} />
-        <DetailCard label="Furnishing" value={data.furnishingType} />
-        <DetailCard label="Energy label" value={data.energyLabel} />
-        <DetailCard label="Area" value={data.areaM2 ? `${data.areaM2} m²` : undefined} />
-        <DetailCard label="Rooms" value={numOrDash(data.rooms)} />
-        <DetailCard label="Bedrooms" value={numOrDash(data.bedrooms)} />
-        <DetailCard label="Bathrooms" value={numOrDash(data.bathrooms)} />
-        <DetailCard label="Available from" value={dateOrDash(data.availableFrom)} />
-        <DetailCard label="Available until" value={dateOrDash(data.availableUntil)} />
-        <DetailCard label="Min. lease" value={data.minimumLeaseMonths ? `${data.minimumLeaseMonths} months` : undefined} />
-      </div>
+          <SectionCard className="mt-6">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-gray-500" />
+              <h2 className="text-lg font-semibold">Details</h2>
+            </div>
 
-      {data.description && (
-        <div className="mt-6 rounded-2xl border p-4">
-          <h2 className="text-lg font-semibold">Description</h2>
-          <p className="mt-2 whitespace-pre-line text-gray-700">{data.description}</p>
+            <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+              <DetailItem label="Property type" value={data.propertyType} />
+              <DetailItem label="Furnishing" value={data.furnishingType} />
+              <DetailItem label="Energy label" value={data.energyLabel} />
+              <DetailItem label="Area" value={data.areaM2 ? `${data.areaM2} m²` : undefined} />
+              <DetailItem label="Rooms" value={numOrUndef(data.rooms)} />
+              <DetailItem label="Bedrooms" value={numOrUndef(data.bedrooms)} />
+              <DetailItem label="Bathrooms" value={numOrUndef(data.bathrooms)} />
+              <DetailItem label="Available from" value={dateOrUndef(data.availableFrom)} />
+              <DetailItem label="Available until" value={dateOrUndef(data.availableUntil)} />
+            </dl>
+          </SectionCard>
+
+          {data.description && (
+            <SectionCard className="mt-6">
+              <h2 className="text-lg font-semibold">Description</h2>
+              <p className="mt-2 whitespace-pre-line leading-relaxed text-gray-700">{data.description}</p>
+            </SectionCard>
+          )}
+
+          {data.lat != null && data.lon != null && (
+            <SectionCard className="mt-6">
+              <h2 className="text-lg font-semibold mb-3">Location</h2>
+              <div className="flex items-start gap-2 text-gray-600 mb-3">
+                <MapPin className="mt-0.5 h-4 w-4" />
+                <span>{address || data.location}</span>
+              </div>
+
+              <iframe
+                title="Google Maps"
+                width="100%"
+                height="350"
+                style={{ border: 0, borderRadius: "1rem" }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAHr1tg1BF9jfqW-PnkQI0H79M7UPKuHp4&q=${data.lat},${data.lon}`}
+              ></iframe>
+            </SectionCard>
+          )}
         </div>
-      )}
-
-      {(data.lat != null && data.lon != null) && (
-        <div className="mt-6 rounded-2xl border p-4">
-          <h2 className="text-lg font-semibold">Location</h2>
-          <p className="text-gray-600">{address || data.location}</p>
-          <a
-            href={`https://www.google.com/maps?q=${data.lat},${data.lon}`}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-block underline"
-          >
-            Open in Google Maps
-          </a>
-        </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
 
-function DetailCard({ label, value }: { label: string; value?: string | number | null }) {
+function Row({ label, value }: { label: string; value?: string | number | null }) {
   if (value == null || value === "") return null;
   return (
-    <div className="rounded-2xl border p-4">
-      <div className="text-sm text-gray-500">{label}</div>
-      <div className="mt-1 text-base font-medium">{value}</div>
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-gray-500">{label}</span>
+      <span className="font-medium">{value}</span>
     </div>
   );
 }
 
-function numOrDash(v?: number | null) {
-  return v != null ? `${v}` : undefined;
+function SectionCard({ children, className = "" }: React.PropsWithChildren<{ className?: string }>) {
+  return <section className={`rounded-2xl border bg-white p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
-function dateOrDash(v?: string | null) {
-  if (!v) return undefined;
-  try {
-    const d = new Date(v);
-    return d.toLocaleDateString();
-  } catch {
-    return v;
-  }
+function FactsBar({ price, areaM2, bedrooms, bathrooms }: { price?: string | number | null; areaM2?: number | null; bedrooms?: number | null; bathrooms?: number | null }) {
+  const items: Array<{ key: string; icon: React.ReactNode; label: string } | null> = [
+    price != null && price !== "" ? { key: String(price), icon: <Euro className="h-4 w-4" />, label: `${price}` } : null,
+    areaM2 ? { key: `area-${areaM2}`, icon: <Ruler className="h-4 w-4" />, label: `${areaM2} m²` } : null,
+    bedrooms != null ? { key: `bed-${bedrooms}`, icon: <Bed className="h-4 w-4" />, label: `${bedrooms} bed${bedrooms === 1 ? "" : "s"}` } : null,
+    bathrooms != null ? { key: `bath-${bathrooms}`, icon: <Bath className="h-4 w-4" />, label: `${bathrooms} bath${bathrooms === 1 ? "" : "s"}` } : null,
+  ];
+
+  const visible = items.filter(Boolean) as Array<{ key: string; icon: React.ReactNode; label: string }>;
+  if (visible.length === 0) return null;
+
+  return (
+    <div className="mt-3 rounded-2xl border bg-white/80 backdrop-blur p-3">
+      <ul className="flex flex-wrap items-center gap-2">
+        {visible.map((it) => (
+          <li key={it.key} className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            {it.icon}
+            <span>{it.label}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function DetailItem({ label, value }: { label: string; value?: string | number | null }) {
+  if (value == null || value === "") return null;
+  return (
+    <div className="flex items-baseline gap-2">
+      <dt className="text-sm text-gray-500">{label}</dt>
+      <dd className="text-base font-medium">{value}</dd>
+    </div>
+  );
 }

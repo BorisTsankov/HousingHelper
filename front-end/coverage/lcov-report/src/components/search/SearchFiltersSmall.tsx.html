@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/components/search/SearchFilters.tsx</title>
+    <title>Code coverage report for src/components/search/SearchFiltersSmall.tsx</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../prettify.css" />
     <link rel="stylesheet" href="../../../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/components/search</a> SearchFilters.tsx</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/components/search</a> SearchFiltersSmall.tsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -98,25 +98,18 @@
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a>
 <a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -130,41 +123,51 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Select } from "../ui/Select";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import React from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >import { Select } from "../ui/Select";</span>
 import type { Filters } from "../../types/filters";
+import type { FilterGroup } from "../../types/filterOptions";
 &nbsp;
-type Props = {
-    value: Filters;
-    onChange: (f: Filters) =&gt; void };
+type Props = { value: Filters; onChange: (f: Filters) =&gt; void; options: FilterGroup };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export const SearchFilters: React.FC&lt;Props&gt; = ({ value, onChange }) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  const update = (k: keyof Filters) =&gt; (e: React.ChangeEvent&lt;HTMLSelectElement&gt;) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >    onChange({ ...value, [k]: e.target.value as any });</span>
+<span class="cstat-no" title="statement not covered" >export const SearchFiltersSmall: React.FC&lt;Props&gt; = ({ value, onChange, options }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  const set = (patch: Partial&lt;Filters&gt;) =&gt; onChange({ ...value, ...patch });</span>
+<span class="cstat-no" title="statement not covered" >  const selectedPriceLabel =</span>
+<span class="cstat-no" title="statement not covered" >    options.priceBuckets.find(b =&gt; b.min === value.minPrice &amp;&amp; b.max === value.maxPrice)?.label ?? "";</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
 <span class="cstat-no" title="statement not covered" >    &lt;div className="grid grid-cols-1 gap-3 sm:grid-cols-3"&gt;</span>
-<span class="cstat-no" title="statement not covered" >      &lt;Select value={value.type ?? ""} onChange={update("type")}&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;Select value={value.type ?? ""} onChange={(e) =&gt; set({ type: e.target.value || undefined })}&gt;</span>
 <span class="cstat-no" title="statement not covered" >        &lt;option value=""&gt;Property Type&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Apartment&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;House&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Studio&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        {options.types.map(o =&gt; &lt;option key={o.value} value={o.value}&gt;{o.label}&lt;/option&gt;)}</span>
       &lt;/Select&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      &lt;Select value={value.price ?? ""} onChange={update("price")}&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;Select</span>
+<span class="cstat-no" title="statement not covered" >        value={selectedPriceLabel}</span>
+<span class="cstat-no" title="statement not covered" >        onChange={(e) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >          const bucket = options.priceBuckets.find(b =&gt; b.label === e.target.value);</span>
+<span class="cstat-no" title="statement not covered" >          set({ minPrice: bucket?.min ?? undefined, maxPrice: bucket?.max ?? undefined });</span>
+<span class="cstat-no" title="statement not covered" >        }}</span>
+      &gt;
 <span class="cstat-no" title="statement not covered" >        &lt;option value=""&gt;Price Range&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;$500 - $1,000&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;$1,000 - $1,500&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;$2,500+&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        {options.priceBuckets.map(b =&gt; &lt;option key={b.label} value={b.label}&gt;{b.label}&lt;/option&gt;)}</span>
       &lt;/Select&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      &lt;Select value={value.location ?? ""} onChange={update("location")}&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;Select value={value.city ?? ""} onChange={(e) =&gt; set({ city: e.target.value || undefined })}&gt;</span>
 <span class="cstat-no" title="statement not covered" >        &lt;option value=""&gt;Location&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Eindhoven&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Rotterdam&lt;/option&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;option&gt;Amsterdam&lt;/option&gt;</span>
+<span class="cstat-no" title="statement not covered" >        {options.cities.map(o =&gt; &lt;option key={o.value} value={o.value}&gt;{o.label}&lt;/option&gt;)}</span>
       &lt;/Select&gt;
     &lt;/div&gt;
   );
@@ -175,7 +178,7 @@ type Props = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-04T15:01:45.422Z
+                at 2025-11-08T11:23:43.646Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

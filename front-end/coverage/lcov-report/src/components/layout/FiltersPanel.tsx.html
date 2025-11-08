@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/pages/Register.tsx</title>
+    <title>Code coverage report for src/components/layout/FiltersPanel.tsx</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../sort-arrow-sprite.png);
+            background-image: url(../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/pages</a> Register.tsx</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/components/layout</a> FiltersPanel.tsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/25</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/25</span>
             </div>
         
             
@@ -104,14 +104,11 @@
 <a name='L39'></a><a href='#L39'>39</a>
 <a name='L40'></a><a href='#L40'>40</a>
 <a name='L41'></a><a href='#L41'>41</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -127,62 +124,65 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { useState } from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import React from "react";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >import { SlidersHorizontal } from "lucide-react"; // optional, remove if not installed</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export default function Register() {</span>
-<span class="cstat-no" title="statement not covered" >    const [form, setForm] = useState({ email: "", name: "", password: "" });</span>
-<span class="cstat-no" title="statement not covered" >    const [message, setMessage] = useState("");</span>
+type Props = { title?: string; children: React.ReactNode; className?: string };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >        setForm({ ...form, [e.target.name]: e.target.value });</span>
+<span class="cstat-no" title="statement not covered" >export const FiltersPanel: React.FC&lt;Props&gt; = ({</span>
+<span class="cstat-no" title="statement not covered" >  title = "Search &amp; Filters",</span>
+<span class="cstat-no" title="statement not covered" >  children,</span>
+<span class="cstat-no" title="statement not covered" >  className = "",</span>
+<span class="cstat-no" title="statement not covered" >}) =&gt; (</span>
+<span class="cstat-no" title="statement not covered" >  &lt;aside</span>
+<span class="cstat-no" title="statement not covered" >    className={[</span>
+<span class="cstat-no" title="statement not covered" >      // sticky and truly hugging the left (pair with md:-ml-4 on column)</span>
+<span class="cstat-no" title="statement not covered" >      "md:sticky md:top-24 h-fit",</span>
+<span class="cstat-no" title="statement not covered" >      // premium card vibes</span>
+<span class="cstat-no" title="statement not covered" >      "rounded-2xl border border-gray-200 bg-white/90 backdrop-blur shadow-xl ring-1 ring-black/5",</span>
+<span class="cstat-no" title="statement not covered" >      "overflow-hidden", // keep header gradient crisp</span>
+<span class="cstat-no" title="statement not covered" >      className,</span>
+<span class="cstat-no" title="statement not covered" >    ].join(" ")}</span>
+<span class="cstat-no" title="statement not covered" >    aria-label={title}</span>
+  &gt;
+    {/* Header */}
+<span class="cstat-no" title="statement not covered" >    &lt;div className="bg-gradient-to-b from-gray-50 to-white border-b px-4 py-3"&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;div className="flex items-center gap-2"&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;SlidersHorizontal className="size-4 opacity-70" /&gt;</span>
+<span class="cstat-no" title="statement not covered" >        &lt;h2 className="text-sm font-semibold tracking-wide"&gt;{title}&lt;/h2&gt;</span>
+      &lt;/div&gt;
+    &lt;/div&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    const handleSubmit = async (e: React.FormEvent) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        e.preventDefault();</span>
-<span class="cstat-no" title="statement not covered" >        try {</span>
-<span class="cstat-no" title="statement not covered" >            const res = await fetch("/api/users/register", {</span>
-<span class="cstat-no" title="statement not covered" >                method: "POST",</span>
-<span class="cstat-no" title="statement not covered" >                headers: { "Content-Type": "application/json" },</span>
-<span class="cstat-no" title="statement not covered" >                body: JSON.stringify(form),</span>
-<span class="cstat-no" title="statement not covered" >            });</span>
-<span class="cstat-no" title="statement not covered" >            if (res.ok) setMessage("Registration successful");</span>
-<span class="cstat-no" title="statement not covered" >            else setMessage("Error: " + (await res.text()));</span>
-<span class="cstat-no" title="statement not covered" >        } catch (err) {</span>
-<span class="cstat-no" title="statement not covered" >            setMessage("Network error: " + err);</span>
-<span class="cstat-no" title="statement not covered" >        }</span>
-<span class="cstat-no" title="statement not covered" >    };</span>
+    {/* Body */}
+<span class="cstat-no" title="statement not covered" >    &lt;div className="px-4 py-4"&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;div className="space-y-4"&gt;{children}&lt;/div&gt;</span>
+    &lt;/div&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return (</span>
-<span class="cstat-no" title="statement not covered" >        &lt;div style={{ maxWidth: 400, margin: "2rem auto" }}&gt;</span>
-<span class="cstat-no" title="statement not covered" >            &lt;h2&gt;Register&lt;/h2&gt;</span>
-<span class="cstat-no" title="statement not covered" >            &lt;form onSubmit={handleSubmit}&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;input name="email" placeholder="Email" value={form.email} onChange={handleChange} required /&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;br /&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;input name="name" placeholder="Name" value={form.name} onChange={handleChange} required /&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;br /&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required /&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;br /&gt;</span>
-<span class="cstat-no" title="statement not covered" >                &lt;button type="submit"&gt;Register&lt;/button&gt;</span>
-            &lt;/form&gt;
-<span class="cstat-no" title="statement not covered" >            &lt;p&gt;{message}&lt;/p&gt;</span>
-        &lt;/div&gt;
-    );
-<span class="cstat-no" title="statement not covered" >}</span>
+    {/* Subtle bottom hairline */}
+<span class="cstat-no" title="statement not covered" >    &lt;div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" /&gt;</span>
+  &lt;/aside&gt;
+);
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export default FiltersPanel;</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -192,14 +192,14 @@
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-11-08T11:23:43.646Z
             </div>
-        <script src="../../prettify.js"></script>
+        <script src="../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../sorter.js"></script>
-        <script src="../../block-navigation.js"></script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
     </body>
 </html>
     
