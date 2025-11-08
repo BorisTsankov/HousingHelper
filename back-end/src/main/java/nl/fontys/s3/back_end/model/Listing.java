@@ -99,6 +99,13 @@ public class Listing {
     @Column(name = "ingest_job_id")
     private Long ingestJobId;
 
+    @Column(name = "pets_allowed")
+    private Boolean petsAllowed;
+
+    public Boolean getPetsAllowed() { return petsAllowed; }
+    public void setPetsAllowed(Boolean petsAllowed) { this.petsAllowed = petsAllowed; }
+
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

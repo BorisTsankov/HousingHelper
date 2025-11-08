@@ -2,6 +2,10 @@ import React from "react";
 import { Select } from "../ui/Select";
 import type { Filters } from "../../types/filters";
 import type { FilterGroup } from "../../types/filterOptions";
+import { CityCombo } from "./CityCombo"; // <-- add this import
+import type { Filters } from "../../types/filters";
+import type { FilterGroup } from "../../types/filterOptions";
+import { FILTER_FIELD_CLASS } from "../../styles/filterField";
 
 type Props = { value: Filters; onChange: (f: Filters) => void; options: FilterGroup };
 
@@ -12,12 +16,12 @@ export const SearchFiltersSmall: React.FC<Props> = ({ value, onChange, options }
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-      <Select value={value.type ?? ""} onChange={(e) => set({ type: e.target.value || undefined })}>
+      <Select className={FILTER_FIELD_CLASS} value={value.type ?? ""} onChange={(e) => set({ type: e.target.value || undefined })}>
         <option value="">Property Type</option>
         {options.types.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </Select>
 
-      <Select
+      <Select className={FILTER_FIELD_CLASS}
         value={selectedPriceLabel}
         onChange={(e) => {
           const bucket = options.priceBuckets.find(b => b.label === e.target.value);
@@ -28,10 +32,13 @@ export const SearchFiltersSmall: React.FC<Props> = ({ value, onChange, options }
         {options.priceBuckets.map(b => <option key={b.label} value={b.label}>{b.label}</option>)}
       </Select>
 
-      <Select value={value.city ?? ""} onChange={(e) => set({ city: e.target.value || undefined })}>
-        <option value="">Location</option>
-        {options.cities.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </Select>
+      <CityCombo
+              value={value.city}
+              onChange={(v) => set({ city: v })}
+              options={options.cities}
+              placeholder="City (type to search)"
+              limit={5}
+            />
     </div>
   );
 };

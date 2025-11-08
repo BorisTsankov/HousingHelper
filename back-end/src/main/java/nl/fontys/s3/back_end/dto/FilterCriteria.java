@@ -12,7 +12,7 @@ public record FilterCriteria(
         // advanced
         Integer bedroomsMin,
         Integer bathroomsMin,
-        String furnished,    // "yes" | "no"
+        String furnished,    // furnished semi-furnished or unfurnished
         String petsAllowed,  // "yes" | "no"
         Integer areaMin,
         Integer areaMax,

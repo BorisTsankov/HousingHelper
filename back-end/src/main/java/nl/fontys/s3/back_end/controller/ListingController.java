@@ -79,11 +79,9 @@ public class ListingController {
                 new FilterOption("House", "house"),
                 new FilterOption("Studio", "studio")
         );
-        List<FilterOption> cities = List.of(
-                new FilterOption("Eindhoven", "eindhoven"),
-                new FilterOption("Rotterdam", "rotterdam"),
-                new FilterOption("Amsterdam", "amsterdam")
-        );
+
+        List<FilterOption> cities = listingService.getCityOptions();
+
         List<PriceBucket> price = List.of(
                 new PriceBucket("$500 - $1,000", 500, 1000),
                 new PriceBucket("$1,000 - $1,500", 1000, 1500),
@@ -102,8 +100,10 @@ public class ListingController {
                     new FilterOption("2+", "2")
             );
             List<FilterOption> furnished = List.of(
-                    new FilterOption("Yes", "yes"),
-                    new FilterOption("No", "no")
+                    new FilterOption("Furnished", "furnished"),
+                    new FilterOption("Semi-Furnished", "semi-furnished"),
+                    new FilterOption("Unfurnished", "unfurnished")
+
             );
             List<FilterOption> pets = List.of(
                     new FilterOption("Allowed", "yes"),

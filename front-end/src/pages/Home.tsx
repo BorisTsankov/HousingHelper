@@ -82,10 +82,6 @@ const Home: React.FC = () => {
     window.location.assign(`/listings${qs ? `?${qs}` : ""}`);
   };
 
-  const resetDraft = () => {
-    setDraftFilters({});
-    setQDraft("");
-  };
 
   return (
     <Page>
@@ -115,16 +111,6 @@ const Home: React.FC = () => {
           options={options}
         />
 
-        <div className="mt-3 flex items-center justify-end">
-          <button
-            type="button"
-            onClick={resetDraft}
-            className="rounded-md border px-3 py-1.5 text-sm hover:bg-gray-50"
-            aria-label="Reset filters"
-          >
-            Reset
-          </button>
-        </div>
       </div>
     </div>
   </div>

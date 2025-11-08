@@ -8,7 +8,7 @@ export type Filters = {
   // advanced (listings only)
   bedroomsMin?: number;
   bathroomsMin?: number;
-  furnished?: "yes" | "no" | "";
+  furnished?: "furnished" | "semi-furnished" | "unfurnished" | "";
   petsAllowed?: "yes" | "no" | "";
   areaMin?: number;
   areaMax?: number;

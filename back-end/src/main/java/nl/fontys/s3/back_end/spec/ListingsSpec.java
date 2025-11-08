@@ -6,6 +6,7 @@ import nl.fontys.s3.back_end.model.Listing;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public final class ListingsSpec {
     private ListingsSpec() {}
@@ -54,5 +55,80 @@ public final class ListingsSpec {
 
     public static Specification<Listing> alwaysTrue() {
         return (root, q, cb) -> cb.conjunction();
+    }
+
+    public static Specification<Listing> bedroomsMin(Integer min) {
+        if (min == null) return alwaysTrue();
+        return (root, q, cb) -> cb.greaterThanOrEqualTo(root.get("bedrooms"), min);
+    }
+
+    public static Specification<Listing> bathroomsMin(Integer min) {
+        if (min == null) return alwaysTrue();
+        return (root, q, cb) -> cb.greaterThanOrEqualTo(root.get("bathrooms"), min);
+    }
+
+    public static Specification<Listing> furnished(String val) {
+        if (val == null || val.isBlank()) return alwaysTrue();
+        String v = val.trim().toLowerCase();
+
+        return (root, q, cb) -> {
+            Join<Object, Object> f = root.join("furnishingType", JoinType.LEFT);
+            var code = cb.upper(f.get("code")); // FURNISHED / SEMI_FURNISHED / UNFURNISHED
+
+            // 1) Three-state from UI
+            switch (v) {
+                case "furnished":
+                    return cb.equal(code, "FURNISHED");
+                case "semi-furnished":
+                case "semi_furnished": // just in case
+                    return cb.equal(code, "SEMI_FURNISHED");
+                case "unfurnished":
+                    return cb.equal(code, "UNFURNISHED");
+            }
+            // unexpected value => no-op
+            return cb.conjunction();
+        };
+    }
+
+    public static Specification<Listing> petsAllowed(String val) {
+        if (val == null || val.isBlank()) return alwaysTrue();
+        String v = val.trim().toLowerCase();
+
+        Boolean boolVal = switch (v) {
+            case "yes", "true", "1" -> true;
+            case "no", "false", "0" -> false;
+
+            default -> null;
+        };
+        if (boolVal == null) return alwaysTrue();
+
+        return (root, q, cb) -> cb.equal(root.get("petsAllowed"), boolVal);
+    }
+
+    // Helper that safely parses
+    private static Boolean parseYesNo(String s) {
+        if (s == null) return null;
+        String v = s.trim().toLowerCase();
+        if (v.isEmpty()) return null;
+        switch (v) {
+            case "yes": case "true": case "1":  return true;
+            case "no":  case "false": case "0": return false;
+            default: return null; // don't filter if value is unexpected
+        }
+    }
+
+    public static Specification<Listing> areaMin(Integer min) {
+        if (min == null) return alwaysTrue();
+        return (root, q, cb) -> cb.greaterThanOrEqualTo(root.get("areaM2"), min);
+    }
+
+    public static Specification<Listing> areaMax(Integer max) {
+        if (max == null) return alwaysTrue();
+        return (root, q, cb) -> cb.lessThanOrEqualTo(root.get("areaM2"), max);
+    }
+
+    public static Specification<Listing> availableFrom(LocalDate from) {
+        if (from == null) return alwaysTrue();
+        return (root, q, cb) -> cb.lessThanOrEqualTo(root.get("availableFrom"), from);
     }
 }
