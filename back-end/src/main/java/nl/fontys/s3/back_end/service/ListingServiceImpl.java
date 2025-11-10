@@ -2,7 +2,6 @@ package nl.fontys.s3.back_end.service;
 
 import jakarta.transaction.Transactional;
 import nl.fontys.s3.back_end.dto.FilterCriteria;
-import nl.fontys.s3.back_end.dto.FilterGroup;
 import nl.fontys.s3.back_end.dto.FilterOption;
 import nl.fontys.s3.back_end.dto.PropertyDto;
 import nl.fontys.s3.back_end.mapper.PropertyMapper;
