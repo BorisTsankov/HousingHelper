@@ -9,7 +9,6 @@ const Navbar: React.FC = () => {
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
       <Container>
         <nav className="flex items-center justify-between py-3">
-          {/* Logo + Title */}
           <Link to="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
               <Home className="h-5 w-5" />
@@ -19,7 +18,6 @@ const Navbar: React.FC = () => {
             </span>
           </Link>
 
-          {/* Contact button */}
           <Button className="flex items-center gap-2" rounded="full">
             <Mail className="h-4 w-4" />
             Contact Us

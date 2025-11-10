@@ -1,7 +1,6 @@
-// components/search/SearchFiltersAdvanced.tsx
 import React, { useMemo, useState } from "react";
 import { Select } from "../ui/Select";
-import { CityCombo } from "./CityCombo"; // <-- add this import
+import { CityCombo } from "./CityCombo";
 import type { Filters } from "../../types/filters";
 import type { FilterGroup } from "../../types/filterOptions";
 import { FILTER_FIELD_CLASS } from "../../styles/filterField";
@@ -30,7 +29,6 @@ export const SearchFiltersAdvanced: React.FC<Props> = ({ value, onChange, option
         {options.priceBuckets.map(b => <option key={b.label} value={b.label}>{b.label}</option>)}
       </Select>
 
-      {/* City combobox with 5-item cap */}
       <CityCombo
         value={value.city}
         onChange={(v) => set({ city: v })}
@@ -39,7 +37,6 @@ export const SearchFiltersAdvanced: React.FC<Props> = ({ value, onChange, option
         limit={5}
       />
 
-      {/* Advanced */}
       <Select className={FILTER_FIELD_CLASS} value={String(value.bedroomsMin ?? "")} onChange={(e)=>set({ bedroomsMin: e.target.value ? Number(e.target.value) : undefined })}>
         <option value="">Bedrooms (min)</option>
         {options.bedrooms.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}

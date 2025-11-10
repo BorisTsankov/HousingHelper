@@ -1,4 +1,3 @@
-// components/search/CityCombo.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FILTER_FIELD_CLASS } from "../../styles/filterField";
 
@@ -51,9 +50,8 @@ export const CityCombo: React.FC<CityComboProps> = ({
 
   return (
     <div ref={wrapRef} className="relative">
-      {/* Input styled exactly like other filter bars */}
       <input
-        className={`${FILTER_FIELD_CLASS} pr-8`} /* space for chevron */
+        className={`${FILTER_FIELD_CLASS} pr-8`}
         type="text"
         placeholder={placeholder}
         value={input}
@@ -70,12 +68,10 @@ export const CityCombo: React.FC<CityComboProps> = ({
         aria-haspopup="listbox"
       />
 
-      {/* Chevron to match <select> look */}
       <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
         ▾
       </span>
 
-      {/* Dropdown panel styled to match inputs */}
       {open && (
         <ul
           role="listbox"

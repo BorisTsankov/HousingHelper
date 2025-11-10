@@ -9,6 +9,6 @@ public record FilterGroup(
         // advanced
         List<FilterOption> bedrooms,
         List<FilterOption> bathrooms,
-        List<FilterOption> furnished,   // e.g. yes/no/partly
-        List<FilterOption> petsAllowed  // e.g. yes/no
+        List<FilterOption> furnished,
+        List<FilterOption> petsAllowed
 ) {}

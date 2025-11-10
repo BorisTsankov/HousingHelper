@@ -76,6 +76,11 @@ export default function MapWithListings({
     return b.pad(0.05) as LatLngBoundsExpression;
   }, [valid, fitBounds]);
 
+const clusterKey = useMemo(
+    () => valid.map(p => String(p.id)).sort().join("|"),
+    [valid]
+  );
+
   return (
     <div className={"relative w-full h-[70vh] rounded-2xl overflow-hidden " + (className ?? "")}>
       <MapContainer
@@ -92,29 +97,36 @@ export default function MapWithListings({
 
         <ViewEvents onBoundsChange={onBoundsChange} />
 
-        <MarkerClusterGroup chunkedLoading>
-          {valid.map((p) => (
-            <Marker
-              key={String(p.id)}
-              position={[p.lat!, p.lon!]}
-              opacity={activeId != null && String(activeId) === String(p.id) ? 1 : 0.9}
-              eventHandlers={{
-                click: () => onPreview?.(p.id),
-              }}
-            >
-              <Popup>
-                <PopupCard
-                  p={p}
-                  onPreview={() => onPreview?.(p.id)}
-                  detailsHref={getDetailsHref ? getDetailsHref(p) : `/listings/${p.id}`}
-                />
-              </Popup>
-            </Marker>
-          ))}
-        </MarkerClusterGroup>
+        <MarkerClusterGroup key={clusterKey} chunkedLoading>
+                  {valid.map((p) => (
+                    <Marker
+                      key={String(p.id)}
+                      position={[p.lat!, p.lon!]}
+                      opacity={activeId != null && String(activeId) === String(p.id) ? 1 : 0.9}
+                      eventHandlers={{ click: () => onPreview?.(p.id) }}
+                    >
+                      <Popup>
+                        <PopupCard
+                          p={p}
+                          onPreview={() => onPreview?.(p.id)}
+                          detailsHref={getDetailsHref ? getDetailsHref(p) : `/listings/${p.id}`}
+                        />
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MarkerClusterGroup>
       </MapContainer>
     </div>
   );
+}
+
+function AutoResize() {
+  const map = useMap();
+  React.useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 50);
+    return () => clearTimeout(t);
+  }, [map]);
+  return null;
 }
 
 function ViewEvents({

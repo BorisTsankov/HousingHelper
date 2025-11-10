@@ -27,6 +27,8 @@ const Listings: React.FC = () => {
 
   const [q, setQ] = React.useState<string>("");
 
+  const [bbox, setBbox] = React.useState<{north:number;south:number;east:number;west:number} | null>(null);
+
   const [properties, setProperties] = React.useState<Property[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -83,12 +85,20 @@ const Listings: React.FC = () => {
     if (Number.isFinite(areaMax as number)) p.set("areaMax", String(areaMax));
     if (availableFrom) p.set("availableFrom", availableFrom);
 
+   if (showMap && bbox) {
+      p.set("north", String(bbox.north));
+      p.set("south", String(bbox.south));
+      p.set("east",  String(bbox.east));
+      p.set("west",  String(bbox.west));
+    }
+
     p.set("page", String(page));
     p.set("size", String(size));
-
     const qs = p.toString();
     return qs ? `?${qs}` : "";
-  }, [q, filters, page, size]);
+  }, [q, filters, page, size, showMap, bbox]);
+
+
 
   const updateSearchParams = React.useCallback(
     (next: Partial<{ q: string; filters: Filters; page: number; size: number }>) => {
@@ -394,7 +404,7 @@ const Listings: React.FC = () => {
                       image: p.image ?? null,
                       city: p.city ?? null,
                     }))}
-                  onBoundsChange={onBoundsChange}
+                  onBoundsChange={(b)=> setBbox(b)}
                   onPreview={(id)=> setPreviewId(id)}
                   getDetailsHref={(pp)=> buildDetailsHref(pp.id)}
                   className="w-full h-[70vh] md:h-[calc(100vh-var(--nav-offset,80px)-64px)] rounded-xl overflow-hidden"
