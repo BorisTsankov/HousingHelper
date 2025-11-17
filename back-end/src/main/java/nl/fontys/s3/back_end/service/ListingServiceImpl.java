@@ -3,10 +3,11 @@ package nl.fontys.s3.back_end.service;
 import jakarta.transaction.Transactional;
 import nl.fontys.s3.back_end.dto.FilterCriteria;
 import nl.fontys.s3.back_end.dto.FilterOption;
-import nl.fontys.s3.back_end.dto.PropertyDto;
-import nl.fontys.s3.back_end.mapper.PropertyMapper;
-import nl.fontys.s3.back_end.model.Listing;
-import nl.fontys.s3.back_end.repository.ListingRepository;
+import nl.fontys.s3.back_end.dto.ListingDto;
+import nl.fontys.s3.back_end.mapper.ListingMapper;
+import nl.fontys.s3.back_end.entity.Listing;
+import nl.fontys.s3.back_end.repository.repositoryInterface.ListingRepository;
+import nl.fontys.s3.back_end.service.serviceInterface.ListingService;
 import nl.fontys.s3.back_end.spec.ListingsSpec;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,15 +31,15 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public List<PropertyDto> getFeatured(int limit) {
+    public List<ListingDto> getFeatured(int limit) {
         Pageable pageable = firstPageWithLimit(limit, Sort.by(Sort.Direction.DESC, "lastSeenAt"));
         return listingRepository.findAll(pageable)
-                .map(PropertyMapper::toPropertyDto)
+                .map(ListingMapper::toListingDto)
                 .getContent();
     }
 
     @Override
-    public List<PropertyDto> search(String q, int limit) {
+    public List<ListingDto> search(String q, int limit) {
         Pageable pageable = firstPageWithLimit(limit, Sort.by(Sort.Direction.DESC, "lastSeenAt"));
         // build a minimal criteria with only q
         FilterCriteria c = new FilterCriteria(
@@ -48,12 +49,12 @@ public class ListingServiceImpl implements ListingService {
         );
         Specification<Listing> spec = buildSpec(c);
         return listingRepository.findAll(spec, pageable)
-                .map(PropertyMapper::toPropertyDto)
+                .map(ListingMapper::toListingDto)
                 .getContent();
     }
 
     @Override
-    public Page<PropertyDto> list(FilterCriteria criteria, Pageable pageable) {
+    public Page<ListingDto> list(FilterCriteria criteria, Pageable pageable) {
         // normalize ranges defensively
         Integer minPrice = criteria.minPrice();
         Integer maxPrice = criteria.maxPrice();
@@ -90,14 +91,14 @@ public class ListingServiceImpl implements ListingService {
         Specification<Listing> spec = buildSpec(normalized);
 
         return listingRepository.findAll(spec, effectivePageable)
-                .map(PropertyMapper::toPropertyDto);
+                .map(ListingMapper::toListingDto);
     }
 
     @Override
-    public PropertyDto getById(long id) {
+    public ListingDto getById(long id) {
         Listing listing = listingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Listing not found"));
-        return PropertyMapper.toPropertyDto(listing);
+        return ListingMapper.toListingDto(listing);
     }
 
     private Pageable firstPageWithLimit(int limit, Sort sort) {

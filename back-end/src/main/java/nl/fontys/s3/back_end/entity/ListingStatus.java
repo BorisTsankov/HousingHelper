@@ -1,24 +1,24 @@
-package nl.fontys.s3.back_end.model;
+package nl.fontys.s3.back_end.entity;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "listing_source")
-public class ListingSource {
+@Table(name = "listing_status")
+public class ListingStatus {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Short id;
 
-    @Column(nullable = false, unique = true, length = 40)
+    @Column(nullable = false, unique = true, length = 24)
     private String code;
 
-    @Column(nullable = false, length = 120)
+    @Column(nullable = false, length = 80)
     private String label;
 
     @Column(nullable = false)
     private boolean isActive = true;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Short getId() { return id; }
+    public void setId(Short id) { this.id = id; }
 
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }

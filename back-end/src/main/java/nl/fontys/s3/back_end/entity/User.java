@@ -1,4 +1,4 @@
-package nl.fontys.s3.back_end.model;
+package nl.fontys.s3.back_end.entity;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 

@@ -2,7 +2,7 @@ package nl.fontys.s3.back_end.spec;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import nl.fontys.s3.back_end.model.Listing;
+import nl.fontys.s3.back_end.entity.Listing;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;

@@ -1,10 +1,10 @@
-package nl.fontys.s3.back_end.model;
+package nl.fontys.s3.back_end.entity;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "property_type")
-public class PropertyType {
+@Table(name = "rent_period")
+public class RentPeriod {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Short id;
 

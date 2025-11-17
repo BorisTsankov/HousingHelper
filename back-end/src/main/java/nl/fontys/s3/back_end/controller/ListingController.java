@@ -1,6 +1,6 @@
 package nl.fontys.s3.back_end.controller;
 import nl.fontys.s3.back_end.dto.*;
-import nl.fontys.s3.back_end.service.ListingService;
+import nl.fontys.s3.back_end.service.serviceInterface.ListingService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,14 +25,14 @@ public class ListingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PropertyDto> getOne(@PathVariable long id) {
-        PropertyDto property = listingService.getById(id);
-        return ResponseEntity.ok(property);
+    public ResponseEntity<ListingDto> getOne(@PathVariable long id) {
+        ListingDto listing = listingService.getById(id);
+        return ResponseEntity.ok(listing);
     }
 
 
     @GetMapping
-    public ResponseEntity<ListingsResponse<PropertyDto>> list(
+    public ResponseEntity<ListingsResponse<ListingDto>> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String city,
@@ -61,7 +61,7 @@ public class ListingController {
                 areaMin, areaMax, availableFrom
         );
 
-        Page<PropertyDto> page = listingService.list(criteria, safePageable);
+        Page<ListingDto> page = listingService.list(criteria, safePageable);
         return ResponseEntity.ok(new ListingsResponse<>(
                 page.getContent(),
                 page.getTotalElements(),
@@ -73,7 +73,7 @@ public class ListingController {
 
     @GetMapping("/filters")
     public ResponseEntity<FilterGroup> filters(@RequestParam(defaultValue = "home") String scope) {
-        // TODO: should fetch valued from db
+        // TODO: should fetch values from db
         List<FilterOption> types = List.of(
                 new FilterOption("Apartment", "apartment"),
                 new FilterOption("House", "house"),

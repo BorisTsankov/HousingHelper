@@ -1,8 +1,8 @@
 package nl.fontys.s3.back_end.controller;
 
-import nl.fontys.s3.back_end.model.User;
+import nl.fontys.s3.back_end.entity.User;
 import nl.fontys.s3.back_end.dto.UserRegistrationDto;
-import nl.fontys.s3.back_end.repository.UserRepository;
+import nl.fontys.s3.back_end.repository.repositoryInterface.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

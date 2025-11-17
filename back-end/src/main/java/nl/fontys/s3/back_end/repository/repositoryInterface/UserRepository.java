@@ -1,7 +1,7 @@
-package nl.fontys.s3.back_end.repository;
+package nl.fontys.s3.back_end.repository.repositoryInterface;
 
 
-import nl.fontys.s3.back_end.model.User;
+import nl.fontys.s3.back_end.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
