@@ -150,10 +150,4 @@ public final class ListingMapper {
                 m.getSourceName()
         );
     }
-
-    // --------- CONVENIENCE: ENTITY -> DTO ------------
-
-    public static ListingDto toListingDto(Listing l) {
-        return toListingDto(toModel(l));
-    }
 }

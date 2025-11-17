@@ -33,23 +33,27 @@ public class ListingServiceImpl implements ListingService {
     @Override
     public List<ListingDto> getFeatured(int limit) {
         Pageable pageable = firstPageWithLimit(limit, Sort.by(Sort.Direction.DESC, "lastSeenAt"));
+
         return listingRepository.findAll(pageable)
-                .map(ListingMapper::toListingDto)
+                .map(ListingMapper::toModel)          // ENTITY -> MODEL
+                .map(ListingMapper::toListingDto)     // MODEL  -> DTO
                 .getContent();
     }
 
     @Override
     public List<ListingDto> search(String q, int limit) {
         Pageable pageable = firstPageWithLimit(limit, Sort.by(Sort.Direction.DESC, "lastSeenAt"));
-        // build a minimal criteria with only q
+
         FilterCriteria c = new FilterCriteria(
                 q, null, null, null, null,
                 null, null, null, null,
                 null, null, null
         );
         Specification<Listing> spec = buildSpec(c);
+
         return listingRepository.findAll(spec, pageable)
-                .map(ListingMapper::toListingDto)
+                .map(ListingMapper::toModel)          // ENTITY -> MODEL
+                .map(ListingMapper::toListingDto)     // MODEL  -> DTO
                 .getContent();
     }
 
@@ -71,7 +75,6 @@ public class ListingServiceImpl implements ListingService {
             areaMax = tmp;
         }
 
-        // rebuild criteria with normalized ranges
         FilterCriteria normalized = new FilterCriteria(
                 criteria.q(),
                 criteria.type(),
@@ -91,15 +94,21 @@ public class ListingServiceImpl implements ListingService {
         Specification<Listing> spec = buildSpec(normalized);
 
         return listingRepository.findAll(spec, effectivePageable)
-                .map(ListingMapper::toListingDto);
+                .map(ListingMapper::toModel)          // ENTITY -> MODEL
+                .map(ListingMapper::toListingDto);    // MODEL  -> DTO
     }
 
     @Override
     public ListingDto getById(long id) {
         Listing listing = listingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Listing not found"));
-        return ListingMapper.toListingDto(listing);
+
+        return ListingMapper.toListingDto(
+                ListingMapper.toModel(listing)        // ENTITY -> MODEL -> DTO
+        );
     }
+
+    // ---------- helper methods ----------
 
     private Pageable firstPageWithLimit(int limit, Sort sort) {
         int size = Math.max(1, Math.min(limit, MAX_LIMIT));
@@ -137,7 +146,6 @@ public class ListingServiceImpl implements ListingService {
             }
             return cb.conjunction();
         };
-
     }
 
     @Override
