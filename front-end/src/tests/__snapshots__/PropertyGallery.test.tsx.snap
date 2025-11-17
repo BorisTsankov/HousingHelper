@@ -1,0 +1,92 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PropertyGallery > matches snapshot 1`] = `
+<div>
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
+  >
+    <div
+      class="h-full"
+    >
+      <a
+        class="block group h-full"
+        data-discover="true"
+        href="/listings/1"
+      >
+        <figure
+          class="flex flex-col h-full overflow-hidden rounded-3xl border border-slate-200 shadow-sm transition hover:shadow-md"
+        >
+          <img
+            alt="Modern Studio"
+            class="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+            src="studio.jpg"
+          />
+          <figcaption
+            class="flex flex-col justify-between flex-grow p-4 bg-white"
+          >
+            <div>
+              <h3
+                class="text-lg font-semibold text-slate-800 group-hover:text-blue-600 transition"
+              >
+                Modern Studio
+              </h3>
+              <p
+                class="text-slate-600 text-sm"
+              >
+                Eindhoven, NL
+              </p>
+            </div>
+            <p
+              class="text-blue-600 font-semibold mt-3"
+            >
+              €1,000 / month
+            </p>
+          </figcaption>
+        </figure>
+      </a>
+    </div>
+    <div
+      class="h-full"
+    >
+      <a
+        class="block group h-full"
+        data-discover="true"
+        href="/listings/2"
+      >
+        <figure
+          class="flex flex-col h-full overflow-hidden rounded-3xl border border-slate-200 shadow-sm transition hover:shadow-md"
+        >
+          <img
+            alt="Spacious Loft"
+            class="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+            src="loft.jpg"
+          />
+          <figcaption
+            class="flex flex-col justify-between flex-grow p-4 bg-white"
+          >
+            <div>
+              <h3
+                class="text-lg font-semibold text-slate-800 group-hover:text-blue-600 transition"
+              >
+                Spacious Loft
+              </h3>
+              <p
+                class="text-slate-600 text-sm"
+              >
+                Amsterdam, NL
+              </p>
+            </div>
+            <p
+              class="text-blue-600 font-semibold mt-3"
+            >
+              €2,100 / month
+            </p>
+          </figcaption>
+        </figure>
+      </a>
+    </div>
+  </div>
+</div>
+`;

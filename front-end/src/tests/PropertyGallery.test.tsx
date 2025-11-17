@@ -1,45 +1,79 @@
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import React from "react";
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { PropertyGallery } from '../components/gallery/PropertyGallery'
-import { PropertyCard } from "../components/gallery/PropertyCard";
-import type { Property } from "../../types/property";
 
+const mockItems = [
+  {
+    id: "1",
+    title: "Modern Studio",
+    location: "Eindhoven, NL",
+    price: "€1,000 / month",
+    image: "studio.jpg",
+  },
+  {
+    id: "2",
+    title: "Spacious Loft",
+    location: "Amsterdam, NL",
+    price: "€2,100 / month",
+    image: "loft.jpg",
+  },
+];
+
+const renderWithRouter = (ui: React.ReactElement) =>
+  render(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe("PropertyGallery", () => {
-  it("renders 'No properties found.' when items array is empty", () => {
-    render(<PropertyGallery items={[]} />);
-    expect(screen.getByText("No properties found.")).toBeInTheDocument();
+  it("renders 'No properties found.' when items is an empty array", () => {
+    renderWithRouter(<PropertyGallery items={[]} />);
+
+    expect(
+      screen.getByText("No properties found.")
+    ).toBeInTheDocument();
   });
 
-  it("renders 'No properties found.' when items is undefined", () => {
-    render(<PropertyGallery items={undefined as unknown as Property[]} />);
-    expect(screen.getByText("No properties found.")).toBeInTheDocument();
+  it("renders 'No properties found.' when items is undefined at runtime", () => {
+    // @ts-expect-error: testing runtime behavior with undefined items
+    renderWithRouter(<PropertyGallery items={undefined} />);
+
+    expect(
+      screen.getByText("No properties found.")
+    ).toBeInTheDocument();
   });
 
-  it("renders one visual card (figure) per item", () => {
-    const items: Property[] = [
-      { id: 1, name: "Modern Apartment", price: 1200, location: "Eindhoven" },
-      { id: 2, name: "Cozy Studio", price: 800, location: "Tilburg" },
-    ];
-    const { container } = render(<PropertyGallery items={items} />);
+  it("renders a grid of PropertyCard components for each item", () => {
+    const { container } = renderWithRouter(
+      <PropertyGallery items={mockItems} />
+    );
 
-    const figures = container.querySelectorAll("figure");
-    expect(figures.length).toBe(items.length);
+    // Titles from the underlying PropertyCard
+    expect(screen.getByText("Modern Studio")).toBeInTheDocument();
+    expect(screen.getByText("Spacious Loft")).toBeInTheDocument();
 
-    expect(screen.getByText(/Eindhoven/i)).toBeInTheDocument();
-    expect(screen.getByText(/Tilburg/i)).toBeInTheDocument();
-    expect(screen.getByText("1200")).toBeInTheDocument();
-    expect(screen.getByText("800")).toBeInTheDocument();
+    // Ensure grid container exists
+    const grid = container.querySelector(
+      ".grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3"
+    );
+    expect(grid).not.toBeNull();
+
+    // Ensure we have as many children as items
+    expect(grid?.children.length).toBe(mockItems.length);
   });
 
-  it("applies the grid layout classes on the wrapper when items exist", () => {
-    const items: Property[] = [{ id: 1, name: "Villa", price: 2500, location: "Eindhoven" }];
-    const { container } = render(<PropertyGallery items={items} />);
+  it("stretches each card to full height in its column", () => {
+    const { container } = renderWithRouter(
+      <PropertyGallery items={mockItems} />
+    );
 
-    const grid = container.querySelector("div.grid.grid-cols-1");
-    expect(grid).toBeTruthy();
+    const wrappers = container.querySelectorAll("div.h-full");
+    expect(wrappers.length).toBe(mockItems.length);
+  });
 
-    expect(grid?.className).toContain("sm:grid-cols-2");
-    expect(grid?.className).toContain("lg:grid-cols-3");
+  it("matches snapshot", () => {
+    const { container } = renderWithRouter(
+      <PropertyGallery items={mockItems} />
+    );
+    expect(container).toMatchSnapshot();
   });
 });

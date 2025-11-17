@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Page wrapper > matches snapshot 1`] = `
+<div>
+  <div
+    class="min-h-screen flex flex-col "
+  />
+</div>
+`;

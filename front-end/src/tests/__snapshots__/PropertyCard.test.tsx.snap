@@ -1,0 +1,43 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PropertyCard (Vitest) > matches snapshot 1`] = `
+<div>
+  <a
+    class="block group h-full"
+    data-discover="true"
+    href="/listings/123"
+  >
+    <figure
+      class="flex flex-col h-full overflow-hidden rounded-3xl border border-slate-200 shadow-sm transition hover:shadow-md"
+    >
+      <img
+        alt="Cozy Apartment"
+        class="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        loading="lazy"
+        src="test-image.jpg"
+      />
+      <figcaption
+        class="flex flex-col justify-between flex-grow p-4 bg-white"
+      >
+        <div>
+          <h3
+            class="text-lg font-semibold text-slate-800 group-hover:text-blue-600 transition"
+          >
+            Cozy Apartment
+          </h3>
+          <p
+            class="text-slate-600 text-sm"
+          >
+            Amsterdam, NL
+          </p>
+        </div>
+        <p
+          class="text-blue-600 font-semibold mt-3"
+        >
+          €1,500 / month
+        </p>
+      </figcaption>
+    </figure>
+  </a>
+</div>
+`;

@@ -1,3 +1,324 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="0" failures="0" errors="0" time="0">
+<testsuites name="vitest tests" tests="30" failures="3" errors="0" time="1.246194">
+    <testsuite name="src/tests/FiltersPanel.test.tsx" timestamp="2025-11-17T16:59:24.713Z" hostname="DESKTOP-VMUK9EL" tests="8" failures="1" errors="0" skipped="0" time="0.568187">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with default title" time="0.0726118">
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with a custom title" time="0.0072408">
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; sets the aria-label based on the title" time="0.0078565">
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders children inside the panel" time="0.0077924">
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; applies a custom className" time="0.0240568">
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders the icon" time="0.4316427">
+            <failure message="Unable to find an accessible element with the role &quot;img&quot;
+
+Here are the accessible roles:
+
+  complementary:
+
+  Name &quot;Search &amp; Filters&quot;:
+  [36m&lt;aside[39m
+    [33maria-label[39m=[32m&quot;Search &amp; Filters&quot;[39m
+    [33mclass[39m=[32m&quot;md:sticky md:top-24 h-fit rounded-2xl border border-gray-200 bg-white/90 backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden &quot;[39m
+  [36m/&gt;[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name &quot;Search &amp; Filters&quot;:
+  [36m&lt;h2[39m
+    [33mclass[39m=[32m&quot;text-sm font-semibold tracking-wide&quot;[39m
+  [36m/&gt;[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name &quot;&quot;:
+  [36m&lt;p[39m
+    [33mdata-testid[39m=[32m&quot;child&quot;[39m
+  [36m/&gt;[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m&lt;body&gt;[39m
+  [36m&lt;div&gt;[39m
+    [36m&lt;aside[39m
+      [33maria-label[39m=[32m&quot;Search &amp; Filters&quot;[39m
+      [33mclass[39m=[32m&quot;md:sticky md:top-24 h-fit rounded-2xl border border-gray-200 bg-white/90 backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden &quot;[39m
+    [36m&gt;[39m
+      [36m&lt;div[39m
+        [33mclass[39m=[32m&quot;bg-gradient-to-b from-gray-50 to-white border-b px-4 py-3&quot;[39m
+      [36m&gt;[39m
+        [36m&lt;div[39m
+          [33mclass[39m=[32m&quot;flex items-center gap-2&quot;[39m
+        [36m&gt;[39m
+          [36m&lt;svg[39m
+            [33maria-hidden[39m=[32m&quot;true&quot;[39m
+            [33mclass[39m=[32m&quot;lucide lucide-sliders-horizontal size-4 opacity-70&quot;[39m
+            [33mfill[39m=[32m&quot;none&quot;[39m
+            [33mheight[39m=[32m&quot;24&quot;[39m
+            [33mstroke[39m=[32m&quot;currentColor&quot;[39m
+            [33mstroke-linecap[39m=[32m&quot;round&quot;[39m
+            [33mstroke-linejoin[39m=[32m&quot;round&quot;[39m
+            [33mstroke-width[39m=[32m&quot;2&quot;[39m
+            [33mviewBox[39m=[32m&quot;0 0 24 24&quot;[39m
+            [33mwidth[39m=[32m&quot;24&quot;[39m
+            [33mxmlns[39m=[32m&quot;http://www.w3.org/2000/svg&quot;[39m
+          [36m&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M10 5H3&quot;[39m
+            [36m/&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M12 19H3&quot;[39m
+            [36m/&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M14 3v4&quot;[39m
+            [36m/&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M16 17v4&quot;[39m
+            [36m/&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M21 12h-9&quot;[39m
+            [36m/&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M21 19h-5&quot;[39m
+            [36m/&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M21 5h-7&quot;[39m
+            [36m/&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M8 10v4&quot;[39m
+            [36m/&gt;[39m
+            [36m&lt;path[39m
+              [33md[39m=[32m&quot;M8 12H3&quot;[39m
+            [36m/&gt;[39m
+          [36m&lt;/svg&gt;[39m
+          [36m&lt;h2[39m
+            [33mclass[39m=[32m&quot;text-sm font-semibold tracking-wide&quot;[39m
+          [36m&gt;[39m
+            [0mSearch &amp; Filters[0m
+          [36m&lt;/h2&gt;[39m
+        [36m&lt;/div&gt;[39m
+      [36m&lt;/div&gt;[39m
+      [36m&lt;div[39m
+        [33mclass[39m=[32m&quot;px-4 py-4&quot;[39m
+      [36m&gt;[39m
+        [36m&lt;div[39m
+          [33mclass[39m=[32m&quot;space-y-4&quot;[39m
+        [36m&gt;[39m
+          [36m&lt;p[39m
+            [33mdata-testid[39m=[32m&quot;child&quot;[39m
+          [36m&gt;[39m
+            [0mChild content[0m
+          [36m&lt;/p&gt;[39m
+        [36m&lt;/div&gt;[39m
+      [36m&lt;/div&gt;[39m
+      [36m&lt;div[39m
+        [33mclass[39m=[32m&quot;h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent&quot;[39m
+      [36m/&gt;[39m
+    [36m&lt;/aside&gt;[39m
+  [36m&lt;/div&gt;[39m
+[36m&lt;/body&gt;[39m" type="TestingLibraryElementError">
+TestingLibraryElementError: Unable to find an accessible element with the role &quot;img&quot;
+
+Here are the accessible roles:
+
+  complementary:
+
+  Name &quot;Search &amp; Filters&quot;:
+  &lt;aside
+    aria-label=&quot;Search &amp; Filters&quot;
+    class=&quot;md:sticky md:top-24 h-fit rounded-2xl border border-gray-200 bg-white/90 backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden &quot;
+  /&gt;
+
+  --------------------------------------------------
+  heading:
+
+  Name &quot;Search &amp; Filters&quot;:
+  &lt;h2
+    class=&quot;text-sm font-semibold tracking-wide&quot;
+  /&gt;
+
+  --------------------------------------------------
+  paragraph:
+
+  Name &quot;&quot;:
+  &lt;p
+    data-testid=&quot;child&quot;
+  /&gt;
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+&lt;body&gt;
+  &lt;div&gt;
+    &lt;aside
+      aria-label=&quot;Search &amp; Filters&quot;
+      class=&quot;md:sticky md:top-24 h-fit rounded-2xl border border-gray-200 bg-white/90 backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden &quot;
+    &gt;
+      &lt;div
+        class=&quot;bg-gradient-to-b from-gray-50 to-white border-b px-4 py-3&quot;
+      &gt;
+        &lt;div
+          class=&quot;flex items-center gap-2&quot;
+        &gt;
+          &lt;svg
+            aria-hidden=&quot;true&quot;
+            class=&quot;lucide lucide-sliders-horizontal size-4 opacity-70&quot;
+            fill=&quot;none&quot;
+            height=&quot;24&quot;
+            stroke=&quot;currentColor&quot;
+            stroke-linecap=&quot;round&quot;
+            stroke-linejoin=&quot;round&quot;
+            stroke-width=&quot;2&quot;
+            viewBox=&quot;0 0 24 24&quot;
+            width=&quot;24&quot;
+            xmlns=&quot;http://www.w3.org/2000/svg&quot;
+          &gt;
+            &lt;path
+              d=&quot;M10 5H3&quot;
+            /&gt;
+            &lt;path
+              d=&quot;M12 19H3&quot;
+            /&gt;
+            &lt;path
+              d=&quot;M14 3v4&quot;
+            /&gt;
+            &lt;path
+              d=&quot;M16 17v4&quot;
+            /&gt;
+            &lt;path
+              d=&quot;M21 12h-9&quot;
+            /&gt;
+            &lt;path
+              d=&quot;M21 19h-5&quot;
+            /&gt;
+            &lt;path
+              d=&quot;M21 5h-7&quot;
+            /&gt;
+            &lt;path
+              d=&quot;M8 10v4&quot;
+            /&gt;
+            &lt;path
+              d=&quot;M8 12H3&quot;
+            /&gt;
+          &lt;/svg&gt;
+          &lt;h2
+            class=&quot;text-sm font-semibold tracking-wide&quot;
+          &gt;
+            Search &amp; Filters
+          &lt;/h2&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div
+        class=&quot;px-4 py-4&quot;
+      &gt;
+        &lt;div
+          class=&quot;space-y-4&quot;
+        &gt;
+          &lt;p
+            data-testid=&quot;child&quot;
+          &gt;
+            Child content
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div
+        class=&quot;h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent&quot;
+      /&gt;
+    &lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ getByRole node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/tests/FiltersPanel.test.tsx:44:25
+            </failure>
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders structural elements (header, content, divider)" time="0.0069952">
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; matches snapshot" time="0.0066726">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Footer.test.tsx" timestamp="2025-11-17T16:59:24.720Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.1111138">
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders current year" time="0.0534204">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders Facebook, Instagram, and LinkedIn links" time="0.013281">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; contains correct social URLs" time="0.0114124">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; matches snapshot" time="0.0300708">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Navbar.test.tsx" timestamp="2025-11-17T16:59:24.722Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/tests/Navbar.test.tsx" name="src/tests/Navbar.test.tsx" time="0">
+            <failure message="Failed to resolve import &quot;../../context/AuthContext&quot; from &quot;src/tests/Navbar.test.tsx&quot;. Does the file exist?" type="Error">
+Error: Failed to resolve import &quot;../../context/AuthContext&quot; from &quot;src/tests/Navbar.test.tsx&quot;. Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/Boris/Desktop/Fontys/3rd_semester/Individual_Project/HousingHelper/front-end/src/tests/Navbar.test.tsx:19:0
+  21 |  const __vi_import_3__ = await import(&quot;../components/layout/Navbar&quot;);
+  22 |  const __vi_import_4__ = await import(&quot;react-router-dom&quot;);
+  23 |  const __vi_import_5__ = await import(&quot;../../context/AuthContext&quot;);
+     |                                       ^
+  24 |  
+  25 |  
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:31185:43
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:31182:14
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29665:18
+ ❯ node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29723:32
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29691:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:30984:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:26116:26
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Page.test.tsx" timestamp="2025-11-17T16:59:24.724Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.064527">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; renders children" time="0.0436136">
+        </testcase>
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; applies custom className" time="0.005451">
+        </testcase>
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; has correct base layout classes" time="0.0044879">
+        </testcase>
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; matches snapshot" time="0.0086116">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/PropertyCard.test.tsx" timestamp="2025-11-17T16:59:24.725Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="0.3981496">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property title" time="0.0600311">
+        </testcase>
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property location" time="0.0057588">
+        </testcase>
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property price" time="0.0046174">
+        </testcase>
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the image with correct src &amp; alt" time="0.2206486">
+        </testcase>
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; wraps everything in a correct &lt;Link&gt;" time="0.0454231">
+        </testcase>
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; includes hover-related classes" time="0.0510494">
+        </testcase>
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; matches snapshot" time="0.0069314">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/PropertyGallery.test.tsx" timestamp="2025-11-17T16:59:24.727Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.1042166">
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is an empty array" time="0.045858">
+        </testcase>
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is undefined at runtime" time="0.0032532">
+        </testcase>
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders a grid of PropertyCard components for each item" time="0.0287375">
+        </testcase>
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; stretches each card to full height in its column" time="0.0079836">
+        </testcase>
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; matches snapshot" time="0.0150536">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/SearchBar.test.tsx" timestamp="2025-11-17T16:59:24.727Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/tests/SearchBar.test.tsx" name="src/tests/SearchBar.test.tsx" time="0">
+            <failure message="No test suite found in file C:/Users/Boris/Desktop/Fontys/3rd_semester/Individual_Project/HousingHelper/front-end/src/tests/SearchBar.test.tsx" type="Error">
+Error: No test suite found in file C:/Users/Boris/Desktop/Fontys/3rd_semester/Individual_Project/HousingHelper/front-end/src/tests/SearchBar.test.tsx
+            </failure>
+        </testcase>
+    </testsuite>
 </testsuites>
