@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="30" failures="3" errors="0" time="1.246194">
-    <testsuite name="src/tests/FiltersPanel.test.tsx" timestamp="2025-11-17T16:59:24.713Z" hostname="DESKTOP-VMUK9EL" tests="8" failures="1" errors="0" skipped="0" time="0.568187">
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with default title" time="0.0726118">
+<testsuites name="vitest tests" tests="41" failures="6" errors="0" time="1.2336176">
+    <testsuite name="src/tests/FiltersPanel.test.tsx" timestamp="2025-11-17T17:41:50.066Z" hostname="DESKTOP-VMUK9EL" tests="8" failures="1" errors="0" skipped="0" time="0.4997558">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with default title" time="0.0535697">
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with a custom title" time="0.0072408">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with a custom title" time="0.0075353">
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; sets the aria-label based on the title" time="0.0078565">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; sets the aria-label based on the title" time="0.0086171">
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders children inside the panel" time="0.0077924">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders children inside the panel" time="0.0065231">
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; applies a custom className" time="0.0240568">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; applies a custom className" time="0.0155079">
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders the icon" time="0.4316427">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders the icon" time="0.3931207">
             <failure message="Unable to find an accessible element with the role &quot;img&quot;
 
 Here are the accessible roles:
@@ -239,22 +239,327 @@ Ignored nodes: comments, script, style
  ❯ src/tests/FiltersPanel.test.tsx:44:25
             </failure>
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders structural elements (header, content, divider)" time="0.0069952">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders structural elements (header, content, divider)" time="0.0062064">
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; matches snapshot" time="0.0066726">
-        </testcase>
-    </testsuite>
-    <testsuite name="src/tests/Footer.test.tsx" timestamp="2025-11-17T16:59:24.720Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.1111138">
-        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders current year" time="0.0534204">
-        </testcase>
-        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders Facebook, Instagram, and LinkedIn links" time="0.013281">
-        </testcase>
-        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; contains correct social URLs" time="0.0114124">
-        </testcase>
-        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; matches snapshot" time="0.0300708">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; matches snapshot" time="0.0061682">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Navbar.test.tsx" timestamp="2025-11-17T16:59:24.722Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="1" errors="0" skipped="0" time="0">
+    <testsuite name="src/tests/Footer.test.tsx" timestamp="2025-11-17T17:41:50.074Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.0847954">
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders current year" time="0.0517042">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders Facebook, Instagram, and LinkedIn links" time="0.0117314">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; contains correct social URLs" time="0.0093825">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; matches snapshot" time="0.0099707">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/MapWithListings.test.tsx" timestamp="2025-11-17T17:41:50.076Z" hostname="DESKTOP-VMUK9EL" tests="9" failures="1" errors="0" skipped="0" time="0.1298865">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; filters out items without valid coordinates" time="0.0521608">
+        </testcase>
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; sets bounds when there are valid items" time="0.0062706">
+        </testcase>
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; does not set bounds when there are no valid items" time="0.002331">
+        </testcase>
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses activeId to change marker opacity" time="0.0065035">
+        </testcase>
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; calls onPreview when a marker is clicked" time="0.0116459">
+        </testcase>
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; renders popup content and calls onPreview when &apos;Quick preview&apos; clicked" time="0.026087">
+            <failure message="Found multiple elements with the text: Amsterdam
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m&lt;div[39m
+  [33mclass[39m=[32m&quot;text-xs text-gray-600 mt-0.5&quot;[39m
+[36m&gt;[39m
+  [0mAmsterdam[0m
+[36m&lt;/div&gt;[39m
+
+Ignored nodes: comments, script, style
+[36m&lt;div[39m
+  [33mclass[39m=[32m&quot;text-xs text-gray-600 mt-0.5&quot;[39m
+[36m&gt;[39m
+  [0mAmsterdam[0m
+[36m&lt;/div&gt;[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m&lt;body&gt;[39m
+  [36m&lt;div&gt;[39m
+    [36m&lt;div[39m
+      [33mclass[39m=[32m&quot;relative w-full h-[70vh] rounded-2xl overflow-hidden &quot;[39m
+    [36m&gt;[39m
+      [36m&lt;div[39m
+        [33mdata-bounds[39m=[32m&quot;has-bounds&quot;[39m
+        [33mdata-testid[39m=[32m&quot;map&quot;[39m
+      [36m&gt;[39m
+        [36m&lt;div[39m
+          [33mdata-testid[39m=[32m&quot;tile-layer&quot;[39m
+        [36m/&gt;[39m
+        [36m&lt;div[39m
+          [33mdata-testid[39m=[32m&quot;cluster&quot;[39m
+        [36m&gt;[39m
+          [36m&lt;div[39m
+            [33mdata-opacity[39m=[32m&quot;0.9&quot;[39m
+            [33mdata-position[39m=[32m&quot;[52.37,4.89]&quot;[39m
+            [33mdata-testid[39m=[32m&quot;marker&quot;[39m
+          [36m&gt;[39m
+            [36m&lt;div[39m
+              [33mdata-testid[39m=[32m&quot;popup&quot;[39m
+            [36m&gt;[39m
+              [36m&lt;div[39m
+                [33mclass[39m=[32m&quot;w-56&quot;[39m
+              [36m&gt;[39m
+                [36m&lt;img[39m
+                  [33malt[39m=[32m&quot;Nice flat&quot;[39m
+                  [33mclass[39m=[32m&quot;w-full h-28 object-cover rounded-md mb-2&quot;[39m
+                  [33msrc[39m=[32m&quot;img1.jpg&quot;[39m
+                [36m/&gt;[39m
+                [36m&lt;div[39m
+                  [33mclass[39m=[32m&quot;text-sm font-semibold leading-tight line-clamp-2&quot;[39m
+                [36m&gt;[39m
+                  [0mNice flat[0m
+                [36m&lt;/div&gt;[39m
+                [36m&lt;div[39m
+                  [33mclass[39m=[32m&quot;text-xs text-gray-600 mt-0.5&quot;[39m
+                [36m&gt;[39m
+                  [0mAmsterdam[0m
+                [36m&lt;/div&gt;[39m
+                [36m&lt;div[39m
+                  [33mclass[39m=[32m&quot;text-sm font-medium mt-1&quot;[39m
+                [36m&gt;[39m
+                  [0m€1,500[0m
+                [36m&lt;/div&gt;[39m
+                [36m&lt;div[39m
+                  [33mclass[39m=[32m&quot;mt-2 grid grid-cols-2 gap-2&quot;[39m
+                [36m&gt;[39m
+                  [36m&lt;button[39m
+                    [33mclass[39m=[32m&quot;rounded-md border px-2 py-1 text-xs hover:bg-gray-50&quot;[39m
+                  [36m&gt;[39m
+                    [0mQuick preview[0m
+                  [36m&lt;/button&gt;[39m
+                  [36m&lt;a[39m
+                    [33mclass[39m=[32m&quot;rounded-md border px-2 py-1 text-center text-xs hover:bg-gray-50&quot;[39m
+                    [33mhref[39m=[32m&quot;/listings/1&quot;[39m
+                  [36m&gt;[39m
+                    [0mOpen details[0m
+                  [36m&lt;/a&gt;[39m
+                [36m&lt;/div&gt;[39m
+              [36m&lt;/div&gt;[39m
+            [36m&lt;/div&gt;[39m
+          [36m&lt;/div&gt;[39m
+          [36m&lt;div[39m
+            [33mdata-opacity[39m=[32m&quot;0.9&quot;[39m
+            [33mdata-position[39m=[32m&quot;[52.38,4.91]&quot;[39m
+            [33mdata-testid[39m=[32m&quot;marker&quot;[39m
+          [36m&gt;[39m
+            [36m&lt;div[39m
+              [33mdata-testid[39m=[32m&quot;popup&quot;[39m
+            [36m&gt;[39m
+              [36m&lt;div[39m
+                [33mclass[39m=[32m&quot;w-56&quot;[39m
+              [36m&gt;[39m
+                [36m&lt;img[39m
+                  [33malt[39m=[32m&quot;Cozy studio&quot;[39m
+                  [33mclass[39m=[32m&quot;w-full h-28 object-cover rounded-md mb-2&quot;[39m
+                  [33msrc[39m=[32m&quot;img2.jpg&quot;[39m
+                [36m/&gt;[39m
+                [36m&lt;div[39m
+                  [33mclass[39m=[32m&quot;text-sm font-semibold leading-tight line-clamp-2&quot;[39m
+                [36m&gt;[39m
+                  [0mCozy studio[0m
+                [36m&lt;/div&gt;[39m
+                [36m&lt;div[39m
+                  [33mclass[39m=[32m&quot;text-xs text-gray-600 mt-0.5&quot;[39m
+                [36m&gt;[39m
+                  [0mAmsterdam[0m
+                [36m&lt;/div&gt;[39m
+                [36m&lt;div[39m
+                  [33mclass[39m=[32m&quot;text-sm font-medium mt-1&quot;[39m
+                [36m&gt;[39m
+                  [0m€1,200[0m
+                [36m&lt;/div&gt;[39m
+                [36m&lt;div[39m
+                  [33mclass[39m=[32m&quot;mt-2 grid grid-cols-2 gap-2&quot;[39m
+                [36m&gt;[39m
+                  [36m&lt;button[39m
+                    [33mclass[39m=[32m&quot;rounded-md border px-2 py-1 text-xs hover:bg-gray-50&quot;[39m
+                  [36m&gt;[39m
+                    [0mQuick preview[0m
+                  [36m&lt;/button&gt;[39m
+                  [36m&lt;a[39m
+                    [33mclass[39m=[32m&quot;rounded-md border px-2 py-1 text-center text-xs hover:bg-gray-50&quot;[39m
+                    [33mhref[39m=[32m&quot;/listings/2&quot;[39m
+                  [36m&gt;[39m
+                    [0mOpen details[0m
+                  [36m&lt;/a&gt;[39m
+                [36m&lt;/div&gt;[39m
+              [36m&lt;/div&gt;[39m
+            [36m&lt;/div&gt;[39m
+          [36m&lt;/div&gt;[39m
+        [36m&lt;/div&gt;[39m
+      [36m&lt;/div&gt;[39m
+    [36m&lt;/div&gt;[39m
+  [36m&lt;/div&gt;[39m
+[36m&lt;/body&gt;[39m" type="TestingLibraryElementError">
+TestingLibraryElementError: Found multiple elements with the text: Amsterdam
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+&lt;div
+  class=&quot;text-xs text-gray-600 mt-0.5&quot;
+&gt;
+  Amsterdam
+&lt;/div&gt;
+
+Ignored nodes: comments, script, style
+&lt;div
+  class=&quot;text-xs text-gray-600 mt-0.5&quot;
+&gt;
+  Amsterdam
+&lt;/div&gt;
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+&lt;body&gt;
+  &lt;div&gt;
+    &lt;div
+      class=&quot;relative w-full h-[70vh] rounded-2xl overflow-hidden &quot;
+    &gt;
+      &lt;div
+        data-bounds=&quot;has-bounds&quot;
+        data-testid=&quot;map&quot;
+      &gt;
+        &lt;div
+          data-testid=&quot;tile-layer&quot;
+        /&gt;
+        &lt;div
+          data-testid=&quot;cluster&quot;
+        &gt;
+          &lt;div
+            data-opacity=&quot;0.9&quot;
+            data-position=&quot;[52.37,4.89]&quot;
+            data-testid=&quot;marker&quot;
+          &gt;
+            &lt;div
+              data-testid=&quot;popup&quot;
+            &gt;
+              &lt;div
+                class=&quot;w-56&quot;
+              &gt;
+                &lt;img
+                  alt=&quot;Nice flat&quot;
+                  class=&quot;w-full h-28 object-cover rounded-md mb-2&quot;
+                  src=&quot;img1.jpg&quot;
+                /&gt;
+                &lt;div
+                  class=&quot;text-sm font-semibold leading-tight line-clamp-2&quot;
+                &gt;
+                  Nice flat
+                &lt;/div&gt;
+                &lt;div
+                  class=&quot;text-xs text-gray-600 mt-0.5&quot;
+                &gt;
+                  Amsterdam
+                &lt;/div&gt;
+                &lt;div
+                  class=&quot;text-sm font-medium mt-1&quot;
+                &gt;
+                  €1,500
+                &lt;/div&gt;
+                &lt;div
+                  class=&quot;mt-2 grid grid-cols-2 gap-2&quot;
+                &gt;
+                  &lt;button
+                    class=&quot;rounded-md border px-2 py-1 text-xs hover:bg-gray-50&quot;
+                  &gt;
+                    Quick preview
+                  &lt;/button&gt;
+                  &lt;a
+                    class=&quot;rounded-md border px-2 py-1 text-center text-xs hover:bg-gray-50&quot;
+                    href=&quot;/listings/1&quot;
+                  &gt;
+                    Open details
+                  &lt;/a&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            data-opacity=&quot;0.9&quot;
+            data-position=&quot;[52.38,4.91]&quot;
+            data-testid=&quot;marker&quot;
+          &gt;
+            &lt;div
+              data-testid=&quot;popup&quot;
+            &gt;
+              &lt;div
+                class=&quot;w-56&quot;
+              &gt;
+                &lt;img
+                  alt=&quot;Cozy studio&quot;
+                  class=&quot;w-full h-28 object-cover rounded-md mb-2&quot;
+                  src=&quot;img2.jpg&quot;
+                /&gt;
+                &lt;div
+                  class=&quot;text-sm font-semibold leading-tight line-clamp-2&quot;
+                &gt;
+                  Cozy studio
+                &lt;/div&gt;
+                &lt;div
+                  class=&quot;text-xs text-gray-600 mt-0.5&quot;
+                &gt;
+                  Amsterdam
+                &lt;/div&gt;
+                &lt;div
+                  class=&quot;text-sm font-medium mt-1&quot;
+                &gt;
+                  €1,200
+                &lt;/div&gt;
+                &lt;div
+                  class=&quot;mt-2 grid grid-cols-2 gap-2&quot;
+                &gt;
+                  &lt;button
+                    class=&quot;rounded-md border px-2 py-1 text-xs hover:bg-gray-50&quot;
+                  &gt;
+                    Quick preview
+                  &lt;/button&gt;
+                  &lt;a
+                    class=&quot;rounded-md border px-2 py-1 text-center text-xs hover:bg-gray-50&quot;
+                    href=&quot;/listings/2&quot;
+                  &gt;
+                    Open details
+                  &lt;/a&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getElementError node_modules/@testing-library/dom/dist/query-helpers.js:20:35
+ ❯ getMultipleElementsFoundError node_modules/@testing-library/dom/dist/query-helpers.js:23:10
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+ ❯ getByText node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/tests/MapWithListings.test.tsx:158:19
+            </failure>
+        </testcase>
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses default details link when getDetailsHref is not provided" time="0.0083611">
+        </testcase>
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses custom getDetailsHref when provided" time="0.0077677">
+        </testcase>
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; calls onBoundsChange on move/zoom events" time="0.0059708">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Navbar.test.tsx" timestamp="2025-11-17T17:41:50.081Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="1" errors="0" skipped="0" time="0">
         <testcase classname="src/tests/Navbar.test.tsx" name="src/tests/Navbar.test.tsx" time="0">
             <failure message="Failed to resolve import &quot;../../context/AuthContext&quot; from &quot;src/tests/Navbar.test.tsx&quot;. Does the file exist?" type="Error">
 Error: Failed to resolve import &quot;../../context/AuthContext&quot; from &quot;src/tests/Navbar.test.tsx&quot;. Does the file exist?
@@ -276,45 +581,89 @@ Error: Failed to resolve import &quot;../../context/AuthContext&quot; from &quot
             </failure>
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Page.test.tsx" timestamp="2025-11-17T16:59:24.724Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.064527">
-        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; renders children" time="0.0436136">
+    <testsuite name="src/tests/Page.test.tsx" timestamp="2025-11-17T17:41:50.083Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.0499663">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; renders children" time="0.0340187">
         </testcase>
-        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; applies custom className" time="0.005451">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; applies custom className" time="0.0030339">
         </testcase>
-        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; has correct base layout classes" time="0.0044879">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; has correct base layout classes" time="0.0027052">
         </testcase>
-        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; matches snapshot" time="0.0086116">
-        </testcase>
-    </testsuite>
-    <testsuite name="src/tests/PropertyCard.test.tsx" timestamp="2025-11-17T16:59:24.725Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="0.3981496">
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property title" time="0.0600311">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property location" time="0.0057588">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property price" time="0.0046174">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the image with correct src &amp; alt" time="0.2206486">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; wraps everything in a correct &lt;Link&gt;" time="0.0454231">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; includes hover-related classes" time="0.0510494">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; matches snapshot" time="0.0069314">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; matches snapshot" time="0.0072883">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/PropertyGallery.test.tsx" timestamp="2025-11-17T16:59:24.727Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.1042166">
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is an empty array" time="0.045858">
+    <testsuite name="src/tests/PropertyCard.test.tsx" timestamp="2025-11-17T17:41:50.085Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="0.3657914">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property title" time="0.0585955">
         </testcase>
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is undefined at runtime" time="0.0032532">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property location" time="0.0063631">
         </testcase>
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders a grid of PropertyCard components for each item" time="0.0287375">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property price" time="0.0060119">
         </testcase>
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; stretches each card to full height in its column" time="0.0079836">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the image with correct src &amp; alt" time="0.1875002">
         </testcase>
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; matches snapshot" time="0.0150536">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; wraps everything in a correct &lt;Link&gt;" time="0.0413832">
+        </testcase>
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; includes hover-related classes" time="0.0563448">
+        </testcase>
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; matches snapshot" time="0.0070528">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/SearchBar.test.tsx" timestamp="2025-11-17T16:59:24.727Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="1" errors="0" skipped="0" time="0">
+    <testsuite name="src/tests/PropertyGallery.test.tsx" timestamp="2025-11-17T17:41:50.086Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.1034222">
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is an empty array" time="0.047558">
+        </testcase>
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is undefined at runtime" time="0.0037152">
+        </testcase>
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders a grid of PropertyCard components for each item" time="0.0277182">
+        </testcase>
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; stretches each card to full height in its column" time="0.0073425">
+        </testcase>
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; matches snapshot" time="0.0146404">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/ProtectedRoute.test.tsx" timestamp="2025-11-17T17:41:50.087Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/tests/ProtectedRoute.test.tsx" name="src/tests/ProtectedRoute.test.tsx" time="0">
+            <failure message="Failed to resolve import &quot;../components/context/AuthContext&quot; from &quot;src/tests/ProtectedRoute.test.tsx&quot;. Does the file exist?" type="Error">
+Error: Failed to resolve import &quot;../components/context/AuthContext&quot; from &quot;src/tests/ProtectedRoute.test.tsx&quot;. Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/Boris/Desktop/Fontys/3rd_semester/Individual_Project/HousingHelper/front-end/src/tests/ProtectedRoute.test.tsx:23:0
+  24 |  const __vi_import_2__ = await import(&quot;@testing-library/react&quot;);
+  25 |  const __vi_import_3__ = await import(&quot;react-router-dom&quot;);
+  26 |  const __vi_import_4__ = await import(&quot;../components/context/AuthContext&quot;);
+     |                                       ^
+  27 |  const __vi_import_5__ = await import(&quot;../components/routing/ProtectedRoute&quot;);
+  28 |  
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:31185:43
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:31182:14
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29665:18
+ ❯ node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29723:32
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29691:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:30984:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:26116:26
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/RegisterForm.test.tsx" timestamp="2025-11-17T17:41:50.089Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="1" errors="0" skipped="0" time="0">
+        <testcase classname="src/tests/RegisterForm.test.tsx" name="src/tests/RegisterForm.test.tsx" time="0">
+            <failure message="Failed to resolve import &quot;../components/services/authService&quot; from &quot;src/tests/RegisterForm.test.tsx&quot;. Does the file exist?" type="Error">
+Error: Failed to resolve import &quot;../components/services/authService&quot; from &quot;src/tests/RegisterForm.test.tsx&quot;. Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/Boris/Desktop/Fontys/3rd_semester/Individual_Project/HousingHelper/front-end/src/tests/RegisterForm.test.tsx:10:0
+  6  |  const __vi_import_2__ = await import(&quot;@testing-library/react&quot;);
+  7  |  const __vi_import_3__ = await import(&quot;@testing-library/user-event&quot;);
+  8  |  const __vi_import_4__ = await import(&quot;../components/services/authService&quot;);
+     |                                       ^
+  9  |  const __vi_import_5__ = await import(&quot;../components/register/RegisterForm&quot;);
+  10 |  
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:31185:43
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:31182:14
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29665:18
+ ❯ node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29723:32
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:29691:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:30984:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js:26116:26
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/SearchBar.test.tsx" timestamp="2025-11-17T17:41:50.091Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="1" errors="0" skipped="0" time="0">
         <testcase classname="src/tests/SearchBar.test.tsx" name="src/tests/SearchBar.test.tsx" time="0">
             <failure message="No test suite found in file C:/Users/Boris/Desktop/Fontys/3rd_semester/Individual_Project/HousingHelper/front-end/src/tests/SearchBar.test.tsx" type="Error">
 Error: No test suite found in file C:/Users/Boris/Desktop/Fontys/3rd_semester/Individual_Project/HousingHelper/front-end/src/tests/SearchBar.test.tsx
