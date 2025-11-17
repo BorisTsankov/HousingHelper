@@ -5,20 +5,18 @@ import Listings from "./pages/Listings";
 import ListingDetails from "./pages/ListingDetails";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
-import { AuthProvider } from "./context/AuthContext";   // ⬅️ add this
-import ProtectedRoute from "./components/routing/ProtectedRoute"; // ⬅️ add this, I gave you the code earlier
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/routing/ProtectedRoute";
 
 export default function App() {
   return (
     <AuthProvider>
 
       <Routes>
-        {/* PUBLIC ROUTES */}
           <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Home />} />
 
-        {/* PROTECTED ROUTES */}
         <Route
           path="/listings"
           element={

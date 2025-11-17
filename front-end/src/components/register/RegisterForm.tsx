@@ -1,4 +1,3 @@
-// src/components/register/RegisterForm.tsx
 import React, { useState } from "react";
 import { RegisterRequest, UserResponse } from "../../types/auth";
 import { registerUser } from "../../services/authService";

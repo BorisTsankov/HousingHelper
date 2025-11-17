@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from "./Container"; // ✅ add this line
+import { Container } from "./Container";
 
 type SectionProps = React.PropsWithChildren<{ title?: string; center?: boolean }>;
 

@@ -19,7 +19,6 @@ export default function Login() {
 
     try {
       await login({ email, password });
-      // ✅ Go to home after successful login
       navigate("/", { replace: true });
     } catch (err: any) {
       setError(err.message || "Login failed");
@@ -78,7 +77,6 @@ export default function Login() {
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </form>
 
-          {/* REGISTER CTA */}
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600 mb-2">
               Don’t have an account?

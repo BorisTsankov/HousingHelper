@@ -35,8 +35,8 @@ public class ListingServiceImpl implements ListingService {
         Pageable pageable = firstPageWithLimit(limit, Sort.by(Sort.Direction.DESC, "lastSeenAt"));
 
         return listingRepository.findAll(pageable)
-                .map(ListingMapper::toModel)          // ENTITY -> MODEL
-                .map(ListingMapper::toListingDto)     // MODEL  -> DTO
+                .map(ListingMapper::toModel)
+                .map(ListingMapper::toListingDto)
                 .getContent();
     }
 
@@ -52,8 +52,8 @@ public class ListingServiceImpl implements ListingService {
         Specification<Listing> spec = buildSpec(c);
 
         return listingRepository.findAll(spec, pageable)
-                .map(ListingMapper::toModel)          // ENTITY -> MODEL
-                .map(ListingMapper::toListingDto)     // MODEL  -> DTO
+                .map(ListingMapper::toModel)
+                .map(ListingMapper::toListingDto)
                 .getContent();
     }
 
@@ -94,8 +94,8 @@ public class ListingServiceImpl implements ListingService {
         Specification<Listing> spec = buildSpec(normalized);
 
         return listingRepository.findAll(spec, effectivePageable)
-                .map(ListingMapper::toModel)          // ENTITY -> MODEL
-                .map(ListingMapper::toListingDto);    // MODEL  -> DTO
+                .map(ListingMapper::toModel)
+                .map(ListingMapper::toListingDto);
     }
 
     @Override
@@ -104,11 +104,10 @@ public class ListingServiceImpl implements ListingService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Listing not found"));
 
         return ListingMapper.toListingDto(
-                ListingMapper.toModel(listing)        // ENTITY -> MODEL -> DTO
+                ListingMapper.toModel(listing)
         );
     }
 
-    // ---------- helper methods ----------
 
     private Pageable firstPageWithLimit(int limit, Sort sort) {
         int size = Math.max(1, Math.min(limit, MAX_LIMIT));
@@ -152,7 +151,7 @@ public class ListingServiceImpl implements ListingService {
     public List<FilterOption> getCityOptions() {
         return listingRepository.findAllDistinctCitiesUsed().stream()
                 .sorted(Comparator.naturalOrder())
-                .map(v -> new FilterOption(toTitleCase(v), v)) // label, value
+                .map(v -> new FilterOption(toTitleCase(v), v))
                 .toList();
     }
 

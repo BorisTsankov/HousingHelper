@@ -14,8 +14,6 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
-import java.util.List;
-
 @Configuration
 public class SecurityConfig {
 

@@ -1,4 +1,3 @@
-// src/components/layout/Navbar.tsx
 import React from "react";
 import { Home, Mail, User } from "lucide-react";
 import { Button } from "../ui/Button";
@@ -14,7 +13,7 @@ const Navbar: React.FC = () => {
     if (!isAuthenticated) {
       navigate("/login");
     } else {
-      navigate("/profile"); // or /dashboard, whatever you have
+      navigate("/profile");
     }
   };
 

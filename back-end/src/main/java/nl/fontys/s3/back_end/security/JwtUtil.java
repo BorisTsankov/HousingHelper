@@ -10,7 +10,6 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // In real life, move to config/env
     private final String SECRET = "super-secret-jwt-key-change-this-1234567890";
     private final long EXPIRATION_MS = 1000L * 60 * 60 * 24; // 24 hours
 
