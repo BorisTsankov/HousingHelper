@@ -19,7 +19,11 @@ export const FiltersPanel: React.FC<Props> = ({
   >
     <div className="bg-gradient-to-b from-gray-50 to-white border-b px-4 py-3">
       <div className="flex items-center gap-2">
-        <SlidersHorizontal className="size-4 opacity-70" />
+        <SlidersHorizontal
+          className="size-4 opacity-70"
+          aria-label="Filters"
+          role="img"
+        />
         <h2 className="text-sm font-semibold tracking-wide">{title}</h2>
       </div>
     </div>

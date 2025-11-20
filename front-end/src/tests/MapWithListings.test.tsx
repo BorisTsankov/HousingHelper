@@ -1,10 +1,8 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 
-// --- Mocks MUST be before importing the component ---
 
-// Minimal Leaflet mock
 vi.mock("leaflet", () => {
   const latLngBounds = (coords: any[]) => ({
     coords,
@@ -24,7 +22,7 @@ vi.mock("leaflet", () => {
   };
 });
 
-// react-leaflet mock
+
 vi.mock("react-leaflet", () => {
   return {
     MapContainer: ({ children, bounds }: any) => (
@@ -54,7 +52,7 @@ vi.mock("react-leaflet", () => {
       }),
     }),
     useMapEvents: (handlers: any) => {
-      // Immediately trigger both events for testing
+
       handlers?.moveend?.();
       handlers?.zoomend?.();
       return {};
@@ -62,7 +60,7 @@ vi.mock("react-leaflet", () => {
   };
 });
 
-// markercluster mock
+
 vi.mock("react-leaflet-markercluster", () => ({
   __esModule: true,
   default: ({ children }: any) => (
@@ -104,7 +102,7 @@ describe("MapWithListings", () => {
     render(<MapWithListings items={baseItems} />);
 
     const markers = screen.getAllByTestId("marker");
-    // Only 2 have valid lat/lon
+
     expect(markers.length).toBe(2);
   });
 
@@ -130,9 +128,9 @@ describe("MapWithListings", () => {
     const markers = screen.getAllByTestId("marker");
     const opacities = markers.map((m) => m.getAttribute("data-opacity"));
 
-    // First marker not active
+
     expect(opacities[0]).toBe("0.9");
-    // Second marker is active
+
     expect(opacities[1]).toBe("1");
   });
 
@@ -153,12 +151,17 @@ describe("MapWithListings", () => {
 
     render(<MapWithListings items={baseItems} onPreview={onPreview} />);
 
-    // Popup content is rendered directly by our mocks
-    expect(screen.getByText("Nice flat")).toBeInTheDocument();
-    expect(screen.getByText("Amsterdam")).toBeInTheDocument();
-    expect(screen.getByText("€1,500")).toBeInTheDocument();
 
-    const buttons = screen.getAllByText("Quick preview");
+    const popups = screen.getAllByTestId("popup");
+    const firstPopup = popups[0];
+    const utils = within(firstPopup);
+
+
+    expect(utils.getByText("Nice flat")).toBeInTheDocument();
+    expect(utils.getByText("Amsterdam")).toBeInTheDocument();
+    expect(utils.getByText("€1,500")).toBeInTheDocument();
+
+    const buttons = utils.getAllByText("Quick preview");
     fireEvent.click(buttons[0]);
 
     expect(onPreview).toHaveBeenCalledWith(1);
@@ -190,7 +193,7 @@ describe("MapWithListings", () => {
 
     render(<MapWithListings items={baseItems} onBoundsChange={onBoundsChange} />);
 
-    // our useMapEvents mock calls moveend and zoomend once each
+
     expect(onBoundsChange).toHaveBeenCalledTimes(2);
     expect(onBoundsChange).toHaveBeenCalledWith({
       north: 1,

@@ -1,37 +1,39 @@
 import React from "react";
 import { describe, it, vi, expect, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import Navbar from '../components/layout/Navbar'
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../../context/AuthContext", () => ({
+
+const mockNavigate = vi.fn();
+
+
+vi.mock("../context/AuthContext", () => ({
   useAuth: vi.fn(),
 }));
 
+
 vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+  const actual = await vi.importActual<typeof import("react-router-dom")>(
+    "react-router-dom"
+  );
   return {
     ...actual,
-    useNavigate: () => vi.fn(),
+    useNavigate: () => mockNavigate,
   };
 });
 
-import { useAuth } from "../../context/AuthContext";
+import Navbar from "../components/layout/Navbar";
+import { useAuth } from "../context/AuthContext";
 
 describe("Navbar", () => {
-  const mockNavigate = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
-
-    // override useNavigate mock for each test
-    vi.mock("react-router-dom", async () => {
-      const actual = await vi.importActual("react-router-dom");
-      return {
-        ...actual,
-        useNavigate: () => mockNavigate,
-      };
-    });
+    mockNavigate.mockClear();
   });
 
   const renderNav = () =>
@@ -42,7 +44,7 @@ describe("Navbar", () => {
     );
 
   it("shows login icon when user is NOT authenticated", () => {
-    (useAuth as any).mockReturnValue({
+    (useAuth as unknown as vi.Mock).mockReturnValue({
       isAuthenticated: false,
       user: null,
       logout: vi.fn(),
@@ -50,12 +52,15 @@ describe("Navbar", () => {
 
     renderNav();
 
-    expect(screen.getByRole("button")).toBeInTheDocument();
+
+    const loginButton = screen.getByRole("button", { name: /login/i });
+    expect(loginButton).toBeInTheDocument();
+
     expect(screen.queryByText("Logout")).not.toBeInTheDocument();
   });
 
   it("shows user info and logout when authenticated", () => {
-    (useAuth as any).mockReturnValue({
+    (useAuth as unknown as vi.Mock).mockReturnValue({
       isAuthenticated: true,
       user: { name: "Boris", email: "test@test.com" },
       logout: vi.fn(),
@@ -68,7 +73,7 @@ describe("Navbar", () => {
   });
 
   it("navigates to /login when unauthenticated user icon is clicked", () => {
-    (useAuth as any).mockReturnValue({
+    (useAuth as unknown as vi.Mock).mockReturnValue({
       isAuthenticated: false,
       user: null,
       logout: vi.fn(),
@@ -76,14 +81,14 @@ describe("Navbar", () => {
 
     renderNav();
 
-    const userBtn = screen.getByRole("button");
-    fireEvent.click(userBtn);
+    const loginButton = screen.getByRole("button", { name: /login/i });
+    fireEvent.click(loginButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/login");
   });
 
   it("navigates to /profile when authenticated user is clicked", () => {
-    (useAuth as any).mockReturnValue({
+    (useAuth as unknown as vi.Mock).mockReturnValue({
       isAuthenticated: true,
       user: { name: "Boris" },
       logout: vi.fn(),
@@ -98,9 +103,9 @@ describe("Navbar", () => {
   });
 
   it("calls logout and navigates to /register", async () => {
-    const logoutMock = vi.fn();
+    const logoutMock = vi.fn().mockResolvedValue(undefined);
 
-    (useAuth as any).mockReturnValue({
+    (useAuth as unknown as vi.Mock).mockReturnValue({
       isAuthenticated: true,
       user: { name: "Boris" },
       logout: logoutMock,
@@ -110,12 +115,14 @@ describe("Navbar", () => {
 
     fireEvent.click(screen.getByText("Logout"));
 
-    expect(logoutMock).toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith("/register");
+    await waitFor(() => {
+      expect(logoutMock).toHaveBeenCalled();
+      expect(mockNavigate).toHaveBeenCalledWith("/register");
+    });
   });
 
   it("matches snapshot", () => {
-    (useAuth as any).mockReturnValue({
+    (useAuth as unknown as vi.Mock).mockReturnValue({
       isAuthenticated: false,
       user: null,
       logout: vi.fn(),

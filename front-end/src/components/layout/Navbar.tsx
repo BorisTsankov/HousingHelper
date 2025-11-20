@@ -63,6 +63,7 @@ const Navbar: React.FC = () => {
               <button
                 onClick={handleUserClick}
                 className="p-2 rounded-full hover:bg-slate-100 transition"
+                  aria-label="Login"
               >
                 <User className="h-6 w-6 text-slate-700" />
               </button>

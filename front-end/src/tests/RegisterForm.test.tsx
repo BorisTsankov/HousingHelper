@@ -3,11 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-vi.mock("../../services/authService", () => ({
+vi.mock("../services/authService", () => ({
   registerUser: vi.fn(),
 }));
 
-import { registerUser } from "../components/services/authService";
+import { registerUser } from "../services/authService";
 import RegisterForm from "../components/register/RegisterForm";
 
 describe("RegisterForm", () => {
@@ -36,7 +36,9 @@ describe("RegisterForm", () => {
     expect(screen.getByLabelText("Name")).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Register" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Register" })
+    ).toBeInTheDocument();
   });
 
   it("submits form successfully and shows success message", async () => {
@@ -61,14 +63,14 @@ describe("RegisterForm", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Account created for")
+        screen.getByText("Account created for", { exact: false })
       ).toBeInTheDocument();
       expect(screen.getByText("test@example.com")).toBeInTheDocument();
     });
-  });
+  }); // ← this was missing
 
   it("shows loading state while submitting", async () => {
-    // make it resolve after a little while
+
     registerUserMock.mockImplementation(
       () => new Promise((resolve) => setTimeout(() => resolve({ email: "x" }), 50))
     );
@@ -78,7 +80,7 @@ describe("RegisterForm", () => {
     const submitBtn = screen.getByRole("button", { name: "Register" });
     await user.click(submitBtn);
 
-    // Immediately after click, it should be disabled and show loading text
+
     expect(submitBtn).toBeDisabled();
     expect(submitBtn).toHaveTextContent("Creating account...");
 
@@ -96,9 +98,7 @@ describe("RegisterForm", () => {
     await user.click(submitBtn);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Registration failed")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Registration failed")).toBeInTheDocument();
     });
   });
 

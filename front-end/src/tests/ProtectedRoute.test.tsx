@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../../context/AuthContext", () => ({
+vi.mock("../context/AuthContext", () => ({
   useAuth: vi.fn(),
 }));
 
@@ -13,14 +13,14 @@ vi.mock("react-router-dom", async () => {
   );
   return {
     ...actual,
-    // Replace Navigate with a test-friendly component
+
     Navigate: ({ to }: { to: string }) => (
       <div data-testid="navigate">NAVIGATE:{to}</div>
     ),
   };
 });
 
-import { useAuth } from "../components/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import ProtectedRoute from "../components/routing/ProtectedRoute";
 
 describe("ProtectedRoute", () => {

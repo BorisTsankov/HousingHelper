@@ -14,7 +14,13 @@ import type { Filters } from "../types/filters";
 import type { Property } from "../types/property";
 import type { FilterGroup } from "../types/filterOptions";
 
-type ListingsResponse = { items: Property[]; total?: number };
+type ListingsResponse = {
+  items: Property[];
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  totalPages?: number;
+};
 
 const Listings: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,12 +28,23 @@ const Listings: React.FC = () => {
 
   const [filters, setFilters] = React.useState<Filters>({});
   const [options, setOptions] = React.useState<FilterGroup>({
-    types: [], cities: [], priceBuckets: [], bedrooms: [], bathrooms: [], furnished: [], petsAllowed: []
+    types: [],
+    cities: [],
+    priceBuckets: [],
+    bedrooms: [],
+    bathrooms: [],
+    furnished: [],
+    petsAllowed: [],
   });
 
   const [q, setQ] = React.useState<string>("");
 
-  const [bbox, setBbox] = React.useState<{north:number;south:number;east:number;west:number} | null>(null);
+  const [bbox, setBbox] = React.useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(null);
 
   const [properties, setProperties] = React.useState<Property[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
@@ -44,52 +61,79 @@ const Listings: React.FC = () => {
   const [total, setTotal] = React.useState<number>(0);
 
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [showMap, setShowMap] = React.useState<boolean>(() => (searchParams.get("view") === "map"));
+  const [showMap, setShowMap] = React.useState<boolean>(
+    () => searchParams.get("view") === "map"
+  );
 
   const [previewId, setPreviewId] = React.useState<string | number | null>(null);
-  const previewItem = React.useMemo(() => properties.find(p => String(p.id) === String(previewId)) || null, [properties, previewId]);
+  const previewItem = React.useMemo(
+    () => properties.find((p) => String(p.id) === String(previewId)) || null,
+    [properties, previewId]
+  );
 
-  const onBoundsChange = React.useCallback((bbox: { north:number; south:number; east:number; west:number }) => {
-  }, []);
+  const onBoundsChange = React.useCallback(
+    (bbox: { north: number; south: number; east: number; west: number }) => {
+      // you can react to map bounds here if you want
+    },
+    []
+  );
 
+  // Load filter options
   React.useEffect(() => {
     const c = new AbortController();
     (async () => {
       try {
-        const res = await fetch("/api/listings/filters?scope=listings", { signal: c.signal });
+        const res = await fetch("/api/listings/filters?scope=listings", {
+          signal: c.signal,
+        });
         if (res.ok) setOptions(await res.json());
-      } catch { /* noop */ }
+      } catch {
+        /* noop */
+      }
     })();
     return () => c.abort();
   }, []);
 
+  // Build query string for API
   const buildApiQuery = React.useCallback(() => {
     const p = new URLSearchParams();
     if (q.trim()) p.set("q", q.trim());
 
     const {
-      type, city, minPrice, maxPrice,
-      bedroomsMin, bathroomsMin, furnished, petsAllowed,
-      areaMin, areaMax, availableFrom
+      type,
+      city,
+      minPrice,
+      maxPrice,
+      bedroomsMin,
+      bathroomsMin,
+      furnished,
+      petsAllowed,
+      areaMin,
+      areaMax,
+      availableFrom,
     } = filters;
 
     if (type) p.set("type", type);
     if (city) p.set("city", city);
-    if (Number.isFinite(minPrice as number)) p.set("minPrice", String(minPrice));
-    if (Number.isFinite(maxPrice as number)) p.set("maxPrice", String(maxPrice));
-    if (Number.isFinite(bedroomsMin as number)) p.set("bedroomsMin", String(bedroomsMin));
-    if (Number.isFinite(bathroomsMin as number)) p.set("bathroomsMin", String(bathroomsMin));
+    if (Number.isFinite(minPrice as number))
+      p.set("minPrice", String(minPrice));
+    if (Number.isFinite(maxPrice as number))
+      p.set("maxPrice", String(maxPrice));
+    if (Number.isFinite(bedroomsMin as number))
+      p.set("bedroomsMin", String(bedroomsMin));
+    if (Number.isFinite(bathroomsMin as number))
+      p.set("bathroomsMin", String(bathroomsMin));
     if (furnished) p.set("furnished", furnished);
     if (petsAllowed) p.set("petsAllowed", petsAllowed);
     if (Number.isFinite(areaMin as number)) p.set("areaMin", String(areaMin));
     if (Number.isFinite(areaMax as number)) p.set("areaMax", String(areaMax));
     if (availableFrom) p.set("availableFrom", availableFrom);
 
-   if (showMap && bbox) {
+    if (showMap && bbox) {
       p.set("north", String(bbox.north));
       p.set("south", String(bbox.south));
-      p.set("east",  String(bbox.east));
-      p.set("west",  String(bbox.west));
+      p.set("east", String(bbox.east));
+      p.set("west", String(bbox.west));
     }
 
     p.set("page", String(page));
@@ -98,15 +142,15 @@ const Listings: React.FC = () => {
     return qs ? `?${qs}` : "";
   }, [q, filters, page, size, showMap, bbox]);
 
-
-
+  // Sync URL search params
   const updateSearchParams = React.useCallback(
     (next: Partial<{ q: string; filters: Filters; page: number; size: number }>) => {
       const p = new URLSearchParams(searchParams.toString());
 
       if (next.q !== undefined) {
         const val = next.q.trim();
-        if (val) p.set("q", val); else p.delete("q");
+        if (val) p.set("q", val);
+        else p.delete("q");
       }
 
       const f = next.filters ?? filters;
@@ -138,6 +182,7 @@ const Listings: React.FC = () => {
     [filters, page, size, searchParams, setSearchParams]
   );
 
+  // Hydrate state from URL
   React.useEffect(() => {
     const qParam = searchParams.get("q") || "";
     setQ(qParam);
@@ -167,6 +212,7 @@ const Listings: React.FC = () => {
     if (Number.isFinite(s) && s > 0) setSize(s);
   }, [searchParams]);
 
+  // Fetch listings
   const fetchListings = React.useCallback(() => {
     const controller = new AbortController();
     (async () => {
@@ -197,10 +243,7 @@ const Listings: React.FC = () => {
     return cleanup;
   }, [fetchListings]);
 
-  React.useEffect(() => {
-    setPage(0);
-    updateSearchParams({ page: 0 });
-  }, [q, filters, updateSearchParams]);
+  // ✅ No more "reset page on q/filters" effect here – we do it explicitly in handlers
 
   const handleSearch = (text: string) => {
     setQ(text);
@@ -252,7 +295,15 @@ const Listings: React.FC = () => {
                 />
               </div>
 
-              <SearchFiltersAdvanced value={filters} onChange={(f)=> { setFilters(f); /* URL sync via useEffect */ }} options={options} />
+              <SearchFiltersAdvanced
+                value={filters}
+                onChange={(f) => {
+                  setFilters(f);
+                  setPage(0);
+                  updateSearchParams({ filters: f, page: 0 });
+                }}
+                options={options}
+              />
 
               <div className="mt-4 flex items-center justify-between border-t pt-4">
                 <button
@@ -263,7 +314,9 @@ const Listings: React.FC = () => {
                   Reset
                 </button>
                 <div className="text-xs md:text-sm opacity-80" aria-live="polite">
-                  {loading ? "Loading…" : `Found ${total} result${total === 1 ? "" : "s"}`}
+                  {loading
+                    ? "Loading…"
+                    : `Found ${total} result${total === 1 ? "" : "s"}`}
                 </div>
               </div>
             </FiltersPanel>
@@ -281,15 +334,29 @@ const Listings: React.FC = () => {
 
               <div className="ml-auto flex gap-2">
                 <button
-                  className={`rounded-md border px-3 py-2 text-sm ${!showMap ? "bg-black text-white" : ""}`}
-                  onClick={() => { setShowMap(false); const sp = new URLSearchParams(searchParams); sp.delete("view"); setSearchParams(sp); }}
+                  className={`rounded-md border px-3 py-2 text-sm ${
+                    !showMap ? "bg-black text-white" : ""
+                  }`}
+                  onClick={() => {
+                    setShowMap(false);
+                    const sp = new URLSearchParams(searchParams);
+                    sp.delete("view");
+                    setSearchParams(sp);
+                  }}
                   aria-pressed={!showMap}
                 >
                   List
                 </button>
                 <button
-                  className={`rounded-md border px-3 py-2 text-sm ${showMap ? "bg-black text-white" : ""}`}
-                  onClick={() => { setShowMap(true); const sp = new URLSearchParams(searchParams); sp.set("view","map"); setSearchParams(sp); }}
+                  className={`rounded-md border px-3 py-2 text-sm ${
+                    showMap ? "bg-black text-white" : ""
+                  }`}
+                  onClick={() => {
+                    setShowMap(true);
+                    const sp = new URLSearchParams(searchParams);
+                    sp.set("view", "map");
+                    setSearchParams(sp);
+                  }}
                   aria-pressed={showMap}
                 >
                   Map
@@ -299,7 +366,10 @@ const Listings: React.FC = () => {
 
             {drawerOpen && (
               <div className="fixed inset-0 z-50 md:hidden">
-                <div className="absolute inset-0 bg-black/30" onClick={() => setDrawerOpen(false)} />
+                <div
+                  className="absolute inset-0 bg-black/30"
+                  onClick={() => setDrawerOpen(false)}
+                />
                 <div className="absolute inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-2xl p-4 overflow-y-auto rounded-r-2xl">
                   <div className="mb-3 flex items-center justify-between">
                     <h2 className="text-base font-semibold">Search &amp; Filters</h2>
@@ -313,13 +383,24 @@ const Listings: React.FC = () => {
 
                   <div className="mb-3">
                     <SearchBar
-                      onSearch={(t) => { handleSearch(t); setDrawerOpen(false); }}
+                      onSearch={(t) => {
+                        handleSearch(t);
+                        setDrawerOpen(false);
+                      }}
                       defaultValue={q}
                       className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
 
-                  <SearchFiltersAdvanced value={filters} onChange={(f)=> setFilters(f)} options={options} />
+                  <SearchFiltersAdvanced
+                    value={filters}
+                    onChange={(f) => {
+                      setFilters(f);
+                      setPage(0);
+                      updateSearchParams({ filters: f, page: 0 });
+                    }}
+                    options={options}
+                  />
 
                   <div className="mt-3 flex items-center justify-between">
                     <button
@@ -354,7 +435,8 @@ const Listings: React.FC = () => {
                   <div className="rounded-2xl border bg-gradient-to-b from-white to-gray-50 p-8 text-center">
                     <p className="font-semibold text-gray-900">No listings found</p>
                     <p className="text-sm text-gray-600 mt-1">
-                      Try adjusting search or filters. You can also hit <span className="font-medium">Reset</span>.
+                      Try adjusting search or filters. You can also hit{" "}
+                      <span className="font-medium">Reset</span>.
                     </p>
                   </div>
                 ) : (
@@ -373,16 +455,17 @@ const Listings: React.FC = () => {
                         Prev
                       </button>
                       <span className="px-3 py-1.5 rounded-full text-sm bg-gray-100">
-                        Page {page + 1} of {Math.max(1, Math.ceil(total / size))} · {total} result{total === 1 ? "" : "s"}
+                        Page {page + 1} of {totalPages} · {total} result
+                        {total === 1 ? "" : "s"}
                       </span>
                       <button
                         className="px-3 py-1.5 rounded-full border hover:bg-gray-50 disabled:opacity-40"
                         onClick={() => {
-                          const nextPage = Math.min(Math.max(1, Math.ceil(total / size)) - 1, page + 1);
+                          const nextPage = Math.min(totalPages - 1, page + 1);
                           setPage(nextPage);
                           updateSearchParams({ page: nextPage });
                         }}
-                        disabled={page >= Math.max(1, Math.ceil(total / size)) - 1 || loading}
+                        disabled={page >= totalPages - 1 || loading}
                       >
                         Next
                       </button>
@@ -394,8 +477,11 @@ const Listings: React.FC = () => {
               <div className="relative">
                 <MapWithListings
                   items={properties
-                    .filter(p => typeof p.lat === "number" && typeof p.lon === "number")
-                    .map(p => ({
+                    .filter(
+                      (p) =>
+                        typeof p.lat === "number" && typeof p.lon === "number"
+                    )
+                    .map((p) => ({
                       id: p.id,
                       title: p.title,
                       lat: p.lat!,
@@ -404,21 +490,38 @@ const Listings: React.FC = () => {
                       image: p.image ?? null,
                       city: p.city ?? null,
                     }))}
-                  onBoundsChange={(b)=> setBbox(b)}
-                  onPreview={(id)=> setPreviewId(id)}
-                  getDetailsHref={(pp)=> buildDetailsHref(pp.id)}
+                  onBoundsChange={(b) => setBbox(b)}
+                  onPreview={(id) => setPreviewId(id)}
+                  getDetailsHref={(pp) => buildDetailsHref(pp.id)}
                   className="w-full h-[70vh] md:h-[calc(100vh-var(--nav-offset,80px)-64px)] rounded-xl overflow-hidden"
                 />
 
                 {previewItem && (
                   <div className="absolute right-4 top-4 z-[500] w-80 max-w-[90vw] rounded-2xl bg-white shadow-xl border overflow-hidden">
                     {previewItem.image && (
-                      <img src={previewItem.image} alt={previewItem.title || "Listing"} className="w-full h-40 object-cover" />
+                      <img
+                        src={previewItem.image}
+                        alt={previewItem.title || "Listing"}
+                        className="w-full h-40 object-cover"
+                      />
                     )}
                     <div className="p-3">
-                      <div className="text-sm font-semibold line-clamp-2">{previewItem.title || "Untitled"}</div>
-                      {previewItem.city && <div className="text-xs text-gray-600 mt-0.5">{previewItem.city}</div>}
-                      {previewItem.price != null && <div className="text-sm font-medium mt-1">{String((previewItem as any).displayPrice ?? previewItem.price)}</div>}
+                      <div className="text-sm font-semibold line-clamp-2">
+                        {previewItem.title || "Untitled"}
+                      </div>
+                      {previewItem.city && (
+                        <div className="text-xs text-gray-600 mt-0.5">
+                          {previewItem.city}
+                        </div>
+                      )}
+                      {previewItem.price != null && (
+                        <div className="text-sm font-medium mt-1">
+                          {String(
+                            (previewItem as any).displayPrice ??
+                              previewItem.price
+                          )}
+                        </div>
+                      )}
                       <div className="mt-3 flex gap-2">
                         <button
                           className="rounded-md border px-3 py-1.5 text-sm hover:bg-gray-50"
@@ -428,7 +531,9 @@ const Listings: React.FC = () => {
                         </button>
                         <button
                           className="ml-auto rounded-md bg-black text-white px-3 py-1.5 text-sm hover:opacity-90"
-                          onClick={() => navigate(buildDetailsHref(previewItem.id))}
+                          onClick={() =>
+                            navigate(buildDetailsHref(previewItem.id))
+                          }
                         >
                           Open details
                         </button>

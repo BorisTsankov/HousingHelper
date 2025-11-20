@@ -38,25 +38,24 @@ describe("FiltersPanel", () => {
     expect(aside?.className).toContain("custom-class");
   });
 
-  it("renders the icon", () => {
-    renderPanel();
-    // lucide icons render as <svg role="img">
-    const icon = screen.getByRole("img");
-    expect(icon).toBeInTheDocument();
-  });
+ it("renders the icon", () => {
+   renderPanel();
+   const icon = screen.getByRole("img", { name: /filters/i });
+   expect(icon).toBeInTheDocument();
+ });
 
   it("renders structural elements (header, content, divider)", () => {
     const { container } = renderPanel();
 
-    // Header section
+
     expect(
       container.querySelector(".bg-gradient-to-b.from-gray-50.to-white")
     ).not.toBeNull();
 
-    // Content wrapper
+
     expect(container.querySelector(".space-y-4")).not.toBeNull();
 
-    // Divider line at bottom
+
     expect(
       container.querySelector(".bg-gradient-to-r.from-transparent.via-gray-200.to-transparent")
     ).not.toBeNull();

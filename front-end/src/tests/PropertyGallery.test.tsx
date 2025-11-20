@@ -34,7 +34,7 @@ describe("PropertyGallery", () => {
   });
 
   it("renders 'No properties found.' when items is undefined at runtime", () => {
-    // @ts-expect-error: testing runtime behavior with undefined items
+
     renderWithRouter(<PropertyGallery items={undefined} />);
 
     expect(
@@ -47,17 +47,17 @@ describe("PropertyGallery", () => {
       <PropertyGallery items={mockItems} />
     );
 
-    // Titles from the underlying PropertyCard
+
     expect(screen.getByText("Modern Studio")).toBeInTheDocument();
     expect(screen.getByText("Spacious Loft")).toBeInTheDocument();
 
-    // Ensure grid container exists
+
     const grid = container.querySelector(
       ".grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3"
     );
     expect(grid).not.toBeNull();
 
-    // Ensure we have as many children as items
+
     expect(grid?.children.length).toBe(mockItems.length);
   });
 
