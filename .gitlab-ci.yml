@@ -41,10 +41,6 @@ test:frontend:
   extends: .default-node
   needs: ["build:frontend"]
   script:
-    - cd front-end
-    - node -v
-    - npm config set cache .npm --location=project
-    - npm ci --no-audit --no-fund
     - npx vitest run --coverage
     - test -f coverage/lcov.info || { echo "coverage/lcov.info missing"; exit 1; }
   artifacts:
