@@ -3,13 +3,38 @@ stages:
   - test
   - sonar
   - integration-test
+  - docker
 
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   GIT_DEPTH: "0"
   GRADLE_USER_HOME: "${CI_PROJECT_DIR}/.gradle"
 
+# -----------------------------
+# Shared rules (branches logic)
+# -----------------------------
 
+# Build & test on feature/*, dev, main
+.build-test-rules:
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Sonar on dev, main and Merge Requests
+.sonar-rules:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# Only on dev and main
+.dev-main-only-rules:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"'
+
+# -----------------------------
+# Frontend (React / Vite) jobs
+# -----------------------------
 .default-node:
   image: node:20-bullseye
   cache:
@@ -27,7 +52,9 @@ variables:
 
 build:frontend:
   stage: build
-  extends: .default-node
+  extends:
+    - .default-node
+    - .build-test-rules
   script:
     - npm run build
   artifacts:
@@ -37,7 +64,9 @@ build:frontend:
 
 test:frontend:
   stage: test
-  extends: .default-node
+  extends:
+    - .default-node
+    - .build-test-rules
   needs: ["build:frontend"]
   script:
     - npx vitest run --coverage
@@ -50,54 +79,12 @@ test:frontend:
       - front-end/coverage/lcov.info
       - front-end/junit/
 
-
-#sonar:whoami:
-#  stage: sonar
-#  image: curlimages/curl:8.10.1
-#  variables:
-#    SONAR_TOKEN: "$SONAR_USER_TOKEN"
-#  script: |
-#    set -euo pipefail
-#    echo "Host: ${SONAR_HOST_URL}"
-#    echo "Validate token:"
-#    curl -s -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/authentication/validate"; echo
-#    echo "Current user:"
-#    curl -s -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/users/current"; echo
-#    echo "Frontend visible? (HTTP 200 expected)"
-#    curl -s -o /dev/null -w "%{http_code}\n" -u "${SONAR_TOKEN}:" \
-#      "${SONAR_HOST_URL}/api/components/show?component=${FRONTEND_SONAR_PROJECT_KEY}"
-#    echo "Backend visible? (HTTP 200 expected)"
-#    curl -s -o /dev/null -w "%{http_code}\n" -u "${SONAR_TOKEN}:" \
-#      "${SONAR_HOST_URL}/api/components/show?component=${BACKEND_SONAR_PROJECT_KEY}"
-#
-#
-##Sonar SMOKE CHECK
-#sonar:smoke:
-#  stage: sonar
-#  image: curlimages/curl:8.10.1
-#  variables:
-#    SONAR_TOKEN: "$SONAR_USER_TOKEN"
-#  script: |
-#    set -euo pipefail
-#    curl -sf "${SONAR_HOST_URL}/api/system/status" | grep -q '"status":"UP"'
-#    curl -sf -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/authentication/validate" | grep -q '"valid":true'
-#
-#    check () {
-#      local key="$1"
-#      code=$(curl -s -o /dev/null -w "%{http_code}" -u "${SONAR_TOKEN}:" \
-#        "${SONAR_HOST_URL}/api/components/show?component=${key}")
-#      test "$code" = "200" || { echo "Token cannot browse ${key} (HTTP $code)"; exit 1; }
-#    }
-#
-#    check "${FRONTEND_SONAR_PROJECT_KEY}"
-#    check "${BACKEND_SONAR_PROJECT_KEY}"
-#    echo "Sonar smoke check OK"
-
-
 sonar:frontend:
   stage: sonar
   image: sonarsource/sonar-scanner-cli:latest
-  needs: ["test:frontend"]    #, "sonar:smoke"
+  extends:
+    - .sonar-rules
+  needs: ["test:frontend"]
   variables:
     SONAR_SCANNER_OPTS: "-Dsonar.qualitygate.wait=true"
     SONAR_TOKEN: "$SONAR_USER_TOKEN"
@@ -117,6 +104,9 @@ sonar:frontend:
         -Dsonar.token="${SONAR_TOKEN}" \
         -Dsonar.qualitygate.wait=true
 
+# -----------------------------
+# Backend (Gradle / Spring Boot)
+# -----------------------------
 .default-gradle:
   image: gradle:8.10.0-jdk17-jammy
   cache:
@@ -125,7 +115,6 @@ sonar:frontend:
       files:
         - back-end/gradle/wrapper/gradle-wrapper.properties
         - back-end/build.gradle
-
     paths:
       - ".gradle/caches"
       - ".gradle/wrapper"
@@ -137,7 +126,9 @@ sonar:frontend:
 
 build:backend:
   stage: build
-  extends: .default-gradle
+  extends:
+    - .default-gradle
+    - .build-test-rules
   script:
     - gradle --no-daemon --build-cache --parallel assemble
   artifacts:
@@ -147,8 +138,10 @@ build:backend:
 
 test:backend:
   stage: test
-  extends: .default-gradle
-  needs: [ "build:backend" ]
+  extends:
+    - .default-gradle
+    - .build-test-rules
+  needs: ["build:backend"]
   script:
     - gradle --no-daemon --build-cache --parallel test jacocoTestReport
   artifacts:
@@ -159,11 +152,12 @@ test:backend:
       - back-end/build/reports/jacoco/test/jacocoTestReport.xml
       - back-end/build/classes/java/main
 
-
 sonar:backend:
   stage: sonar
-  extends: .default-gradle
-  needs: ["test:backend"]  #, "sonar:smoke"
+  extends:
+    - .default-gradle
+    - .sonar-rules
+  needs: ["test:backend"]
   variables:
     SONAR_TOKEN: "$SONAR_USER_TOKEN"
   before_script:
@@ -180,31 +174,9 @@ sonar:backend:
       -Dsonar.java.binaries=build/classes/java/main \
       -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
 
-
-#sonar:list-keys:
-#  image: curlimages/curl:8.10.1
-#  stage: sonar
-#  variables:
-#    SONAR_TOKEN: "$SONAR_USER_TOKEN"
-#  script:
-#    - |
-#      set -euo pipefail
-#      echo "Who am I?"
-#      curl -sS -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/users/current"; echo
-#      echo "Project keys visible to this token:"
-#      curl -sS -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/projects/search?ps=500" \
-#        | sed -n 's/.*"key":"\([^"]*\)".*/\1/p' | sort -u | head -n 200
-
-
-#debug:net:
-#  image: busybox:1.36
-#  script:
-#    - echo "Expect to resolve 'sonarqube' on ci-net"
-#    - cat /etc/resolv.conf || true
-#    - cat /etc/hosts || true
-#    - nslookup sonarqube || ping -c 1 sonarqube || true
-
-# optional: Integration tests with real Postgres
+# -----------------------------
+# Integration tests (backend)
+# -----------------------------
 integration-test:backend:
   stage: integration-test
   image: gradle:8.10.0-jdk17-jammy
@@ -230,7 +202,6 @@ integration-test:backend:
       files:
         - back-end/gradle/wrapper/gradle-wrapper.properties
         - back-end/build.gradle
-
     paths:
       - ".gradle/caches"
       - ".gradle/wrapper"
@@ -242,5 +213,75 @@ integration-test:backend:
     - until pg_isready -h postgres -p 5432 -U "$POSTGRES_USER"; do echo "Waiting for Postgres..."; sleep 1; done
   script:
     - gradle --no-daemon --build-cache --parallel clean test jacocoTestReport
-  rules:
-    - if: '$RUN_INTEGRATION_TESTS == "true"'
+  extends:
+    - .dev-main-only-rules
+  # If you want a manual toggle via env var, use this instead:
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "dev" && $RUN_INTEGRATION_TESTS == "true"'
+  #   - if: '$CI_COMMIT_BRANCH == "main" && $RUN_INTEGRATION_TESTS == "true"'
+
+# -----------------------------
+# Docker image build (monorepo)
+# -----------------------------
+docker:build-backend:
+  stage: docker
+  image: docker:24.0.9
+  services:
+    - docker:24.0.9-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_DRIVER: overlay2
+  needs:
+    - sonar:backend
+    - integration-test:backend
+  script:
+    - echo "Logging in to GitLab container registry..."
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+
+    - echo "Building backend image..."
+    - docker build -t "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_SHORT_SHA}" back-end
+
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        docker tag "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_SHORT_SHA}" \
+                   "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_BRANCH}"
+      fi
+
+    - docker push "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_SHORT_SHA}"
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        docker push "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_BRANCH}"
+      fi
+  extends:
+    - .dev-main-only-rules
+
+docker:build-frontend:
+  stage: docker
+  image: docker:24.0.9
+  services:
+    - docker:24.0.9-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_DRIVER: overlay2
+  needs:
+    - sonar:frontend
+  script:
+    - echo "Logging in to GitLab container registry..."
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+
+    - echo "Building frontend image..."
+    - docker build -t "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_SHORT_SHA}" front-end
+
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        docker tag "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_SHORT_SHA}" \
+                   "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_BRANCH}"
+      fi
+
+    - docker push "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_SHORT_SHA}"
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        docker push "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_BRANCH}"
+      fi
+  extends:
+    - .dev-main-only-rules

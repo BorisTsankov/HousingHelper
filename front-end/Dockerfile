@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM node:18-bullseye AS build
+FROM node:20-bullseye AS build
 WORKDIR /app
 
 # Install deps
@@ -13,6 +13,7 @@ RUN npm run build
 # ---- Nginx stage ----
 FROM nginx:1.27-alpine
 
+# For Vite the output is usually /app/dist
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
