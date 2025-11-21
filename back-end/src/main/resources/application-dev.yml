@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/appdb
+    username: appuser
+    password: secret
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true

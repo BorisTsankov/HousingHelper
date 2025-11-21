@@ -1,0 +1,265 @@
+--
+---- ================================
+---- 2. 30 HARDCODED LISTINGS
+---- ================================
+---- NOTE:
+---- We omit "id" to let the IDENTITY/AUTO_INCREMENT handle it.
+---- Adjust table/column names if needed.
+---- ================================
+--
+--
+--INSERT INTO listing (
+--    source_id,
+--    external_id,
+--    canonical_url,
+--    first_seen_at,
+--    last_seen_at,
+--    status_id,
+--    title,
+--    description,
+--    property_type_id,
+--    furnishing_type_id,
+--    energy_label,
+--    rent_amount,
+--    rent_period_id,
+--    deposit,
+--    area_m2,
+--    rooms,
+--    bedrooms,
+--    bathrooms,
+--    available_from,
+--    available_until,
+--    minimum_lease_months,
+--    country,
+--    city,
+--    postal_code,
+--    street,
+--    house_number,
+--    unit,
+--    lat,
+--    lon,
+--    primary_photo_url,
+--    photos_count,
+--    agency_id,
+--    content_hash,
+--    ingest_job_id,
+--    pets_allowed
+--) VALUES
+---- 1–6: Eindhoven
+--(1,'EHV-APT-001','https://example.com/listings/ehv-apt-001','2025-03-01 09:00:00','2025-03-10 09:00:00',
+-- 1,'Cozy furnished apartment in Eindhoven',
+-- 'Nice 1-bedroom apartment close to TU/e and city center.',
+-- 1,1,'B',1450.00,1,2000.00,55.0,2.0,1.0,1.0,'2025-04-01',NULL,12,
+-- 'NL','Eindhoven','5611AB','Ketelhuisplein','1','A',
+-- 51.4416,5.4697,'https://picsum.photos/seed/ehv1/800/600',6,1,'hash-ehv-apt-001',NULL,TRUE),
+--
+--(1,'EHV-APT-002','https://example.com/listings/ehv-apt-002','2025-03-02 10:00:00','2025-03-11 10:30:00',
+-- 1,'Modern semi-furnished apartment near Strijp-S',
+-- 'Bright 2-bedroom apartment with balcony and private storage.',
+-- 1,2,'A',1650.00,1,2200.00,70.0,3.0,2.0,1.0,'2025-04-15',NULL,12,
+-- 'NL','Eindhoven','5617BC','Glaslaan','5','3',
+-- 51.4450,5.4470,'https://picsum.photos/seed/ehv2/800/600',8,1,'hash-ehv-apt-002',NULL,FALSE),
+--
+--(1,'EHV-STD-001','https://example.com/listings/ehv-std-001','2025-03-03 11:00:00','2025-03-09 08:30:00',
+-- 1,'Compact studio near Eindhoven station',
+-- 'Perfect for a student, small fully furnished studio with private bathroom.',
+-- 3,1,'C',975.00,1,1500.00,30.0,1.0,0.0,1.0,'2025-03-25',NULL,6,
+-- 'NL','Eindhoven','5611CD','Stationsweg','10','2',
+-- 51.4410,5.4810,'https://picsum.photos/seed/ehv3/800/600',4,3,'hash-ehv-std-001',NULL,FALSE),
+--
+--(1,'EHV-HSE-001','https://example.com/listings/ehv-hse-001','2025-02-25 08:00:00','2025-03-05 16:00:00',
+-- 1,'Spacious unfurnished family house in Eindhoven North',
+-- '4-bedroom house with garden and private parking.',
+-- 2,3,'B',1950.00,1,2500.00,120.0,5.0,4.0,1.5,'2025-04-01',NULL,24,
+-- 'NL','Eindhoven','5623EF','Woenselsestraat','35',NULL,
+-- 51.4700,5.4720,'https://picsum.photos/seed/ehv4/800/600',10,1,'hash-ehv-hse-001',NULL,TRUE),
+--
+--(1,'EHV-APT-003','https://example.com/listings/ehv-apt-003','2025-02-28 13:15:00','2025-03-08 12:45:00',
+-- 1,'Renovated apartment near High Tech Campus',
+-- 'Semi-furnished 2-bedroom apartment with modern kitchen and balcony.',
+-- 1,2,'A',1750.00,1,2300.00,65.0,3.0,2.0,1.0,'2025-04-10',NULL,12,
+-- 'NL','Eindhoven','5656GH','Hovenringlaan','15','B',
+-- 51.4110,5.4400,'https://picsum.photos/seed/ehv5/800/600',7,2,'hash-ehv-apt-003',NULL,TRUE),
+--
+--(1,'EHV-STD-002','https://example.com/listings/ehv-std-002','2025-03-04 14:30:00','2025-03-12 09:10:00',
+-- 1,'Affordable studio in Eindhoven Gestel',
+-- 'Unfurnished studio ideal as starter home, separate kitchen corner.',
+-- 3,3,'D',850.00,1,1000.00,28.0,1.0,0.0,1.0,'2025-03-30',NULL,6,
+-- 'NL','Eindhoven','5652JK','Gestelseweg','88',NULL,
+-- 51.4230,5.4570,'https://picsum.photos/seed/ehv6/800/600',3,3,'hash-ehv-std-002',NULL,FALSE),
+--
+--
+---- 7–12: Amsterdam
+--(1,'AMS-APT-001','https://example.com/listings/ams-apt-001','2025-02-20 09:00:00','2025-03-01 09:00:00',
+-- 1,'Furnished canal-view apartment in Amsterdam Centrum',
+-- '1-bedroom apartment with stunning canal views, fully furnished.',
+-- 1,1,'B',2200.00,1,3000.00,50.0,2.0,1.0,1.0,'2025-04-05',NULL,12,
+-- 'NL','Amsterdam','1011AB','Herengracht','120','2',
+-- 52.3720,4.8940,'https://picsum.photos/seed/ams1/800/600',8,2,'hash-ams-apt-001',NULL,FALSE),
+--
+--(1,'AMS-APT-002','https://example.com/listings/ams-apt-002','2025-02-22 10:00:00','2025-03-03 11:00:00',
+-- 1,'Modern semi-furnished apartment in Amsterdam Oost',
+-- '2-bedroom apartment near Oosterpark, great for young professionals.',
+-- 1,2,'A',2100.00,1,2800.00,68.0,3.0,2.0,1.0,'2025-04-20',NULL,12,
+-- 'NL','Amsterdam','1092CD','Linnaeusstraat','45','3',
+-- 52.3600,4.9260,'https://picsum.photos/seed/ams2/800/600',9,2,'hash-ams-apt-002',NULL,TRUE),
+--
+--(1,'AMS-STD-001','https://example.com/listings/ams-std-001','2025-02-25 12:00:00','2025-03-02 08:30:00',
+-- 1,'Compact furnished studio in De Pijp',
+-- 'Studio with private bathroom and kitchenette in lively neighborhood.',
+-- 3,1,'C',1350.00,1,2000.00,24.0,1.0,0.0,1.0,'2025-03-25',NULL,6,
+-- 'NL','Amsterdam','1073EF','Albert Cuypstraat','30',NULL,
+-- 52.3540,4.8950,'https://picsum.photos/seed/ams3/800/600',5,3,'hash-ams-std-001',NULL,FALSE),
+--
+--(1,'AMS-HSE-001','https://example.com/listings/ams-hse-001','2025-02-18 08:00:00','2025-02-28 17:00:00',
+-- 1,'Large unfurnished house in Amsterdam Noord',
+-- '4-bedroom house with garden and parking, perfect for families.',
+-- 2,3,'B',2600.00,1,3500.00,130.0,5.0,4.0,2.0,'2025-05-01',NULL,24,
+-- 'NL','Amsterdam','1033GH','Noorderweg','12',NULL,
+-- 52.3990,4.9220,'https://picsum.photos/seed/ams4/800/600',11,1,'hash-ams-hse-001',NULL,TRUE),
+--
+--(1,'AMS-APT-003','https://example.com/listings/ams-apt-003','2025-03-01 15:00:00','2025-03-09 11:15:00',
+-- 1,'Renovated loft apartment in Amsterdam West',
+-- 'Open-plan loft apartment with high ceilings and modern kitchen.',
+-- 1,2,'A',2350.00,1,3200.00,60.0,2.0,1.0,1.0,'2025-04-10',NULL,12,
+-- 'NL','Amsterdam','1054KL','Kinkerstraat','200','4',
+-- 52.3680,4.8620,'https://picsum.photos/seed/ams5/800/600',7,2,'hash-ams-apt-003',NULL,FALSE),
+--
+--(1,'AMS-STD-002','https://example.com/listings/ams-std-002','2025-02-27 14:15:00','2025-03-06 09:45:00',
+-- 1,'Student studio near Amsterdam Sloterdijk',
+-- 'Unfurnished studio, ideal for students, close to public transport.',
+-- 3,3,'D',1100.00,1,1500.00,22.0,1.0,0.0,1.0,'2025-03-28',NULL,6,
+-- 'NL','Amsterdam','1043AB','Basisweg','5',NULL,
+-- 52.3910,4.8350,'https://picsum.photos/seed/ams6/800/600',3,3,'hash-ams-std-002',NULL,TRUE),
+--
+--
+---- 13–18: Rotterdam
+--(1,'RTD-APT-001','https://example.com/listings/rtd-apt-001','2025-02-21 09:30:00','2025-03-01 10:00:00',
+-- 1,'Modern furnished apartment in Rotterdam Centrum',
+-- '1-bedroom apartment with skyline view, fully furnished.',
+-- 1,1,'A',1550.00,1,2200.00,52.0,2.0,1.0,1.0,'2025-04-05',NULL,12,
+-- 'NL','Rotterdam','3011AA','Coolsingel','10','6',
+-- 51.9225,4.4792,'https://picsum.photos/seed/rtd1/800/600',6,1,'hash-rtd-apt-001',NULL,FALSE),
+--
+--(1,'RTD-APT-002','https://example.com/listings/rtd-apt-002','2025-02-23 11:00:00','2025-03-02 09:00:00',
+-- 1,'Semi-furnished apartment near Erasmus MC',
+-- '2-bedroom apartment, ideal for hospital staff or students.',
+-- 1,2,'B',1400.00,1,2000.00,65.0,3.0,2.0,1.0,'2025-04-15',NULL,12,
+-- 'NL','Rotterdam','3015CD','Westzeedijk','100','3',
+-- 51.9120,4.4570,'https://picsum.photos/seed/rtd2/800/600',7,2,'hash-rtd-apt-002',NULL,TRUE),
+--
+--(1,'RTD-STD-001','https://example.com/listings/rtd-std-001','2025-02-26 10:30:00','2025-03-04 08:00:00',
+-- 1,'Furnished studio near Rotterdam Blaak',
+-- 'Compact studio with shared rooftop terrace.',
+-- 3,1,'C',1050.00,1,1500.00,25.0,1.0,0.0,1.0,'2025-03-25',NULL,6,
+-- 'NL','Rotterdam','3011AD','Blaak','50',NULL,
+-- 51.9170,4.4880,'https://picsum.photos/seed/rtd3/800/600',4,3,'hash-rtd-std-001',NULL,FALSE),
+--
+--(1,'RTD-HSE-001','https://example.com/listings/rtd-hse-001','2025-02-19 08:00:00','2025-02-28 16:30:00',
+-- 1,'Unfurnished family house in Rotterdam Kralingen',
+-- '3-bedroom house with garden, close to Erasmus University.',
+-- 2,3,'B',1850.00,1,2500.00,110.0,4.0,3.0,1.5,'2025-04-20',NULL,24,
+-- 'NL','Rotterdam','3061GH','Kralingseweg','20',NULL,
+-- 51.9260,4.5390,'https://picsum.photos/seed/rtd4/800/600',9,1,'hash-rtd-hse-001',NULL,TRUE),
+--
+--(1,'RTD-APT-003','https://example.com/listings/rtd-apt-003','2025-03-01 09:45:00','2025-03-08 09:15:00',
+-- 1,'Bright apartment near Kop van Zuid',
+-- 'Semi-furnished 2-bedroom apartment with balcony and river view.',
+-- 1,2,'A',1600.00,1,2200.00,68.0,3.0,2.0,1.0,'2025-04-10',NULL,12,
+-- 'NL','Rotterdam','3072AB','Wilhelminakade','75','8',
+-- 51.9030,4.4860,'https://picsum.photos/seed/rtd5/800/600',8,2,'hash-rtd-apt-003',NULL,FALSE),
+--
+--(1,'RTD-STD-002','https://example.com/listings/rtd-std-002','2025-02-28 13:00:00','2025-03-06 10:20:00',
+-- 1,'Affordable studio in Rotterdam Zuid',
+-- 'Unfurnished studio close to public transport and shops.',
+-- 3,3,'D',850.00,1,1000.00,27.0,1.0,0.0,1.0,'2025-03-28',NULL,6,
+-- 'NL','Rotterdam','3073JK','Zuiderparklaan','8',NULL,
+-- 51.8890,4.4900,'https://picsum.photos/seed/rtd6/800/600',3,3,'hash-rtd-std-002',NULL,TRUE),
+--
+--
+---- 19–24: Utrecht
+--(1,'UTC-APT-001','https://example.com/listings/utc-apt-001','2025-02-20 09:00:00','2025-02-28 10:00:00',
+-- 1,'Furnished apartment in Utrecht Lombok',
+-- '1-bedroom apartment with balcony, close to station.',
+-- 1,1,'B',1450.00,1,2000.00,48.0,2.0,1.0,1.0,'2025-04-01',NULL,12,
+-- 'NL','Utrecht','3531AB','Vleutenseweg','60','2',
+-- 52.0900,5.1000,'https://picsum.photos/seed/utc1/800/600',6,1,'hash-utc-apt-001',NULL,FALSE),
+--
+--(1,'UTC-APT-002','https://example.com/listings/utc-apt-002','2025-02-22 11:00:00','2025-03-03 09:30:00',
+-- 1,'Semi-furnished apartment near Utrecht Science Park',
+-- '2-bedroom apartment ideal for students or staff.',
+-- 1,2,'A',1350.00,1,1800.00,62.0,3.0,2.0,1.0,'2025-04-15',NULL,12,
+-- 'NL','Utrecht','3584CD','Uithoflaan','12','4',
+-- 52.0860,5.1750,'https://picsum.photos/seed/utc2/800/600',7,3,'hash-utc-apt-002',NULL,TRUE),
+--
+--(1,'UTC-STD-001','https://example.com/listings/utc-std-001','2025-02-24 10:30:00','2025-03-01 08:30:00',
+-- 1,'Student studio in Utrecht Overvecht',
+-- 'Compact studio, unfurnished, near shopping center.',
+-- 3,3,'C',800.00,1,1000.00,23.0,1.0,0.0,1.0,'2025-03-25',NULL,6,
+-- 'NL','Utrecht','3564EF','Zambesidreef','5',NULL,
+-- 52.1110,5.1170,'https://picsum.photos/seed/utc3/800/600',4,3,'hash-utc-std-001',NULL,TRUE),
+--
+--(1,'UTC-HSE-001','https://example.com/listings/utc-hse-001','2025-02-19 08:00:00','2025-02-28 16:00:00',
+-- 1,'Family house in Utrecht Leidsche Rijn',
+-- '3-bedroom house with garden and driveway.',
+-- 2,2,'B',1750.00,1,2300.00,115.0,4.0,3.0,1.5,'2025-04-20',NULL,24,
+-- 'NL','Utrecht','3543GH','Parklaan','25',NULL,
+-- 52.0990,5.0430,'https://picsum.photos/seed/utc4/800/600',9,2,'hash-utc-hse-001',NULL,TRUE),
+--
+--(1,'UTC-APT-003','https://example.com/listings/utc-apt-003','2025-02-28 14:00:00','2025-03-07 09:00:00',
+-- 1,'Bright apartment near Utrecht city center',
+-- 'Semi-furnished 1-bedroom with large windows and canal view.',
+-- 1,2,'A',1550.00,1,2000.00,54.0,2.0,1.0,1.0,'2025-04-10',NULL,12,
+-- 'NL','Utrecht','3511KL','Oudegracht','200','3',
+-- 52.0910,5.1210,'https://picsum.photos/seed/utc5/800/600',7,1,'hash-utc-apt-003',NULL,FALSE),
+--
+--(1,'UTC-STD-002','https://example.com/listings/utc-std-002','2025-03-01 10:15:00','2025-03-08 08:45:00',
+-- 1,'Affordable studio near Utrecht Zuilen',
+-- 'Unfurnished studio, basic but well located.',
+-- 3,3,'D',750.00,1,800.00,21.0,1.0,0.0,1.0,'2025-03-30',NULL,6,
+-- 'NL','Utrecht','3553AB','Amsterdamsestraatweg','300',NULL,
+-- 52.1050,5.0940,'https://picsum.photos/seed/utc6/800/600',3,3,'hash-utc-std-002',NULL,FALSE),
+--
+--
+---- 25–30: Tilburg
+--(1,'TLB-APT-001','https://example.com/listings/tlb-apt-001','2025-02-21 09:00:00','2025-02-28 09:00:00',
+-- 1,'Furnished apartment in Tilburg Centrum',
+-- '1-bedroom apartment near central station, fully furnished.',
+-- 1,1,'B',1250.00,1,1700.00,48.0,2.0,1.0,1.0,'2025-04-01',NULL,12,
+-- 'NL','Tilburg','5038AB','Spoorlaan','20','2',
+-- 51.5550,5.0910,'https://picsum.photos/seed/tlb1/800/600',6,2,'hash-tlb-apt-001',NULL,FALSE),
+--
+--(1,'TLB-APT-002','https://example.com/listings/tlb-apt-002','2025-02-23 11:00:00','2025-03-02 09:00:00',
+-- 1,'Semi-furnished apartment near Tilburg University',
+-- '2-bedroom apartment, ideal for students.',
+-- 1,2,'C',1150.00,1,1500.00,60.0,3.0,2.0,1.0,'2025-04-10',NULL,12,
+-- 'NL','Tilburg','5037CD','Universiteitslaan','10','3',
+-- 51.5620,5.0850,'https://picsum.photos/seed/tlb2/800/600',7,3,'hash-tlb-apt-002',NULL,TRUE),
+--
+--(1,'TLB-STD-001','https://example.com/listings/tlb-std-001','2025-02-25 10:00:00','2025-03-03 08:30:00',
+-- 1,'Student studio in Tilburg West',
+-- 'Compact unfurnished studio near shops and bus stop.',
+-- 3,3,'D',700.00,1,800.00,22.0,1.0,0.0,1.0,'2025-03-25',NULL,6,
+-- 'NL','Tilburg','5045EF','Westlaan','5',NULL,
+-- 51.5650,5.0650,'https://picsum.photos/seed/tlb3/800/600',4,3,'hash-tlb-std-001',NULL,TRUE),
+--
+--(1,'TLB-HSE-001','https://example.com/listings/tlb-hse-001','2025-02-19 08:00:00','2025-02-27 16:00:00',
+-- 1,'Unfurnished house in Tilburg Noord',
+-- '3-bedroom house with garden and driveway.',
+-- 2,3,'B',1450.00,1,2000.00,110.0,4.0,3.0,1.5,'2025-04-20',NULL,24,
+-- 'NL','Tilburg','5014GH','Noordstraat','15',NULL,
+-- 51.5730,5.0900,'https://picsum.photos/seed/tlb4/800/600',9,1,'hash-tlb-hse-001',NULL,TRUE),
+--
+--(1,'TLB-APT-003','https://example.com/listings/tlb-apt-003','2025-02-28 14:00:00','2025-03-07 09:00:00',
+-- 1,'Bright apartment near Reeshof',
+-- 'Semi-furnished 2-bedroom with balcony.',
+-- 1,2,'C',1050.00,1,1500.00,58.0,3.0,2.0,1.0,'2025-04-15',NULL,12,
+-- 'NL','Tilburg','5043KL','Reeshofweg','100','4',
+-- 51.5720,5.0400,'https://picsum.photos/seed/tlb5/800/600',7,2,'hash-tlb-apt-003',NULL,FALSE),
+--
+--(1,'TLB-STD-002','https://example.com/listings/tlb-std-002','2025-03-01 10:15:00','2025-03-08 08:45:00',
+-- 1,'Affordable studio near Tilburg Centrum',
+-- 'Basic unfurnished studio, good for starters.',
+-- 3,3,'D',725.00,1,900.00,24.0,1.0,0.0,1.0,'2025-03-30',NULL,6,
+-- 'NL','Tilburg','5038KL','Stationsstraat','80',NULL,
+-- 51.5570,5.0900,'https://picsum.photos/seed/tlb6/800/600',3,3,'hash-tlb-std-002',NULL,FALSE);

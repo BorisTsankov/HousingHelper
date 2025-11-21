@@ -4,6 +4,7 @@ stages:
   - sonar
   - integration-test
   - docker
+  - deploy
 
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
@@ -31,6 +32,12 @@ variables:
 .dev-main-only-rules:
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"'
+
+# Only on main (for deploy)
+.main-only-rules:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
 
 # -----------------------------
 # Frontend (React / Vite) jobs
@@ -301,3 +308,35 @@ docker:build-frontend:
   extends:
     - .dev-main-only-rules
 
+
+deploy:azure-containerapps:
+  stage: deploy
+  image: mcr.microsoft.com/azure-cli:2.64.0
+  needs:
+    - docker:build-backend
+    - docker:build-frontend
+  extends:
+    - .main-only-rules
+  script:
+    - echo "Logging in to Azure..."
+    - az login --service-principal \
+      --username "$AZURE_CLIENT_ID" \
+      --password "$AZURE_CLIENT_SECRET" \
+      --tenant "$AZURE_TENANT_ID"
+    - az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+    - echo "Updating backend Container App image..."
+    - az containerapp update \
+      --name housinghelper-backend \
+      --resource-group housinghelper-rg \
+      --image "$DOCKERHUB_USERNAME/housinghelper-backend:main"
+
+    - echo "Updating frontend Container App image..."
+    - az containerapp update \
+      --name housinghelper-frontend \
+      --resource-group housinghelper-rg \
+      --image "$DOCKERHUB_USERNAME/housinghelper-frontend:main"
+
+    - echo "Deployment to Azure Container Apps completed."
+  environment:
+    name: production
