@@ -1,15 +1,20 @@
 # ---- Build stage ----
 FROM node:18-bullseye AS build
 WORKDIR /app
-COPY frontend/package*.json ./
+
+# Install deps
+COPY package*.json ./
 RUN npm ci
-COPY frontend/ ./
+
+# Copy source and build
+COPY . .
 RUN npm run build
 
 # ---- Nginx stage ----
 FROM nginx:1.27-alpine
-COPY --from=build /app/build /usr/share/nginx/html
-# Optional: custom nginx.conf for SPA routing
-# COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+# For CRA the build output is /app/build. For Vite it might be /app/dist.
+COPY --from=build /app/dist /usr/share/nginx/html
+
 EXPOSE 80
-CMD ["nginx","-g","daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
