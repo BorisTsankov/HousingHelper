@@ -13,7 +13,6 @@ RUN npm run build
 # ---- Nginx stage ----
 FROM nginx:1.27-alpine
 
-# For CRA the build output is /app/build. For Vite it might be /app/dist.
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
