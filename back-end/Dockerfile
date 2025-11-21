@@ -1,19 +1,18 @@
 # ---- Build stage ----
-FROM eclipse-temurin:21-jdk AS build
+FROM gradle:8.10-jdk17 AS build
 WORKDIR /app
 
-# Copy Gradle wrapper + config
-COPY gradlew gradle/ ./
-COPY build.gradle settings.gradle ./
-COPY src ./src
+# Copy everything needed for the build
+COPY . .
 
-RUN chmod +x ./gradlew && ./gradlew clean bootJar --no-daemon
+# Build the Spring Boot jar
+RUN gradle clean bootJar --no-daemon
 
 # ---- Runtime stage ----
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Copy the built jar
+# Copy the built jar from the Gradle image
 COPY --from=build /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
