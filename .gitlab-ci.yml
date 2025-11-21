@@ -259,8 +259,6 @@ docker:build-backend:
   extends:
     - .dev-main-only-rules
 
-
-
 docker:build-frontend:
   stage: docker
   image: docker:24.0.9
