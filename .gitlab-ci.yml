@@ -231,32 +231,34 @@ docker:build-backend:
       alias: docker
       command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
   variables:
-    DOCKER_TLS_CERTDIR: ""             # disable TLS in client
-    DOCKER_HOST: "tcp://docker:2375"   # talk to the dind service
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "tcp://docker:2375"
     DOCKER_DRIVER: overlay2
   needs:
     - sonar:backend
     - integration-test:backend
   script:
-    - echo "Logging in to GitLab container registry..."
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - echo "Logging in to Docker Hub..."
+    - docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_TOKEN"
 
     - echo "Building backend image..."
-    - docker build -t "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_SHORT_SHA}" back-end
+    - docker build -t "$DOCKERHUB_USERNAME/housinghelper-backend:${CI_COMMIT_SHORT_SHA}" back-end
 
+    # Optional: tag by branch for dev/main
     - |
       if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
-        docker tag "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_SHORT_SHA}" \
-                   "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_BRANCH}"
+        docker tag "$DOCKERHUB_USERNAME/housinghelper-backend:${CI_COMMIT_SHORT_SHA}" \
+                   "$DOCKERHUB_USERNAME/housinghelper-backend:${CI_COMMIT_BRANCH}"
       fi
 
-    - docker push "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_SHORT_SHA}"
+    - docker push "$DOCKERHUB_USERNAME/housinghelper-backend:${CI_COMMIT_SHORT_SHA}"
     - |
       if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
-        docker push "$CI_REGISTRY_IMAGE/backend:${CI_COMMIT_BRANCH}"
+        docker push "$DOCKERHUB_USERNAME/housinghelper-backend:${CI_COMMIT_BRANCH}"
       fi
   extends:
     - .dev-main-only-rules
+
 
 
 docker:build-frontend:
@@ -273,23 +275,24 @@ docker:build-frontend:
   needs:
     - sonar:frontend
   script:
-    - echo "Logging in to GitLab container registry..."
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - echo "Logging in to Docker Hub..."
+    - docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_TOKEN"
 
     - echo "Building frontend image..."
-    - docker build -t "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_SHORT_SHA}" front-end
+    - docker build -t "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_SHORT_SHA}" front-end
 
     - |
       if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
-        docker tag "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_SHORT_SHA}" \
-                   "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_BRANCH}"
+        docker tag "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_SHORT_SHA}" \
+                   "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_BRANCH}"
       fi
 
-    - docker push "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_SHORT_SHA}"
+    - docker push "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_SHORT_SHA}"
     - |
       if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
-        docker push "$CI_REGISTRY_IMAGE/frontend:${CI_COMMIT_BRANCH}"
+        docker push "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_BRANCH}"
       fi
   extends:
     - .dev-main-only-rules
+
 
