@@ -6,11 +6,11 @@ shutdown_timeout = 0
   session_timeout = 1800
 
 [[runners]]
-  name = "docker-monorepo-runner-win"
-  url = "https://git.fhict.nl"
-  id = 11887
-  token = "glrt-rxon37SeT739SsaNTy3Z"
-  token_obtained_at = 2025-09-30T17:10:53Z
+  name = "gitlab-runner"
+  url = "https://git.fhict.nl/"
+  id = 12072
+  token = "glrt-d6ZGW7adP7ZisZwFxNB1"
+  token_obtained_at = 2025-11-21T02:06:24Z
   token_expires_at = 0001-01-01T00:00:00Z
   executor = "docker"
   [runners.cache]
@@ -20,13 +20,11 @@ shutdown_timeout = 0
     [runners.cache.azure]
   [runners.docker]
     tls_verify = false
-    image = "alpine:3.20"
-    privileged = false
+    image = "docker:24.0.9"
+    privileged = true
     disable_entrypoint_overwrite = false
     oom_kill_disable = false
     disable_cache = false
     volumes = ["/cache"]
     shm_size = 0
     network_mtu = 0
-    extra_hosts = ["host.docker.internal:host-gateway"]
-    network_mode = "housinghelper_default"

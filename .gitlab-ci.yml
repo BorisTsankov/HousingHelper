@@ -227,9 +227,12 @@ docker:build-backend:
   stage: docker
   image: docker:24.0.9
   services:
-    - docker:24.0.9-dind
+    - name: docker:24.0.9-dind
+      alias: docker
+      command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
   variables:
-    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_CERTDIR: ""             # disable TLS in client
+    DOCKER_HOST: "tcp://docker:2375"   # talk to the dind service
     DOCKER_DRIVER: overlay2
   needs:
     - sonar:backend
@@ -255,13 +258,17 @@ docker:build-backend:
   extends:
     - .dev-main-only-rules
 
+
 docker:build-frontend:
   stage: docker
   image: docker:24.0.9
   services:
-    - docker:24.0.9-dind
+    - name: docker:24.0.9-dind
+      alias: docker
+      command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
   variables:
-    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "tcp://docker:2375"
     DOCKER_DRIVER: overlay2
   needs:
     - sonar:frontend
@@ -285,3 +292,4 @@ docker:build-frontend:
       fi
   extends:
     - .dev-main-only-rules
+
