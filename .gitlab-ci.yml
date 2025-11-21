@@ -234,13 +234,14 @@ docker:build-backend:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_DRIVER: overlay2
+    DOCKER_CONFIG: "/tmp/docker"
   needs:
     - sonar:backend
     - integration-test:backend
   script:
     - echo "Logging in to Docker Hub..."
-    - mkdir -p /tmp/docker
-    - echo "$DOCKERHUB_TOKEN" | docker --config /tmp/docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+    - mkdir -p "$DOCKER_CONFIG"
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
     - echo "Building backend image..."
     - docker build -t "$DOCKERHUB_USERNAME/housinghelper-backend:${CI_COMMIT_SHORT_SHA}" back-end
@@ -252,6 +253,7 @@ docker:build-backend:
       fi
 
     - docker push "$DOCKERHUB_USERNAME/housinghelper-backend:${CI_COMMIT_SHORT_SHA}"
+
     - |
       if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
         docker push "$DOCKERHUB_USERNAME/housinghelper-backend:${CI_COMMIT_BRANCH}"
@@ -259,6 +261,7 @@ docker:build-backend:
 
   extends:
     - .dev-main-only-rules
+
 
 docker:build-frontend:
   stage: docker
@@ -271,12 +274,13 @@ docker:build-frontend:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_DRIVER: overlay2
+    DOCKER_CONFIG: "/tmp/docker"
   needs:
     - sonar:frontend
   script:
     - echo "Logging in to Docker Hub..."
-    - mkdir -p /tmp/docker
-    - echo "$DOCKERHUB_TOKEN" | docker --config /tmp/docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+    - mkdir -p "$DOCKER_CONFIG"
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
     - echo "Building frontend image..."
     - docker build -t "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_SHORT_SHA}" front-end
@@ -288,6 +292,7 @@ docker:build-frontend:
       fi
 
     - docker push "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_SHORT_SHA}"
+
     - |
       if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
         docker push "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_BRANCH}"
@@ -295,5 +300,4 @@ docker:build-frontend:
 
   extends:
     - .dev-main-only-rules
-
 
