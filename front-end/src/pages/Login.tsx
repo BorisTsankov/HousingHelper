@@ -23,14 +23,14 @@ export default function Login() {
     } catch (err: any) {
       let message = "Login failed";
 
-      if (err && typeof err.message === "string" && err.message.trim().length > 0) {
-        message = err.message;
-      }
-      else if (err && err.response) {
-        const data = err.response.data;
+      const errorMessage = err?.message;
+      if (typeof errorMessage === "string" && errorMessage.trim().length > 0) {
+        message = errorMessage;
+      } else {
+        const data = err?.response?.data;
         if (typeof data === "string") {
           message = data;
-        } else if (data && typeof data.message === "string") {
+        } else if (typeof data?.message === "string") {
           message = data.message;
         }
       }

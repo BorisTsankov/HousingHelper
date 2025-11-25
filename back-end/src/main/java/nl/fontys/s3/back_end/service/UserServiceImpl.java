@@ -59,21 +59,13 @@ public class UserServiceImpl implements UserService {
 
         try {
             User saved = userRepository.save(user);
-
             String verificationLink = "http://localhost:8080/api/auth/verify?token=" + token;
 
-            try {
-                emailService.sendVerificationEmail(saved.getEmail(), verificationLink);
-            } catch (Exception ex) {
-                log.error("Failed to send verification email to {} with link {}", saved.getEmail(), verificationLink, ex);
-            }
+            sendVerificationEmailSafely(saved.getEmail(), verificationLink);
 
             return mapToResponse(saved);
         } catch (DataIntegrityViolationException ex) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Email is already in use"
-            );
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
         }
     }
 
@@ -130,5 +122,13 @@ public class UserServiceImpl implements UserService {
         dto.setName(user.getName());
         dto.setCreatedAt(user.getCreatedAt());
         return dto;
+    }
+
+    private void sendVerificationEmailSafely(String email, String link) {
+        try {
+            emailService.sendVerificationEmail(email, link);
+        } catch (Exception ex) {
+            log.error("Failed to send verification email to {} with link {}", email, link, ex);
+        }
     }
 }

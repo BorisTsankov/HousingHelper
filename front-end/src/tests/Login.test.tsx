@@ -201,4 +201,58 @@ describe("Login page", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("/", { replace: true });
   });
+
+ it("shows backend string error when login throws with response.data as string", async () => {
+    mockLogin.mockRejectedValueOnce({
+      response: {
+        data: "Backend says no",
+      },
+    });
+
+    const user = userEvent.setup();
+    renderLogin();
+
+    const emailInput = screen.getByLabelText("Email") as HTMLInputElement;
+    const passwordInput = screen.getByLabelText(
+      "Password"
+    ) as HTMLInputElement;
+    const submitBtn = screen.getByRole("button", { name: /login/i });
+
+    await user.type(emailInput, "wrong@example.com");
+    await user.type(passwordInput, "wrongpassword");
+    await user.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText("Backend says no")).toBeInTheDocument();
+    });
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("shows backend message when login throws with response.data.message", async () => {
+    mockLogin.mockRejectedValueOnce({
+      response: {
+        data: { message: "Backend message" },
+      },
+    });
+
+    const user = userEvent.setup();
+    renderLogin();
+
+    const emailInput = screen.getByLabelText("Email") as HTMLInputElement;
+    const passwordInput = screen.getByLabelText(
+      "Password"
+    ) as HTMLInputElement;
+    const submitBtn = screen.getByRole("button", { name: /login/i });
+
+    await user.type(emailInput, "wrong@example.com");
+    await user.type(passwordInput, "wrongpassword");
+    await user.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText("Backend message")).toBeInTheDocument();
+    });
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
 });

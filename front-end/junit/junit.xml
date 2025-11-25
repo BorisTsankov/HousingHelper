@@ -1,177 +1,177 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="147" failures="0" errors="0" time="23.5393454">
-    <testsuite name="src/tests/App.test.tsx" timestamp="2025-11-25T03:54:44.423Z" hostname="DESKTOP-VMUK9EL" tests="6" failures="0" errors="0" skipped="0" time="0.1142185">
-        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; renders Home on /" time="0.078316">
+<testsuites name="vitest tests" tests="151" failures="0" errors="0" time="28.8562885">
+    <testsuite name="src/tests/App.test.tsx" timestamp="2025-11-25T04:16:49.006Z" hostname="DESKTOP-VMUK9EL" tests="6" failures="0" errors="0" skipped="0" time="0.103817">
+        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; renders Home on /" time="0.0706795">
         </testcase>
-        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; renders Login on /login" time="0.0059631">
+        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; renders Login on /login" time="0.0056434">
         </testcase>
-        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; renders Register on /register" time="0.0086488">
+        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; renders Register on /register" time="0.0058656">
         </testcase>
-        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; wraps /listings in ProtectedRoute and renders Listings" time="0.005705">
+        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; wraps /listings in ProtectedRoute and renders Listings" time="0.0061489">
         </testcase>
-        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; wraps /listings/:id in ProtectedRoute and renders ListingDetails" time="0.0055606">
+        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; wraps /listings/:id in ProtectedRoute and renders ListingDetails" time="0.0058726">
         </testcase>
-        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; wraps /profile in ProtectedRoute and renders Profile" time="0.0057306">
-        </testcase>
-    </testsuite>
-    <testsuite name="src/tests/AuthContext.test.tsx" timestamp="2025-11-25T03:54:44.427Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.1855095">
-        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; initially loads current user and sets loading=false afterwards" time="0.094315">
-        </testcase>
-        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; sets user=null if getCurrentUser throws" time="0.0105605">
-        </testcase>
-        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; login() updates user and isAuthenticated" time="0.0293717">
-        </testcase>
-        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; logout() clears the user" time="0.0331379">
-        </testcase>
-        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; throws if useAuth is used outside AuthProvider" time="0.0140507">
+        <testcase classname="src/tests/App.test.tsx" name="App routing &gt; wraps /profile in ProtectedRoute and renders Profile" time="0.0060171">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/authService.test.tsx" timestamp="2025-11-25T03:54:44.429Z" hostname="DESKTOP-VMUK9EL" tests="13" failures="0" errors="0" skipped="0" time="0.011132">
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; registerUser sends correct request and returns user on success" time="0.0036831">
+    <testsuite name="src/tests/AuthContext.test.tsx" timestamp="2025-11-25T04:16:49.009Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.2647683">
+        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; initially loads current user and sets loading=false afterwards" time="0.1066832">
         </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; registerUser throws error with API message when registration fails with message" time="0.0018149">
+        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; sets user=null if getCurrentUser throws" time="0.0283886">
         </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; registerUser throws default message when registration fails without message" time="0.0004638">
+        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; login() updates user and isAuthenticated" time="0.0562956">
         </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; registerUser throws default message when error body is not JSON" time="0.0003211">
+        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; logout() clears the user" time="0.0531379">
         </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; loginUser sends correct request and returns user on success" time="0.0004237">
-        </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; loginUser throws error with API message when login fails with message" time="0.0002599">
-        </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; loginUser throws default message when login fails without message" time="0.0002413">
-        </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; getCurrentUser returns user when response is 200 OK" time="0.0004746">
-        </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; getCurrentUser returns null when response is 401" time="0.0001844">
-        </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; getCurrentUser throws error when response is not ok and not 401" time="0.0002071">
-        </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; logoutUser sends POST and resolves when response is ok" time="0.0006864">
-        </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; logoutUser resolves even when response status is 204" time="0.0001914">
-        </testcase>
-        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; logoutUser throws error when response is not ok and not 204" time="0.0002163">
+        <testcase classname="src/tests/AuthContext.test.tsx" name="AuthProvider + useAuth &gt; throws if useAuth is used outside AuthProvider" time="0.0164081">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Button.test.tsx" timestamp="2025-11-25T03:54:44.432Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.6142181">
-        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; renders a button with default props" time="0.3064243">
+    <testsuite name="src/tests/authService.test.tsx" timestamp="2025-11-25T04:16:49.010Z" hostname="DESKTOP-VMUK9EL" tests="13" failures="0" errors="0" skipped="0" time="0.0121889">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; registerUser sends correct request and returns user on success" time="0.0040232">
         </testcase>
-        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; applies ghost variant classes" time="0.0839806">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; registerUser throws error with API message when registration fails with message" time="0.0016647">
         </testcase>
-        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; applies rounded-md radius" time="0.0685742">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; registerUser throws default message when registration fails without message" time="0.0003665">
         </testcase>
-        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; merges custom className" time="0.0581015">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; registerUser throws default message when error body is not JSON" time="0.0003437">
         </testcase>
-        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; passes through additional props" time="0.0935724">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; loginUser sends correct request and returns user on success" time="0.0004353">
         </testcase>
-    </testsuite>
-    <testsuite name="src/tests/Card.test.tsx" timestamp="2025-11-25T03:54:44.433Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.0524644">
-        <testcase classname="src/tests/Card.test.tsx" name="Card &gt; renders children" time="0.0438109">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; loginUser throws error with API message when login fails with message" time="0.0002899">
         </testcase>
-        <testcase classname="src/tests/Card.test.tsx" name="Card &gt; applies default classes" time="0.0030076">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; loginUser throws default message when login fails without message" time="0.0002359">
         </testcase>
-        <testcase classname="src/tests/Card.test.tsx" name="Card &gt; merges custom className" time="0.0023637">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; getCurrentUser returns user when response is 200 OK" time="0.0005212">
         </testcase>
-    </testsuite>
-    <testsuite name="src/tests/CityCombo.test.tsx" timestamp="2025-11-25T03:54:44.433Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="1.2922917">
-        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; shows placeholder and syncs input with value prop" time="0.4038">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; getCurrentUser returns null when response is 401" time="0.0002142">
         </testcase>
-        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; filters options based on input and respects limit" time="0.2362852">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; getCurrentUser throws error when response is not ok and not 401" time="0.0002293">
         </testcase>
-        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; shows &apos;No matches&apos; when there are no matches" time="0.1555907">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; logoutUser sends POST and resolves when response is ok" time="0.0006757">
         </testcase>
-        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; calls onChange and closes list when an option is clicked" time="0.1107328">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; logoutUser resolves even when response status is 204" time="0.0002959">
         </testcase>
-        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; closes dropdown when clicking outside" time="0.1183214">
-        </testcase>
-        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; supports keyboard navigation and Enter to select" time="0.1462593">
-        </testcase>
-        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; closes dropdown and clears active index on Escape" time="0.1178571">
+        <testcase classname="src/tests/authService.test.tsx" name="authService &gt; logoutUser throws error when response is not ok and not 204" time="0.0002347">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Container.test.tsx" timestamp="2025-11-25T03:54:44.435Z" hostname="DESKTOP-VMUK9EL" tests="2" failures="0" errors="0" skipped="0" time="0.0692473">
-        <testcase classname="src/tests/Container.test.tsx" name="Container &gt; renders children" time="0.0602054">
+    <testsuite name="src/tests/Button.test.tsx" timestamp="2025-11-25T04:16:49.013Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.9953948">
+        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; renders a button with default props" time="0.3792978">
         </testcase>
-        <testcase classname="src/tests/Container.test.tsx" name="Container &gt; applies the layout classes" time="0.0054421">
+        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; applies ghost variant classes" time="0.1226688">
         </testcase>
-    </testsuite>
-    <testsuite name="src/tests/ErrorBoundary.test.tsx" timestamp="2025-11-25T03:54:44.436Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.1065358">
-        <testcase classname="src/tests/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders children when no error occurs" time="0.0602894">
+        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; applies rounded-md radius" time="0.2044886">
         </testcase>
-        <testcase classname="src/tests/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; shows fallback UI when a child throws" time="0.0357909">
+        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; merges custom className" time="0.1401307">
         </testcase>
-        <testcase classname="src/tests/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; calls console.error when an error is caught" time="0.0066484">
+        <testcase classname="src/tests/Button.test.tsx" name="Button &gt; passes through additional props" time="0.1452268">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/FiltersPanel.test.tsx" timestamp="2025-11-25T03:54:44.437Z" hostname="DESKTOP-VMUK9EL" tests="8" failures="0" errors="0" skipped="0" time="0.4718449">
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with default title" time="0.0982122">
+    <testsuite name="src/tests/Card.test.tsx" timestamp="2025-11-25T04:16:49.014Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.0882844">
+        <testcase classname="src/tests/Card.test.tsx" name="Card &gt; renders children" time="0.0762863">
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with a custom title" time="0.0408896">
+        <testcase classname="src/tests/Card.test.tsx" name="Card &gt; applies default classes" time="0.0051751">
         </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; sets the aria-label based on the title" time="0.0111331">
-        </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders children inside the panel" time="0.0083764">
-        </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; applies a custom className" time="0.0194453">
-        </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders the icon" time="0.2496725">
-        </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders structural elements (header, content, divider)" time="0.0225721">
-        </testcase>
-        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; matches snapshot" time="0.0174382">
+        <testcase classname="src/tests/Card.test.tsx" name="Card &gt; merges custom className" time="0.0032052">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Footer.test.tsx" timestamp="2025-11-25T03:54:44.438Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.1567239">
-        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders current year" time="0.0949533">
+    <testsuite name="src/tests/CityCombo.test.tsx" timestamp="2025-11-25T04:16:49.015Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="1.6319895">
+        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; shows placeholder and syncs input with value prop" time="0.6962197">
         </testcase>
-        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders Facebook, Instagram, and LinkedIn links" time="0.0171346">
+        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; filters options based on input and respects limit" time="0.253474">
         </testcase>
-        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; contains correct social URLs" time="0.0218154">
+        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; shows &apos;No matches&apos; when there are no matches" time="0.1933662">
         </testcase>
-        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; matches snapshot" time="0.0189411">
+        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; calls onChange and closes list when an option is clicked" time="0.1183628">
         </testcase>
-    </testsuite>
-    <testsuite name="src/tests/Home.test.tsx" timestamp="2025-11-25T03:54:44.439Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="1.1938296">
-        <testcase classname="src/tests/Home.test.tsx" name="Home page &gt; shows loading then renders PropertyGallery when listings load" time="0.1425663">
+        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; closes dropdown when clicking outside" time="0.1029534">
         </testcase>
-        <testcase classname="src/tests/Home.test.tsx" name="Home page &gt; shows error message when listings fetch fails" time="0.0411984">
+        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; supports keyboard navigation and Enter to select" time="0.1606857">
         </testcase>
-        <testcase classname="src/tests/Home.test.tsx" name="Home page &gt; shows empty state when no listings are returned" time="0.0685722">
-        </testcase>
-        <testcase classname="src/tests/Home.test.tsx" name="Home page &gt; navigates to /listings with query and filters when searching" time="0.9377254">
+        <testcase classname="src/tests/CityCombo.test.tsx" name="CityCombo &gt; closes dropdown and clears active index on Escape" time="0.1034012">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Input.test.tsx" timestamp="2025-11-25T03:54:44.441Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.3224458">
-        <testcase classname="src/tests/Input.test.tsx" name="Input &gt; renders with base classes and placeholder" time="0.0520694">
+    <testsuite name="src/tests/Container.test.tsx" timestamp="2025-11-25T04:16:49.016Z" hostname="DESKTOP-VMUK9EL" tests="2" failures="0" errors="0" skipped="0" time="0.0783938">
+        <testcase classname="src/tests/Container.test.tsx" name="Container &gt; renders children" time="0.0641283">
         </testcase>
-        <testcase classname="src/tests/Input.test.tsx" name="Input &gt; merges custom className" time="0.2377253">
-        </testcase>
-        <testcase classname="src/tests/Input.test.tsx" name="Input &gt; forwards other props (type, onChange, value etc.)" time="0.0295619">
+        <testcase classname="src/tests/Container.test.tsx" name="Container &gt; applies the layout classes" time="0.0103396">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/ListingDetails.test.tsx" timestamp="2025-11-25T03:54:44.441Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.9425419">
-        <testcase classname="src/tests/ListingDetails.test.tsx" name="ListingDetails &gt; shows loading skeleton initially then renders listing details on success" time="0.8005462">
+    <testsuite name="src/tests/ErrorBoundary.test.tsx" timestamp="2025-11-25T04:16:49.016Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.11111">
+        <testcase classname="src/tests/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; renders children when no error occurs" time="0.0588224">
         </testcase>
-        <testcase classname="src/tests/ListingDetails.test.tsx" name="ListingDetails &gt; shows error state when fetch fails" time="0.0244485">
+        <testcase classname="src/tests/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; shows fallback UI when a child throws" time="0.0421652">
         </testcase>
-        <testcase classname="src/tests/ListingDetails.test.tsx" name="ListingDetails &gt; returns null when there is no data (e.g. if id is missing) - no crash" time="0.0117711">
-        </testcase>
-        <testcase classname="src/tests/ListingDetails.test.tsx" name="ListingDetails &gt; renders map iframe when lat and lon are provided" time="0.10241">
+        <testcase classname="src/tests/ErrorBoundary.test.tsx" name="ErrorBoundary &gt; calls console.error when an error is caught" time="0.0065669">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Listings.test.tsx" timestamp="2025-11-25T03:54:44.442Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="1.5371595">
-        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; loads listings and shows gallery after skeleton" time="0.1626248">
+    <testsuite name="src/tests/FiltersPanel.test.tsx" timestamp="2025-11-25T04:16:49.017Z" hostname="DESKTOP-VMUK9EL" tests="8" failures="0" errors="0" skipped="0" time="0.5801398">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with default title" time="0.1319125">
         </testcase>
-        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; shows error state when listings fetch fails" time="0.0606529">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders with a custom title" time="0.0103104">
         </testcase>
-        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; shows empty state when no listings are returned" time="0.0421602">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; sets the aria-label based on the title" time="0.0111735">
         </testcase>
-        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; requests the next page when clicking Next (pagination)" time="0.6491356">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders children inside the panel" time="0.0140114">
         </testcase>
-        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; performs search and includes q param in API call" time="0.5264994">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; applies a custom className" time="0.0185533">
         </testcase>
-        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; switches to map view when Map button is clicked" time="0.0656513">
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders the icon" time="0.3489142">
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; renders structural elements (header, content, divider)" time="0.0122261">
+        </testcase>
+        <testcase classname="src/tests/FiltersPanel.test.tsx" name="FiltersPanel &gt; matches snapshot" time="0.0293998">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Footer.test.tsx" timestamp="2025-11-25T04:16:49.019Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.1515619">
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders current year" time="0.101397">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; renders Facebook, Instagram, and LinkedIn links" time="0.0151935">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; contains correct social URLs" time="0.0116684">
+        </testcase>
+        <testcase classname="src/tests/Footer.test.tsx" name="Footer &gt; matches snapshot" time="0.0195789">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Home.test.tsx" timestamp="2025-11-25T04:16:49.020Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="1.3451268">
+        <testcase classname="src/tests/Home.test.tsx" name="Home page &gt; shows loading then renders PropertyGallery when listings load" time="0.2358455">
+        </testcase>
+        <testcase classname="src/tests/Home.test.tsx" name="Home page &gt; shows error message when listings fetch fails" time="0.0198929">
+        </testcase>
+        <testcase classname="src/tests/Home.test.tsx" name="Home page &gt; shows empty state when no listings are returned" time="0.027102">
+        </testcase>
+        <testcase classname="src/tests/Home.test.tsx" name="Home page &gt; navigates to /listings with query and filters when searching" time="1.0586385">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Input.test.tsx" timestamp="2025-11-25T04:16:49.021Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.4565499">
+        <testcase classname="src/tests/Input.test.tsx" name="Input &gt; renders with base classes and placeholder" time="0.0544176">
+        </testcase>
+        <testcase classname="src/tests/Input.test.tsx" name="Input &gt; merges custom className" time="0.3272797">
+        </testcase>
+        <testcase classname="src/tests/Input.test.tsx" name="Input &gt; forwards other props (type, onChange, value etc.)" time="0.0715687">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/ListingDetails.test.tsx" timestamp="2025-11-25T04:16:49.022Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="1.2465667">
+        <testcase classname="src/tests/ListingDetails.test.tsx" name="ListingDetails &gt; shows loading skeleton initially then renders listing details on success" time="1.0462399">
+        </testcase>
+        <testcase classname="src/tests/ListingDetails.test.tsx" name="ListingDetails &gt; shows error state when fetch fails" time="0.1204353">
+        </testcase>
+        <testcase classname="src/tests/ListingDetails.test.tsx" name="ListingDetails &gt; returns null when there is no data (e.g. if id is missing) - no crash" time="0.0067484">
+        </testcase>
+        <testcase classname="src/tests/ListingDetails.test.tsx" name="ListingDetails &gt; renders map iframe when lat and lon are provided" time="0.069253">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Listings.test.tsx" timestamp="2025-11-25T04:16:49.023Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="1.4702421">
+        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; loads listings and shows gallery after skeleton" time="0.2661763">
+        </testcase>
+        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; shows error state when listings fetch fails" time="0.041672">
+        </testcase>
+        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; shows empty state when no listings are returned" time="0.1100135">
+        </testcase>
+        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; requests the next page when clicking Next (pagination)" time="0.4697959">
+        </testcase>
+        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; performs search and includes q param in API call" time="0.4771778">
+        </testcase>
+        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; switches to map view when Map button is clicked" time="0.0829378">
             <system-err>
 An update to Listings inside a test was not wrapped in act(...).
 
@@ -196,183 +196,191 @@ This ensures that you&apos;re testing the behavior the user would see in the bro
 
             </system-err>
         </testcase>
-        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; starts directly in map view when view=map in URL" time="0.026694">
+        <testcase classname="src/tests/Listings.test.tsx" name="Listings page &gt; starts directly in map view when view=map in URL" time="0.018576">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Login.test.tsx" timestamp="2025-11-25T03:54:44.444Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="6.0647646">
-        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; renders layout with navbar, footer, and form fields" time="0.7020781">
+    <testsuite name="src/tests/Login.test.tsx" timestamp="2025-11-25T04:16:49.024Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="7.6677826">
+        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; renders layout with navbar, footer, and form fields" time="0.7221913">
         </testcase>
-        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; calls login with email and password and redirects on success" time="1.2373326">
+        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; calls login with email and password and redirects on success" time="1.3937476">
         </testcase>
-        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; shows error when login throws with a specific message" time="0.9856851">
+        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; shows error when login throws with a specific message" time="1.0697319">
         </testcase>
-        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; shows generic error when login throws without a message" time="0.9582408">
+        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; shows generic error when login throws without a message" time="0.9654304">
         </testcase>
-        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; clears previous error when resubmitting" time="2.1782294">
+        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; clears previous error when resubmitting" time="2.137002">
         </testcase>
-    </testsuite>
-    <testsuite name="src/tests/MapWithListings.test.tsx" timestamp="2025-11-25T03:54:44.445Z" hostname="DESKTOP-VMUK9EL" tests="9" failures="0" errors="0" skipped="0" time="0.1886952">
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; filters out items without valid coordinates" time="0.0719642">
+        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; shows backend string error when login throws with response.data as string" time="0.6785832">
         </testcase>
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; sets bounds when there are valid items" time="0.0113385">
-        </testcase>
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; does not set bounds when there are no valid items" time="0.0055034">
-        </testcase>
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses activeId to change marker opacity" time="0.0110215">
-        </testcase>
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; calls onPreview when a marker is clicked" time="0.0212992">
-        </testcase>
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; renders popup content and calls onPreview when &apos;Quick preview&apos; clicked" time="0.0233076">
-        </testcase>
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses default details link when getDetailsHref is not provided" time="0.0123167">
-        </testcase>
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses custom getDetailsHref when provided" time="0.0139779">
-        </testcase>
-        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; calls onBoundsChange on move/zoom events" time="0.0143245">
+        <testcase classname="src/tests/Login.test.tsx" name="Login page &gt; shows backend message when login throws with response.data.message" time="0.6972836">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Navbar.test.tsx" timestamp="2025-11-25T03:54:44.447Z" hostname="DESKTOP-VMUK9EL" tests="6" failures="0" errors="0" skipped="0" time="0.9089935">
-        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; shows login icon when user is NOT authenticated" time="0.5037533">
+    <testsuite name="src/tests/MapWithListings.test.tsx" timestamp="2025-11-25T04:16:49.025Z" hostname="DESKTOP-VMUK9EL" tests="9" failures="0" errors="0" skipped="0" time="0.1884004">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; filters out items without valid coordinates" time="0.080726">
         </testcase>
-        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; shows user info and logout when authenticated" time="0.0436369">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; sets bounds when there are valid items" time="0.0106712">
         </testcase>
-        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; navigates to /login when unauthenticated user icon is clicked" time="0.2064462">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; does not set bounds when there are no valid items" time="0.0052339">
         </testcase>
-        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; navigates to /profile when authenticated user is clicked" time="0.0331759">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses activeId to change marker opacity" time="0.0114566">
         </testcase>
-        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; calls logout and navigates to /register" time="0.0975077">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; calls onPreview when a marker is clicked" time="0.0232038">
         </testcase>
-        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; matches snapshot" time="0.0209324">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; renders popup content and calls onPreview when &apos;Quick preview&apos; clicked" time="0.0213096">
         </testcase>
-    </testsuite>
-    <testsuite name="src/tests/Page.test.tsx" timestamp="2025-11-25T03:54:44.448Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.0904789">
-        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; renders children" time="0.0705432">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses default details link when getDetailsHref is not provided" time="0.0108077">
         </testcase>
-        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; applies custom className" time="0.0045807">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; uses custom getDetailsHref when provided" time="0.0112391">
         </testcase>
-        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; has correct base layout classes" time="0.0031136">
-        </testcase>
-        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; matches snapshot" time="0.0084612">
+        <testcase classname="src/tests/MapWithListings.test.tsx" name="MapWithListings &gt; calls onBoundsChange on move/zoom events" time="0.0098581">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Profile.test.tsx" timestamp="2025-11-25T03:54:44.450Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.8581802">
-        <testcase classname="src/tests/Profile.test.tsx" name="Profile page &gt; shows login required message when user is not logged in" time="0.4758141">
+    <testsuite name="src/tests/Navbar.test.tsx" timestamp="2025-11-25T04:16:49.027Z" hostname="DESKTOP-VMUK9EL" tests="6" failures="0" errors="0" skipped="0" time="0.8543537">
+        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; shows login icon when user is NOT authenticated" time="0.5052899">
         </testcase>
-        <testcase classname="src/tests/Profile.test.tsx" name="Profile page &gt; renders profile info when user is logged in (with Unknown member date fallback)" time="0.2996338">
+        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; shows user info and logout when authenticated" time="0.0152265">
         </testcase>
-        <testcase classname="src/tests/Profile.test.tsx" name="Profile page &gt; formats and displays member since date when createdAt is provided" time="0.0789054">
+        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; navigates to /login when unauthenticated user icon is clicked" time="0.1785942">
         </testcase>
-    </testsuite>
-    <testsuite name="src/tests/PropertyCard.test.tsx" timestamp="2025-11-25T03:54:44.450Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="0.7827372">
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property title" time="0.1126075">
+        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; navigates to /profile when authenticated user is clicked" time="0.01981">
         </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property location" time="0.0094912">
+        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; calls logout and navigates to /register" time="0.1120082">
         </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property price" time="0.0055756">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the image with correct src &amp; alt" time="0.4361737">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; wraps everything in a correct &lt;Link&gt;" time="0.0826048">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; includes hover-related classes" time="0.1198917">
-        </testcase>
-        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; matches snapshot" time="0.0128697">
+        <testcase classname="src/tests/Navbar.test.tsx" name="Navbar &gt; matches snapshot" time="0.0196224">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/PropertyGallery.test.tsx" timestamp="2025-11-25T03:54:44.452Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.1789283">
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is an empty array" time="0.0795341">
+    <testsuite name="src/tests/Page.test.tsx" timestamp="2025-11-25T04:16:49.028Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.0778807">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; renders children" time="0.0545654">
         </testcase>
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is undefined at runtime" time="0.0056199">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; applies custom className" time="0.005318">
         </testcase>
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders a grid of PropertyCard components for each item" time="0.0601994">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; has correct base layout classes" time="0.0044187">
         </testcase>
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; stretches each card to full height in its column" time="0.0105557">
-        </testcase>
-        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; matches snapshot" time="0.0195346">
+        <testcase classname="src/tests/Page.test.tsx" name="Page wrapper &gt; matches snapshot" time="0.0098002">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/ProtectedRoute.test.tsx" timestamp="2025-11-25T03:54:44.453Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.0874189">
-        <testcase classname="src/tests/ProtectedRoute.test.tsx" name="ProtectedRoute &gt; shows loading state when auth is loading" time="0.0695816">
+    <testsuite name="src/tests/Profile.test.tsx" timestamp="2025-11-25T04:16:49.029Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="1.0046441">
+        <testcase classname="src/tests/Profile.test.tsx" name="Profile page &gt; shows login required message when user is not logged in" time="0.5400318">
         </testcase>
-        <testcase classname="src/tests/ProtectedRoute.test.tsx" name="ProtectedRoute &gt; navigates to /register when not authenticated" time="0.0087405">
+        <testcase classname="src/tests/Profile.test.tsx" name="Profile page &gt; renders profile info when user is logged in (with Unknown member date fallback)" time="0.4099454">
         </testcase>
-        <testcase classname="src/tests/ProtectedRoute.test.tsx" name="ProtectedRoute &gt; renders children when authenticated" time="0.004137">
-        </testcase>
-    </testsuite>
-    <testsuite name="src/tests/Register.test.tsx" timestamp="2025-11-25T03:54:44.454Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="0" errors="0" skipped="0" time="0.5097504">
-        <testcase classname="src/tests/Register.test.tsx" name="Register page &gt; renders layout, section, and registration UI" time="0.5065564">
+        <testcase classname="src/tests/Profile.test.tsx" name="Profile page &gt; formats and displays member since date when createdAt is provided" time="0.0510363">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/RegisterForm.test.tsx" timestamp="2025-11-25T03:54:44.454Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="5.6061069">
-        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; renders all fields and submit button" time="0.4306627">
+    <testsuite name="src/tests/PropertyCard.test.tsx" timestamp="2025-11-25T04:16:49.030Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="0.935634">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property title" time="0.128215">
         </testcase>
-        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; submits form successfully and shows success message" time="1.6008714">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property location" time="0.0073895">
         </testcase>
-        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; shows loading state while submitting" time="1.1926272">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the property price" time="0.0086492">
         </testcase>
-        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; shows error message when registration fails" time="1.3205472">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; renders the image with correct src &amp; alt" time="0.4059326">
         </testcase>
-        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; falls back to generic error message if error has no message" time="1.057354">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; wraps everything in a correct &lt;Link&gt;" time="0.0750179">
         </testcase>
-    </testsuite>
-    <testsuite name="src/tests/SearchBar.test.tsx" timestamp="2025-11-25T03:54:44.456Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.5796204">
-        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; renders the input field" time="0.062694">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; includes hover-related classes" time="0.2522664">
         </testcase>
-        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; updates the input value" time="0.0214095">
-        </testcase>
-        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; calls onSearch with the current input value" time="0.300755">
-        </testcase>
-        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; does not throw if onSearch is undefined" time="0.1589217">
-        </testcase>
-        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; matches snapshot" time="0.0319676">
+        <testcase classname="src/tests/PropertyCard.test.tsx" name="PropertyCard (Vitest) &gt; matches snapshot" time="0.0537294">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/SearchFiltersAdvanced.test.tsx" timestamp="2025-11-25T03:54:44.457Z" hostname="DESKTOP-VMUK9EL" tests="9" failures="0" errors="0" skipped="0" time="0.2496356">
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; shows the correct price label based on minPrice/maxPrice" time="0.0831163">
+    <testsuite name="src/tests/PropertyGallery.test.tsx" timestamp="2025-11-25T04:16:49.031Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.1413184">
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is an empty array" time="0.0607409">
         </testcase>
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates type when &apos;Property Type&apos; select changes" time="0.02871">
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders &apos;No properties found.&apos; when items is undefined at runtime" time="0.0043733">
         </testcase>
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates minPrice/maxPrice when price range changes" time="0.0176185">
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; renders a grid of PropertyCard components for each item" time="0.0367101">
         </testcase>
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; passes city value to CityCombo and updates city via onChange" time="0.0166395">
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; stretches each card to full height in its column" time="0.0146933">
         </testcase>
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates bedroomsMin when &apos;Bedrooms (min)&apos; changes" time="0.0182927">
-        </testcase>
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates bathroomsMin when &apos;Bathrooms (min)&apos; changes" time="0.0283452">
-        </testcase>
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates furnished and petsAllowed when selects change" time="0.0216698">
-        </testcase>
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates areaMin and areaMax when inputs change" time="0.0152548">
-        </testcase>
-        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates availableFrom when date input changes" time="0.0158684">
+        <testcase classname="src/tests/PropertyGallery.test.tsx" name="PropertyGallery &gt; matches snapshot" time="0.0213606">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/SearchFiltersSmall.test.tsx" timestamp="2025-11-25T03:54:44.460Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.1501155">
-        <testcase classname="src/tests/SearchFiltersSmall.test.tsx" name="SearchFiltersSmall &gt; sets price select value based on minPrice/maxPrice" time="0.0857027">
+    <testsuite name="src/tests/ProtectedRoute.test.tsx" timestamp="2025-11-25T04:16:49.032Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.0957842">
+        <testcase classname="src/tests/ProtectedRoute.test.tsx" name="ProtectedRoute &gt; shows loading state when auth is loading" time="0.0800019">
         </testcase>
-        <testcase classname="src/tests/SearchFiltersSmall.test.tsx" name="SearchFiltersSmall &gt; updates type when &apos;Property Type&apos; select changes" time="0.0258119">
+        <testcase classname="src/tests/ProtectedRoute.test.tsx" name="ProtectedRoute &gt; navigates to /register when not authenticated" time="0.0083338">
         </testcase>
-        <testcase classname="src/tests/SearchFiltersSmall.test.tsx" name="SearchFiltersSmall &gt; updates minPrice/maxPrice when price bucket changes" time="0.0170828">
-        </testcase>
-        <testcase classname="src/tests/SearchFiltersSmall.test.tsx" name="SearchFiltersSmall &gt; passes city value to CityCombo and merges city on change" time="0.0175182">
+        <testcase classname="src/tests/ProtectedRoute.test.tsx" name="ProtectedRoute &gt; renders children when authenticated" time="0.0039322">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Section.test.tsx" timestamp="2025-11-25T03:54:44.461Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.1009824">
-        <testcase classname="src/tests/Section.test.tsx" name="Section &gt; renders title and children, with spacing when title is present" time="0.0754619">
-        </testcase>
-        <testcase classname="src/tests/Section.test.tsx" name="Section &gt; centers the title when center prop is true" time="0.0145047">
-        </testcase>
-        <testcase classname="src/tests/Section.test.tsx" name="Section &gt; renders without title and without extra margin when title is missing" time="0.0075052">
+    <testsuite name="src/tests/Register.test.tsx" timestamp="2025-11-25T04:16:49.033Z" hostname="DESKTOP-VMUK9EL" tests="1" failures="0" errors="0" skipped="0" time="0.5330335">
+        <testcase classname="src/tests/Register.test.tsx" name="Register page &gt; renders layout, section, and registration UI" time="0.5297204">
         </testcase>
     </testsuite>
-    <testsuite name="src/tests/Select.test.tsx" timestamp="2025-11-25T03:54:44.463Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.1127745">
-        <testcase classname="src/tests/Select.test.tsx" name="Select &gt; renders children options" time="0.0816212">
+    <testsuite name="src/tests/RegisterForm.test.tsx" timestamp="2025-11-25T04:16:49.033Z" hostname="DESKTOP-VMUK9EL" tests="7" failures="0" errors="0" skipped="0" time="7.4375025">
+        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; renders all fields and submit button" time="0.4551079">
         </testcase>
-        <testcase classname="src/tests/Select.test.tsx" name="Select &gt; applies className and forwards props" time="0.0089664">
+        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; submits form successfully and shows success message" time="1.6221525">
         </testcase>
-        <testcase classname="src/tests/Select.test.tsx" name="Select &gt; forwards ref to the underlying select element" time="0.005163">
+        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; shows loading state while submitting" time="1.1972382">
         </testcase>
-        <testcase classname="src/tests/Select.test.tsx" name="Select &gt; handles change events" time="0.0131731">
+        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; shows error message when registration fails" time="1.1908953">
+        </testcase>
+        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; falls back to generic error message if error has no message" time="1.3020851">
+        </testcase>
+        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; shows backend string error when response.data is a string" time="0.8489814">
+        </testcase>
+        <testcase classname="src/tests/RegisterForm.test.tsx" name="RegisterForm &gt; shows backend message when response.data.message is provided" time="0.8171803">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/SearchBar.test.tsx" timestamp="2025-11-25T04:16:49.035Z" hostname="DESKTOP-VMUK9EL" tests="5" failures="0" errors="0" skipped="0" time="0.7938233">
+        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; renders the input field" time="0.1976419">
+        </testcase>
+        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; updates the input value" time="0.0192544">
+        </testcase>
+        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; calls onSearch with the current input value" time="0.4627716">
+        </testcase>
+        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; does not throw if onSearch is undefined" time="0.1006729">
+        </testcase>
+        <testcase classname="src/tests/SearchBar.test.tsx" name="SearchBar &gt; matches snapshot" time="0.009872">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/SearchFiltersAdvanced.test.tsx" timestamp="2025-11-25T04:16:49.035Z" hostname="DESKTOP-VMUK9EL" tests="9" failures="0" errors="0" skipped="0" time="0.2772453">
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; shows the correct price label based on minPrice/maxPrice" time="0.0996231">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates type when &apos;Property Type&apos; select changes" time="0.0287321">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates minPrice/maxPrice when price range changes" time="0.0259592">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; passes city value to CityCombo and updates city via onChange" time="0.0259622">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates bedroomsMin when &apos;Bedrooms (min)&apos; changes" time="0.0252967">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates bathroomsMin when &apos;Bathrooms (min)&apos; changes" time="0.015087">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates furnished and petsAllowed when selects change" time="0.0241718">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates areaMin and areaMax when inputs change" time="0.0167096">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersAdvanced.test.tsx" name="SearchFiltersAdvanced &gt; updates availableFrom when date input changes" time="0.0119109">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/SearchFiltersSmall.test.tsx" timestamp="2025-11-25T04:16:49.037Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.1134023">
+        <testcase classname="src/tests/SearchFiltersSmall.test.tsx" name="SearchFiltersSmall &gt; sets price select value based on minPrice/maxPrice" time="0.0738432">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersSmall.test.tsx" name="SearchFiltersSmall &gt; updates type when &apos;Property Type&apos; select changes" time="0.0173482">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersSmall.test.tsx" name="SearchFiltersSmall &gt; updates minPrice/maxPrice when price bucket changes" time="0.009595">
+        </testcase>
+        <testcase classname="src/tests/SearchFiltersSmall.test.tsx" name="SearchFiltersSmall &gt; passes city value to CityCombo and merges city on change" time="0.0090464">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Section.test.tsx" timestamp="2025-11-25T04:16:49.038Z" hostname="DESKTOP-VMUK9EL" tests="3" failures="0" errors="0" skipped="0" time="0.0998931">
+        <testcase classname="src/tests/Section.test.tsx" name="Section &gt; renders title and children, with spacing when title is present" time="0.0734321">
+        </testcase>
+        <testcase classname="src/tests/Section.test.tsx" name="Section &gt; centers the title when center prop is true" time="0.0088261">
+        </testcase>
+        <testcase classname="src/tests/Section.test.tsx" name="Section &gt; renders without title and without extra margin when title is missing" time="0.0141513">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/tests/Select.test.tsx" timestamp="2025-11-25T04:16:49.039Z" hostname="DESKTOP-VMUK9EL" tests="4" failures="0" errors="0" skipped="0" time="0.0994565">
+        <testcase classname="src/tests/Select.test.tsx" name="Select &gt; renders children options" time="0.0710234">
+        </testcase>
+        <testcase classname="src/tests/Select.test.tsx" name="Select &gt; applies className and forwards props" time="0.0085146">
+        </testcase>
+        <testcase classname="src/tests/Select.test.tsx" name="Select &gt; forwards ref to the underlying select element" time="0.0050173">
+        </testcase>
+        <testcase classname="src/tests/Select.test.tsx" name="Select &gt; handles change events" time="0.0114068">
         </testcase>
     </testsuite>
 </testsuites>

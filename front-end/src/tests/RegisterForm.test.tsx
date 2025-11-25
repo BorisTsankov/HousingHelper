@@ -116,4 +116,33 @@ describe("RegisterForm", () => {
       ).toBeInTheDocument();
     });
   });
+it("shows backend string error when response.data is a string", async () => {
+    registerUserMock.mockRejectedValue({
+      response: { data: "Email already in use" },
+    });
+
+    await fillForm();
+
+    const submitBtn = screen.getByRole("button", { name: "Register" });
+    await user.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText("Email already in use")).toBeInTheDocument();
+    });
+  });
+
+  it("shows backend message when response.data.message is provided", async () => {
+    registerUserMock.mockRejectedValue({
+      response: { data: { message: "Password too weak" } },
+    });
+
+    await fillForm();
+
+    const submitBtn = screen.getByRole("button", { name: "Register" });
+    await user.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText("Password too weak")).toBeInTheDocument();
+    });
+  });
 });
