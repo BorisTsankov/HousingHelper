@@ -28,7 +28,9 @@ const RegisterForm: React.FC = () => {
       const user = await registerUser(form);
       setSuccessUser(user);
     } catch (err: any) {
-      setError(err.message || "Something went wrong");
+      const backendMessage =
+        err?.response?.data?.message || err?.response?.data || err.message || "Something went wrong";
+      setError(backendMessage);
     } finally {
       setLoading(false);
     }
@@ -96,7 +98,8 @@ const RegisterForm: React.FC = () => {
 
       {successUser && (
         <p className="text-green-600 text-sm mt-2">
-          Account created for <strong>{successUser.email}</strong>.
+          Account created for <strong>{successUser.email}</strong>. <br />
+          Please check your email to verify your account before logging in.
         </p>
       )}
     </form>

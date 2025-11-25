@@ -33,9 +33,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getServletPath();
+
+        // 🔥 1. Skip JWT authentication for auth routes
+        if (path.startsWith("/api/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String jwt = extractJwtFromCookie(request);
 
-        if (jwt != null && jwtUtil.isTokenValid(jwt) &&
+        if (jwt == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (jwtUtil.isTokenValid(jwt) &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
 
             String email = jwtUtil.extractEmail(jwt);
@@ -46,10 +59,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(
                                 email,
                                 null,
-                                Collections.emptyList() // you can map roles here
+                                Collections.emptyList()
                         );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }

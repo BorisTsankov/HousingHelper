@@ -243,7 +243,6 @@ const Listings: React.FC = () => {
     return cleanup;
   }, [fetchListings]);
 
-  // ✅ No more "reset page on q/filters" effect here – we do it explicitly in handlers
 
   const handleSearch = (text: string) => {
     setQ(text);

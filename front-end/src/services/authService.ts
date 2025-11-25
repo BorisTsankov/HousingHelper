@@ -1,6 +1,7 @@
 import { RegisterRequest, LoginRequest, UserResponse } from "../types/auth";
 
-const API_BASE = "/api/auth";
+// talk directly to backend
+const API_BASE = "http://localhost:8080/api/auth";
 
 export async function registerUser(
   data: RegisterRequest
@@ -60,7 +61,8 @@ export async function getCurrentUser(): Promise<UserResponse | null> {
     credentials: "include",
   });
 
-  if (response.status === 401) {
+  // 🔥 treat both 401 and 403 as "not logged in"
+  if (response.status === 401 || response.status === 403) {
     return null;
   }
 

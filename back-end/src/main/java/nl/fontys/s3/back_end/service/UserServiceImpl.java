@@ -5,6 +5,7 @@ import nl.fontys.s3.back_end.dto.UserRegisterRequest;
 import nl.fontys.s3.back_end.dto.UserResponse;
 import nl.fontys.s3.back_end.entity.User;
 import nl.fontys.s3.back_end.repository.repositoryInterface.UserRepository;
+import nl.fontys.s3.back_end.service.serviceInterface.EmailService;
 import nl.fontys.s3.back_end.service.serviceInterface.UserService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -12,18 +13,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public UserServiceImpl(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Override
@@ -41,11 +47,19 @@ public class UserServiceImpl implements UserService {
         user.setName(request.getName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        user.setVerified(false);
+        user.setVerificationTokenExpiresAt(LocalDateTime.now().plusDays(1));
+
         try {
             User saved = userRepository.save(user);
+
+            String verificationLink = "http://localhost:8080/api/auth/verify?token=" + token;
+            emailService.sendVerificationEmail(saved.getEmail(), verificationLink);
+
             return mapToResponse(saved);
         } catch (DataIntegrityViolationException ex) {
-            // in case unique constraint also fires
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Email is already in use"
@@ -65,6 +79,10 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
+        if (!user.isVerified()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please verify your email before logging in.");
+        }
+
         return mapToResponse(user);
     }
 
@@ -73,6 +91,22 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return mapToResponse(user);
+    }
+
+    @Override
+    public void verifyEmail(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid verification token"));
+
+        if (user.getVerificationTokenExpiresAt() != null
+                && user.getVerificationTokenExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verification token has expired");
+        }
+
+        user.setVerified(true);
+        user.setVerificationToken(null);
+        user.setVerificationTokenExpiresAt(null);
+        userRepository.save(user);
     }
 
 

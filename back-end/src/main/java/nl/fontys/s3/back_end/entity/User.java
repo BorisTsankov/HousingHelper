@@ -1,5 +1,7 @@
 package nl.fontys.s3.back_end.entity;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -21,6 +23,15 @@ public class User {
     @Column(name="created_at", nullable=false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
+    @Column(nullable = false)
+    private boolean verified = false;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "verification_token_expires_at")
+    private LocalDateTime verificationTokenExpiresAt;
+
     public User() {}
 
     public User(String email, String name, String password) {
@@ -37,4 +48,11 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
+    public boolean isVerified() {return verified;}
+
+    public void setVerified(boolean verified) {this.verified = verified;}
+    public String getVerificationToken() {return verificationToken;}
+    public void setVerificationToken(String verificationToken) {this.verificationToken = verificationToken;}
+    public LocalDateTime getVerificationTokenExpiresAt() {return verificationTokenExpiresAt;}
+    public void setVerificationTokenExpiresAt(LocalDateTime verificationTokenExpiresAt) {this.verificationTokenExpiresAt = verificationTokenExpiresAt;}
 }

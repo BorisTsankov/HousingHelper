@@ -21,7 +21,10 @@ export default function Login() {
       await login({ email, password });
       navigate("/", { replace: true });
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      const backendMessage =
+        err.response?.data?.message || err.response?.data || "Login failed";
+
+      setError(backendMessage);
     }
   };
 

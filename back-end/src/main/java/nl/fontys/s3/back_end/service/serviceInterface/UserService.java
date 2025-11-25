@@ -8,4 +8,6 @@ public interface UserService {
     UserResponse register(UserRegisterRequest request);
     UserResponse login(LoginRequest request);
     UserResponse getByEmail(String email);
+    void verifyEmail(String token);
+
 }

@@ -16,13 +16,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
-    public AuthController(UserService userService, JwtUtil jwtUtil) {
 
+    public AuthController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
     }
@@ -40,9 +39,9 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
-                .secure(false) // set true on production HTTPS
+                .secure(true)         // 🔥 REQUIRED BY BROWSERS when sameSite=None
+                .sameSite("None")     // 🔥 ALLOWS cross-site cookie
                 .path("/")
-                .sameSite("Lax")
                 .maxAge(24 * 60 * 60)
                 .build();
 
@@ -52,24 +51,20 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> me(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String email = (String) authentication.getPrincipal();
-        UserResponse user = userService.getByEmail(email);
-
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserResponse> me(Authentication auth) {
+        if (auth == null) return ResponseEntity.status(401).build();
+        String email = (String) auth.getPrincipal();
+        return ResponseEntity.ok(userService.getByEmail(email));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(0)
-                .sameSite("Lax")
                 .build();
 
         return ResponseEntity.noContent()
@@ -77,4 +72,9 @@ public class AuthController {
                 .build();
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        userService.verifyEmail(token);
+        return ResponseEntity.ok("Email verified successfully. You can now log in.");
+    }
 }
