@@ -21,12 +21,24 @@ export default function Login() {
       await login({ email, password });
       navigate("/", { replace: true });
     } catch (err: any) {
-      const backendMessage =
-        err.response?.data?.message || err.response?.data || "Login failed";
+      let message = "Login failed";
 
-      setError(backendMessage);
+      if (err && typeof err.message === "string" && err.message.trim().length > 0) {
+        message = err.message;
+      }
+      else if (err && err.response) {
+        const data = err.response.data;
+        if (typeof data === "string") {
+          message = data;
+        } else if (data && typeof data.message === "string") {
+          message = data.message;
+        }
+      }
+
+      setError(message);
     }
   };
+
 
   return (
     <Page>

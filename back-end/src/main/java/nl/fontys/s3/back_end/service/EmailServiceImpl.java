@@ -1,15 +1,18 @@
 package nl.fontys.s3.back_end.service;
 
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import nl.fontys.s3.back_end.service.serviceInterface.EmailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import jakarta.mail.internet.MimeMessage;
+
 @Service
 public class EmailServiceImpl implements EmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private final JavaMailSender mailSender;
 
@@ -34,7 +37,7 @@ public class EmailServiceImpl implements EmailService {
 
             mailSender.send(message);
         } catch (Exception e) {
-            System.err.println("Failed to send verification email: " + e.getMessage());
+            log.error("Failed to send verification email to {} with link {}", to, verificationLink, e);
         }
     }
 }
