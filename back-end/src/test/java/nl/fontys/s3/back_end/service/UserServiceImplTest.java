@@ -5,6 +5,7 @@ import nl.fontys.s3.back_end.dto.UserRegisterRequest;
 import nl.fontys.s3.back_end.dto.UserResponse;
 import nl.fontys.s3.back_end.entity.User;
 import nl.fontys.s3.back_end.repository.repositoryInterface.UserRepository;
+import nl.fontys.s3.back_end.service.serviceInterface.EmailService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -31,9 +33,11 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private EmailService emailService;
+
     @InjectMocks
     private UserServiceImpl userService;
-
 
     private void setId(User user, Long id) {
         try {
@@ -45,40 +49,44 @@ class UserServiceImplTest {
         }
     }
 
+    @Test
+    void register_succeeds_whenEmailNotUsed() {
+        UserRegisterRequest request = new UserRegisterRequest();
+        request.setEmail("test@example.com");
+        request.setName("Viktoria");
+        request.setPassword("plainPassword");
 
-//    @Test
-//    void register_succeeds_whenEmailNotUsed() {
-//        UserRegisterRequest request = new UserRegisterRequest();
-//        request.setEmail("test@example.com");
-//        request.setName("Viktoria");
-//        request.setPassword("plainPassword");
-//
-//        when(userRepository.findByEmail("test@example.com"))
-//                .thenReturn(Optional.empty());
-//        when(passwordEncoder.encode("plainPassword"))
-//                .thenReturn("hashedPassword");
-//
-//        User savedUser = new User();
-//        setId(savedUser, 1L);
-//        savedUser.setEmail("test@example.com");
-//        savedUser.setName("Viktoria");
-//        savedUser.setPassword("hashedPassword");
-//
-//        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-//
-//        UserResponse response = userService.register(request);
-//
-//        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-//        verify(userRepository).save(userCaptor.capture());
-//        User userPassedToRepo = userCaptor.getValue();
-//        assertThat(userPassedToRepo.getEmail()).isEqualTo("test@example.com");
-//        assertThat(userPassedToRepo.getName()).isEqualTo("Viktoria");
-//        assertThat(userPassedToRepo.getPassword()).isEqualTo("hashedPassword");
-//
-//        assertThat(response.getId()).isEqualTo(1L);
-//        assertThat(response.getEmail()).isEqualTo("test@example.com");
-//        assertThat(response.getName()).isEqualTo("Viktoria");
-//    }
+        when(userRepository.findByEmail("test@example.com"))
+                .thenReturn(Optional.empty());
+        when(passwordEncoder.encode("plainPassword"))
+                .thenReturn("hashedPassword");
+
+        User savedUser = new User();
+        setId(savedUser, 1L);
+        savedUser.setEmail("test@example.com");
+        savedUser.setName("Viktoria");
+        savedUser.setPassword("hashedPassword");
+
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        UserResponse response = userService.register(request);
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
+        User userPassedToRepo = userCaptor.getValue();
+        assertThat(userPassedToRepo.getEmail()).isEqualTo("test@example.com");
+        assertThat(userPassedToRepo.getName()).isEqualTo("Viktoria");
+        assertThat(userPassedToRepo.getPassword()).isEqualTo("hashedPassword");
+        assertThat(userPassedToRepo.isVerified()).isFalse();
+        assertThat(userPassedToRepo.getVerificationToken()).isNotNull();
+        assertThat(userPassedToRepo.getVerificationTokenExpiresAt()).isNotNull();
+
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getName()).isEqualTo("Viktoria");
+
+        verify(emailService).sendVerificationEmail(eq("test@example.com"), anyString());
+    }
 
     @Test
     void register_throwsConflictWhenEmailAlreadyExists_precheck() {
@@ -103,6 +111,7 @@ class UserServiceImplTest {
                 });
 
         verify(userRepository, never()).save(any());
+        verify(emailService, never()).sendVerificationEmail(anyString(), anyString());
     }
 
     @Test
@@ -126,34 +135,36 @@ class UserServiceImplTest {
                     ResponseStatusException rse = (ResponseStatusException) ex;
                     assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
                 });
+
+        verify(emailService, never()).sendVerificationEmail(anyString(), anyString());
     }
 
+    @Test
+    void login_succeedsWithCorrectCredentialsAndVerifiedUser() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("plainPassword");
 
-//    @Test
-//    void login_succeedsWithCorrectCredentials() {
-//        LoginRequest request = new LoginRequest();
-//        request.setEmail("test@example.com");
-//        request.setPassword("plainPassword");
-//
-//        User user = new User();
-//        setId(user, 1L);
-//        user.setEmail("test@example.com");
-//        user.setName("Viktoria");
-//        user.setPassword("hashedPassword");
-//
-//        when(userRepository.findByEmail("test@example.com"))
-//                .thenReturn(Optional.of(user));
-//        when(passwordEncoder.matches("plainPassword", "hashedPassword"))
-//                .thenReturn(true);
-//
-//        UserResponse response = userService.login(request);
-//
-//        assertThat(response.getId()).isEqualTo(1L);
-//        assertThat(response.getEmail()).isEqualTo("test@example.com");
-//        assertThat(response.getName()).isEqualTo("Viktoria");
-//
-//        verify(passwordEncoder).matches("plainPassword", "hashedPassword");
-//    }
+        User user = new User();
+        setId(user, 1L);
+        user.setEmail("test@example.com");
+        user.setName("Viktoria");
+        user.setPassword("hashedPassword");
+        user.setVerified(true); // important for success
+
+        when(userRepository.findByEmail("test@example.com"))
+                .thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("plainPassword", "hashedPassword"))
+                .thenReturn(true);
+
+        UserResponse response = userService.login(request);
+
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getName()).isEqualTo("Viktoria");
+
+        verify(passwordEncoder).matches("plainPassword", "hashedPassword");
+    }
 
     @Test
     void login_throwsUnauthorizedWhenEmailNotFound() {
@@ -186,6 +197,7 @@ class UserServiceImplTest {
         user.setEmail("test@example.com");
         user.setName("Viktoria");
         user.setPassword("hashedPassword");
+        user.setVerified(true);
 
         when(userRepository.findByEmail("test@example.com"))
                 .thenReturn(Optional.of(user));
@@ -201,7 +213,33 @@ class UserServiceImplTest {
                 });
     }
 
-    // ---------- getByEmail ----------
+    @Test
+    void login_throwsForbiddenWhenUserNotVerified() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("plainPassword");
+
+        User user = new User();
+        setId(user, 1L);
+        user.setEmail("test@example.com");
+        user.setName("Viktoria");
+        user.setPassword("hashedPassword");
+        user.setVerified(false); // not verified
+
+        when(userRepository.findByEmail("test@example.com"))
+                .thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("plainPassword", "hashedPassword"))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> userService.login(request))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Please verify your email before logging in.")
+                .satisfies(ex -> {
+                    ResponseStatusException rse = (ResponseStatusException) ex;
+                    assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+                });
+    }
+
 
     @Test
     void getByEmail_returnsMappedUserResponseWhenFound() {
@@ -233,5 +271,69 @@ class UserServiceImplTest {
                     ResponseStatusException rse = (ResponseStatusException) ex;
                     assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
                 });
+    }
+
+
+    @Test
+    void verifyEmail_succeeds_marksUserVerifiedAndClearsToken() {
+        String token = "abc-123";
+        User user = new User();
+        setId(user, 1L);
+        user.setEmail("test@example.com");
+        user.setVerified(false);
+        user.setVerificationToken(token);
+        user.setVerificationTokenExpiresAt(LocalDateTime.now().plusHours(1));
+
+        when(userRepository.findByVerificationToken(token))
+                .thenReturn(Optional.of(user));
+
+        userService.verifyEmail(token);
+
+        assertThat(user.isVerified()).isTrue();
+        assertThat(user.getVerificationToken()).isNull();
+        assertThat(user.getVerificationTokenExpiresAt()).isNull();
+
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void verifyEmail_throwsBadRequestWhenTokenInvalid() {
+        String token = "invalid-token";
+        when(userRepository.findByVerificationToken(token))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.verifyEmail(token))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Invalid verification token")
+                .satisfies(ex -> {
+                    ResponseStatusException rse = (ResponseStatusException) ex;
+                    assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                });
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void verifyEmail_throwsBadRequestWhenTokenExpired() {
+        String token = "expired-token";
+        User user = new User();
+        setId(user, 1L);
+        user.setEmail("test@example.com");
+        user.setVerified(false);
+        user.setVerificationToken(token);
+        user.setVerificationTokenExpiresAt(LocalDateTime.now().minusHours(1)); // past
+
+        when(userRepository.findByVerificationToken(token))
+                .thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> userService.verifyEmail(token))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Verification token has expired")
+                .satisfies(ex -> {
+                    ResponseStatusException rse = (ResponseStatusException) ex;
+                    assertThat(rse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                });
+
+        verify(userRepository, never()).save(any());
     }
 }

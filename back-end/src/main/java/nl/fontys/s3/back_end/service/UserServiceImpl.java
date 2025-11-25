@@ -56,7 +56,13 @@ public class UserServiceImpl implements UserService {
             User saved = userRepository.save(user);
 
             String verificationLink = "http://localhost:8080/api/auth/verify?token=" + token;
-            emailService.sendVerificationEmail(saved.getEmail(), verificationLink);
+
+            try {
+                emailService.sendVerificationEmail(saved.getEmail(), verificationLink);
+            } catch (Exception ex) {
+                System.err.println("Failed to send verification email: " + ex.getMessage());
+
+            }
 
             return mapToResponse(saved);
         } catch (DataIntegrityViolationException ex) {
@@ -66,6 +72,9 @@ public class UserServiceImpl implements UserService {
             );
         }
     }
+
+
+
 
     @Override
     public UserResponse login(LoginRequest request) {

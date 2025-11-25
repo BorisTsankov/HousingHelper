@@ -33,8 +33,8 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(content, true);
 
             mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send verification email", e);
+        } catch (Exception e) {
+            System.err.println("Failed to send verification email: " + e.getMessage());
         }
     }
 }

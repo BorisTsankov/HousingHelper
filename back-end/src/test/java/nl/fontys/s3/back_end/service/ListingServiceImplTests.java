@@ -31,11 +31,9 @@ class ListingServiceImplTests {
     @InjectMocks
     private ListingServiceImpl listingService;
 
-    // ---------- getFeatured ----------
 
     @Test
     void getFeatured_usesLimitAndSortsByLastSeenAtDesc() {
-        // we don't care about content here, just paging/sorting
         Page<Listing> page = new PageImpl<>(List.of());
         when(listingRepository.findAll(any(Pageable.class))).thenReturn(page);
 
@@ -57,9 +55,7 @@ class ListingServiceImplTests {
         when(listingRepository.findAll(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        // limit too small -> 1
         listingService.getFeatured(0);
-        // limit too big -> 100
         listingService.getFeatured(500);
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
@@ -70,7 +66,6 @@ class ListingServiceImplTests {
         assertThat(captured.get(1).getPageSize()).isEqualTo(100);
     }
 
-    // ---------- search ----------
 
     @Test
     void search_callsRepositoryWithSpecAndPageable() {
@@ -83,7 +78,6 @@ class ListingServiceImplTests {
         verify(listingRepository).findAll(any(Specification.class), any(Pageable.class));
     }
 
-    // ---------- list (filter + pageable handling) ----------
 
     @Test
     void list_usesFallbackSortWhenPageableIsNull() {
@@ -141,7 +135,6 @@ class ListingServiceImplTests {
 
     @Test
     void list_swapsMinAndMaxWhenReversed() {
-        // min > max for both price and area
         FilterCriteria criteria = new FilterCriteria(
                 null,
                 null,
@@ -160,12 +153,10 @@ class ListingServiceImplTests {
 
         listingService.list(criteria, PageRequest.of(0, 10));
 
-        // we only care that repository is called successfully,
-        // not the exact specification internals
+
         verify(listingRepository).findAll(any(Specification.class), any(Pageable.class));
     }
 
-    // ---------- getById (not found) ----------
 
     @Test
     void getById_throwsNotFoundWhenMissing() {
@@ -176,7 +167,6 @@ class ListingServiceImplTests {
                 .hasMessageContaining("Listing not found");
     }
 
-    // ---------- getCityOptions (also covers toTitleCase) ----------
 
     @Test
     void getCityOptions_sortsByValueAndTitleCasesLabels() {

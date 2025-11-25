@@ -48,6 +48,7 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
     public boolean isVerified() {return verified;}
 
     public void setVerified(boolean verified) {this.verified = verified;}

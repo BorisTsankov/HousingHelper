@@ -1,7 +1,7 @@
 import { RegisterRequest, LoginRequest, UserResponse } from "../types/auth";
 
 // talk directly to backend
-const API_BASE = "http://localhost:8080/api/auth";
+const API_BASE = "/api/auth";
 
 export async function registerUser(
   data: RegisterRequest

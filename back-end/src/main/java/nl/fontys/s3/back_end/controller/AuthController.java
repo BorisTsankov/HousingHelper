@@ -39,8 +39,8 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
-                .secure(true)         // 🔥 REQUIRED BY BROWSERS when sameSite=None
-                .sameSite("None")     // 🔥 ALLOWS cross-site cookie
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(24 * 60 * 60)
                 .build();
