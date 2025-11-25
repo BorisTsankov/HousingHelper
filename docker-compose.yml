@@ -7,9 +7,9 @@ services:
     image: postgres:16-alpine
     container_name: hh-postgres
     environment:
-      POSTGRES_DB: appdb
-      POSTGRES_USER: appuser
-      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -21,14 +21,16 @@ services:
     container_name: hh-backend
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
-      SPRING_DATASOURCE_USERNAME: appuser
-      SPRING_DATASOURCE_PASSWORD: secret
-      # SPRING_PROFILES_ACTIVE: docker   # uncomment if you use a docker profile
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     depends_on:
       - postgres
     ports:
       - "8080:8080"
+
 
   frontend:
     build:

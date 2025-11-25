@@ -1,0 +1,25 @@
+# Environment files (DO NOT COMMIT)
+.env
+*.env
+
+# Docker artifacts
+docker-compose.override.yml
+**/docker-data/
+**/docker-volume/
+**/pgdata/
+*.pid
+
+# Uploads, temporary storage
+storage/
+uploads/
+tmp/
+*.log
+
+# IntelliJ / VSCode / Editors
+.idea/
+.vscode/
+*.iml
+
+# OS junk
+.DS_Store
+Thumbs.db
