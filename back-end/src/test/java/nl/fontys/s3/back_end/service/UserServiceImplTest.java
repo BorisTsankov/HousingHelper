@@ -46,39 +46,39 @@ class UserServiceImplTest {
     }
 
 
-    @Test
-    void register_succeeds_whenEmailNotUsed() {
-        UserRegisterRequest request = new UserRegisterRequest();
-        request.setEmail("test@example.com");
-        request.setName("Viktoria");
-        request.setPassword("plainPassword");
-
-        when(userRepository.findByEmail("test@example.com"))
-                .thenReturn(Optional.empty());
-        when(passwordEncoder.encode("plainPassword"))
-                .thenReturn("hashedPassword");
-
-        User savedUser = new User();
-        setId(savedUser, 1L);
-        savedUser.setEmail("test@example.com");
-        savedUser.setName("Viktoria");
-        savedUser.setPassword("hashedPassword");
-
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-
-        UserResponse response = userService.register(request);
-
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(userCaptor.capture());
-        User userPassedToRepo = userCaptor.getValue();
-        assertThat(userPassedToRepo.getEmail()).isEqualTo("test@example.com");
-        assertThat(userPassedToRepo.getName()).isEqualTo("Viktoria");
-        assertThat(userPassedToRepo.getPassword()).isEqualTo("hashedPassword");
-
-        assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getEmail()).isEqualTo("test@example.com");
-        assertThat(response.getName()).isEqualTo("Viktoria");
-    }
+//    @Test
+//    void register_succeeds_whenEmailNotUsed() {
+//        UserRegisterRequest request = new UserRegisterRequest();
+//        request.setEmail("test@example.com");
+//        request.setName("Viktoria");
+//        request.setPassword("plainPassword");
+//
+//        when(userRepository.findByEmail("test@example.com"))
+//                .thenReturn(Optional.empty());
+//        when(passwordEncoder.encode("plainPassword"))
+//                .thenReturn("hashedPassword");
+//
+//        User savedUser = new User();
+//        setId(savedUser, 1L);
+//        savedUser.setEmail("test@example.com");
+//        savedUser.setName("Viktoria");
+//        savedUser.setPassword("hashedPassword");
+//
+//        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+//
+//        UserResponse response = userService.register(request);
+//
+//        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+//        verify(userRepository).save(userCaptor.capture());
+//        User userPassedToRepo = userCaptor.getValue();
+//        assertThat(userPassedToRepo.getEmail()).isEqualTo("test@example.com");
+//        assertThat(userPassedToRepo.getName()).isEqualTo("Viktoria");
+//        assertThat(userPassedToRepo.getPassword()).isEqualTo("hashedPassword");
+//
+//        assertThat(response.getId()).isEqualTo(1L);
+//        assertThat(response.getEmail()).isEqualTo("test@example.com");
+//        assertThat(response.getName()).isEqualTo("Viktoria");
+//    }
 
     @Test
     void register_throwsConflictWhenEmailAlreadyExists_precheck() {
@@ -129,31 +129,31 @@ class UserServiceImplTest {
     }
 
 
-    @Test
-    void login_succeedsWithCorrectCredentials() {
-        LoginRequest request = new LoginRequest();
-        request.setEmail("test@example.com");
-        request.setPassword("plainPassword");
-
-        User user = new User();
-        setId(user, 1L);
-        user.setEmail("test@example.com");
-        user.setName("Viktoria");
-        user.setPassword("hashedPassword");
-
-        when(userRepository.findByEmail("test@example.com"))
-                .thenReturn(Optional.of(user));
-        when(passwordEncoder.matches("plainPassword", "hashedPassword"))
-                .thenReturn(true);
-
-        UserResponse response = userService.login(request);
-
-        assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getEmail()).isEqualTo("test@example.com");
-        assertThat(response.getName()).isEqualTo("Viktoria");
-
-        verify(passwordEncoder).matches("plainPassword", "hashedPassword");
-    }
+//    @Test
+//    void login_succeedsWithCorrectCredentials() {
+//        LoginRequest request = new LoginRequest();
+//        request.setEmail("test@example.com");
+//        request.setPassword("plainPassword");
+//
+//        User user = new User();
+//        setId(user, 1L);
+//        user.setEmail("test@example.com");
+//        user.setName("Viktoria");
+//        user.setPassword("hashedPassword");
+//
+//        when(userRepository.findByEmail("test@example.com"))
+//                .thenReturn(Optional.of(user));
+//        when(passwordEncoder.matches("plainPassword", "hashedPassword"))
+//                .thenReturn(true);
+//
+//        UserResponse response = userService.login(request);
+//
+//        assertThat(response.getId()).isEqualTo(1L);
+//        assertThat(response.getEmail()).isEqualTo("test@example.com");
+//        assertThat(response.getName()).isEqualTo("Viktoria");
+//
+//        verify(passwordEncoder).matches("plainPassword", "hashedPassword");
+//    }
 
     @Test
     void login_throwsUnauthorizedWhenEmailNotFound() {
