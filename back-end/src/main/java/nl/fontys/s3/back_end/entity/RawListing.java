@@ -1,6 +1,9 @@
 package nl.fontys.s3.back_end.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.OffsetDateTime;
 
 @Entity
@@ -9,10 +12,12 @@ import java.time.OffsetDateTime;
         uniqueConstraints = @UniqueConstraint(columnNames = {"source_id", "external_id"})
 )
 public class RawListing {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false) @JoinColumn(name = "source_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "source_id")
     private ListingSource source;
 
     @Column(name = "external_id", nullable = false, length = 128)
@@ -24,7 +29,8 @@ public class RawListing {
     @Column(name = "fetched_at", nullable = false)
     private OffsetDateTime fetchedAt = OffsetDateTime.now();
 
-    @Column(name = "payload_json", nullable = false, columnDefinition = "JSONB")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "payload_json", nullable = false, columnDefinition = "jsonb")
     private String payloadJson;
 
     @Column(name = "content_hash", nullable = false, length = 64)
@@ -50,5 +56,4 @@ public class RawListing {
 
     public String getContentHash() { return contentHash; }
     public void setContentHash(String contentHash) { this.contentHash = contentHash; }
-
 }

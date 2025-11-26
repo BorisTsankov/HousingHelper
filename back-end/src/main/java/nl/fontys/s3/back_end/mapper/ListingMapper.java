@@ -6,6 +6,7 @@ import nl.fontys.s3.back_end.model.ListingModel;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 public final class ListingMapper {
@@ -147,7 +148,9 @@ public final class ListingMapper {
                 m.getCanonicalUrl(),
 
                 m.getExternalId(),
-                m.getSourceName()
+                m.getSourceName(),
+
+                List.of() // no photo URLs from DB for now
         );
     }
 }

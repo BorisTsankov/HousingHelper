@@ -99,8 +99,8 @@ public class Listing {
     @Column(name = "ingest_job_id")
     private Long ingestJobId;
 
-    @Column(name = "pets_allowed")
-    private Boolean petsAllowed;
+    @Column(name = "pets_allowed", nullable = false)
+    private boolean petsAllowed;
 
     public Boolean getPetsAllowed() { return petsAllowed; }
     public void setPetsAllowed(Boolean petsAllowed) { this.petsAllowed = petsAllowed; }

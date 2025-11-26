@@ -2,6 +2,7 @@ package nl.fontys.s3.back_end.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public record ListingDto(
         String id,
@@ -46,5 +47,7 @@ public record ListingDto(
         String canonicalUrl,
 
         String externalId,
-        String source
+        String source,
+
+        List<String> photoUrls
 ) {}
