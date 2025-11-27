@@ -95,7 +95,7 @@ public class ParariusIngestFromDtoService {
                 upsertOne(source, activeStatus, parariusAgency, dto);
                 processed++;
             } catch (RuntimeException ex) {
-                // RuntimeException instead of generic Exception → better for Sonar
+                // RuntimeException instead of generic Exception → acceptable for Sonar
                 log.error("Failed to upsert listing externalId={} url={}",
                         dto.externalId(), dto.canonicalUrl(), ex);
             }
@@ -216,8 +216,9 @@ public class ParariusIngestFromDtoService {
                     photo.setPosition(pos++);
                     listingPhotoRepository.save(photo);
                 } catch (DataAccessException e) {
-                    // more specific than generic Exception
-                    log.warn("Failed to save photo for listingId={} url={}", saved.getId(), url, e);
+                    // Log and continue, don't blow up whole ingest
+                    log.warn("Failed to save photo for listingId={} url={}",
+                            saved.getId(), url, e);
                 }
             }
         }
@@ -225,52 +226,42 @@ public class ParariusIngestFromDtoService {
         log.debug("Upsert complete for externalId={} (id={})", externalId, saved.getId());
     }
 
+    /**
+     * Serialize ListingDto to JSON.
+     * On failure, log and return "{}" as a safe fallback instead of throwing.
+     */
     private String toJson(ListingDto dto) {
         try {
             return objectMapper.writeValueAsString(dto);
         } catch (JsonProcessingException e) {
-            // Either log this exception and handle it, or rethrow it with some contextual information.
-            log.error("Failed to serialize ListingDto to JSON for externalId={} url={}",
+            log.error("Failed to serialize ListingDto to JSON for externalId={} url={}. " +
+                            "Using empty JSON object as fallback.",
                     dto.externalId(), dto.canonicalUrl(), e);
-
-            throw new ListingSerializationException(
-                    "Failed to serialize ListingDto for externalId=" + dto.externalId(),
-                    dto.externalId(),
-                    dto.canonicalUrl(),
-                    e
-            );
+            return "{}"; // Fallback – keeps ingest running
         }
     }
 
+    /**
+     * Compute a SHA-256 content hash for the DTO.
+     * On failure, log and return null as a fallback.
+     */
     private String computeContentHash(ListingDto dto) {
+        String json = toJson(dto); // already logs + fallback
+
         try {
-            String json = toJson(dto); // may already throw ListingSerializationException
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(json.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(hashBytes);
-        } catch (ListingSerializationException ex) {
-            // Already logged & contextual – just bubble up
-            throw ex;
-        }  catch (NoSuchAlgorithmException e) {
-        log.error("Failed to compute content hash for externalId={} url={}",
-                dto.externalId(), dto.canonicalUrl(), e);
-
-        throw new ContentHashComputationException(
-                "Failed to compute content hash for externalId=" + dto.externalId(),
-                dto.externalId(),
-                dto.canonicalUrl(),
-                e
-        );
-    } catch (RuntimeException e) {
-            log.error("Unexpected error while computing content hash for externalId={} url={}",
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Failed to compute content hash (SHA-256 unavailable) " +
+                            "for externalId={} url={}. Returning null hash.",
                     dto.externalId(), dto.canonicalUrl(), e);
-
-            throw new ContentHashComputationException(
-                    "Unexpected error while computing content hash for externalId=" + dto.externalId(),
-                    dto.externalId(),
-                    dto.canonicalUrl(),
-                    e
-            );
+            return null;
+        } catch (RuntimeException e) {
+            log.error("Unexpected error while computing content hash for externalId={} url={}. " +
+                            "Returning null hash.",
+                    dto.externalId(), dto.canonicalUrl(), e);
+            return null;
         }
     }
 }

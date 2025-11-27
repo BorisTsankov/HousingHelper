@@ -44,6 +44,11 @@ public class ParariusScraperUsingListingDto {
             String url = buildSearchUrl(citySlug, page);
             Document doc = fetchSearchPage(citySlug, page, url);
 
+            if (doc == null) {
+                log.warn("Search page document is null for city='{}', page={}. Stopping pagination.", citySlug, page);
+                break;
+            }
+
             Elements items = doc.select(".listing-search-item");
             if (noItemsOnPage(items, citySlug, page)) {
                 break;
@@ -63,6 +68,10 @@ public class ParariusScraperUsingListingDto {
         return BASE_URL + "/apartments/" + citySlug + "/page-" + page;
     }
 
+    /**
+     * Fetch search page.
+     * On IO errors, log and return an empty document so we can stop gracefully.
+     */
     private Document fetchSearchPage(String citySlug, int page, String url) {
         try {
             log.debug("Fetching Pararius search page {} for city='{}' -> {}", page, citySlug, url);
@@ -71,15 +80,11 @@ public class ParariusScraperUsingListingDto {
                     .timeout(15000)
                     .get();
         } catch (java.io.IOException e) {
-            log.error("Failed to fetch Pararius page {} for city='{}' (url={})",
+            log.error("Failed to fetch Pararius page {} for city='{}' (url={}). " +
+                            "Returning empty document and stopping pagination.",
                     page, citySlug, url, e);
-            throw new PageFetchException(
-                    "Unable to fetch Pararius page " + page + " for city '" + citySlug + "'",
-                    url,
-                    page,
-                    citySlug,
-                    e
-            );
+            // Return an empty document so noItemsOnPage() will stop the loop
+            return Jsoup.parse("<html></html>");
         }
     }
 
@@ -114,22 +119,11 @@ public class ParariusScraperUsingListingDto {
                 log.warn("parseItemToDto returned null for an item on page {} city='{}' (searchUrl={})",
                         page, citySlug, url);
             }
-        } catch (ListingDetailParseException | PageFetchException ex) {
-            // Detail/parsing errors that we consider fatal for this run:
-            String msg = String.format(
-                    "Fatal error while parsing listing detail on page %d city='%s' (searchUrl=%s)",
-                    page, citySlug, url
-            );
-            log.error(msg, ex);
-            throw ex; // propagate as-is (already has context)
         } catch (RuntimeException ex) {
-            // Truly unexpected stuff – rethrow with context
-            String msg = String.format(
-                    "Unexpected error while parsing a listing item on page %d city='%s' (searchUrl=%s)",
-                    page, citySlug, url
-            );
-            log.error(msg, ex);
-            throw new ListingItemParseException(msg, page, citySlug, url, ex);
+            // Log and skip this item; do not fail the whole scrape
+            log.error("Unexpected error while parsing a listing item on page {} city='{}' (searchUrl={}). " +
+                            "Skipping this item.",
+                    page, citySlug, url, ex);
         }
     }
 
@@ -311,11 +305,20 @@ public class ParariusScraperUsingListingDto {
         }
     }
 
+    /**
+     * Fetch detail page and parse detail data.
+     * On any error, log and return an "empty" Detail with mostly nulls.
+     */
     private Detail fetchDetailPage(String url) {
         log.debug("Fetching Pararius detail page: {}", url);
 
         try {
             Document doc = loadDetailDocument(url);
+            if (doc == null) {
+                log.warn("Detail document is null for url={}. Returning empty Detail.", url);
+                return emptyDetail();
+            }
+
             String description = extractDescription(doc);
 
             String postalCodeFromSummary = extractPostalCodeFromSummary(doc);
@@ -356,16 +359,36 @@ public class ParariusScraperUsingListingDto {
                     latLon.lon(),
                     photos
             );
-        } catch (PageFetchException ex) {
-            // Already logged in loadDetailDocument; just bubble it up
-            throw ex;
         } catch (RuntimeException ex) {
-            String msg = "Unexpected error while parsing Pararius detail page: " + url;
-            log.error(msg, ex);
-            throw new ListingDetailParseException(msg, url, ex);
+            log.error("Unexpected error while parsing Pararius detail page: {}. " +
+                            "Returning empty Detail.",
+                    url, ex);
+            return emptyDetail();
         }
     }
 
+    private Detail emptyDetail() {
+        return new Detail(
+                null, // description
+                null, // areaM2
+                null, // rooms
+                null, // bedrooms
+                null, // bathrooms
+                null, // availableFrom
+                null, // minimumLeaseMonths
+                null, // furnishingTypeCode
+                null, // propertyTypeCode
+                null, // postalCode
+                null, // houseNumber
+                null, // energyLabel
+                null, // deposit
+                null, // displayDeposit
+                null, // lat
+                null, // lon
+                List.of() // photoUrls
+                // or Collections.emptyList()
+        );
+    }
 
     private Document loadDetailDocument(String url) {
         try {
@@ -374,15 +397,10 @@ public class ParariusScraperUsingListingDto {
                     .timeout(15000)
                     .get();
         } catch (java.io.IOException e) {
-            log.error("Failed to load detail page: {}", url, e);
-            throw new PageFetchException(
-                    "Failed to load detail page: " + url,
-                    url,
-                    e
-            );
+            log.error("Failed to load detail page: {}. Returning null document.", url, e);
+            return null;
         }
     }
-
 
     private String extractDescription(Document doc) {
         Element descContent = doc.selectFirst(".listing-detail-description__content");
@@ -467,7 +485,6 @@ public class ParariusScraperUsingListingDto {
                     label, value, url, ex);
         }
     }
-
 
     private void applyFeature(String lname, String value, FeatureData data) {
         if (lname.contains("living area")) {
@@ -572,7 +589,6 @@ public class ParariusScraperUsingListingDto {
             photos.add(src);
         }
     }
-
 
     private BigDecimal parseNumber(String text) {
         if (text == null) {
