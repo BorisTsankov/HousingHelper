@@ -44,6 +44,7 @@ class ListingControllerTest {
     @Test
     void getOne_returnsListingDto() throws Exception {
 
+        List<String> tags = List.of("tag1", "tag2", "tag3");
         ListingDto dto = new ListingDto(
                 "10", "Test Listing", "img.jpg",
                 "€1.000/mo", "Eindhoven",
@@ -57,7 +58,8 @@ class ListingControllerTest {
                 "Street", "10", "A",
                 51.44, 5.47,
                 3, "https://example.com",
-                "EXT123", "Funda"
+                "EXT123", "Funda",
+                tags
         );
 
         when(listingService.getById(10L)).thenReturn(dto);
@@ -73,6 +75,7 @@ class ListingControllerTest {
     @Test
     void list_returnsPagedResults() throws Exception {
 
+        List<String> tags = List.of("tag1", "tag2", "tag3");
         ListingDto dto = new ListingDto(
                 "10",
                 "Test Listing",
@@ -115,7 +118,8 @@ class ListingControllerTest {
                 3,
                 "https://example.com",
                 "EXT123",
-                "Funda"
+                "Funda",
+                tags
         );
 
         PageImpl<ListingDto> page = new PageImpl<>(
