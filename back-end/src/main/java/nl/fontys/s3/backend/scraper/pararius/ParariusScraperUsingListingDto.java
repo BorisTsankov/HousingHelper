@@ -75,10 +75,25 @@ public class ParariusScraperUsingListingDto {
                     if (dto != null) {
                         result.add(dto);
                     } else {
-                        log.warn("parseItemToDto returned null for an item on page {} city='{}'", page, citySlug);
+                        log.warn("parseItemToDto returned null for an item on page {} city='{}' (searchUrl={})",
+                                page, citySlug, url);
                     }
+                } catch (ListingDetailParseException | PageFetchException ex) {
+                    // Detail/parsing errors that we consider fatal for this run:
+                    String msg = String.format(
+                            "Fatal error while parsing listing detail on page %d city='%s' (searchUrl=%s)",
+                            page, citySlug, url
+                    );
+                    log.error(msg, ex);
+                    throw ex; // propagate as-is (already has context)
                 } catch (RuntimeException ex) {
-                    log.error("Error while parsing a listing item on page {} city='{}'", page, citySlug, ex);
+                    // Truly unexpected stuff – rethrow with context
+                    String msg = String.format(
+                            "Unexpected error while parsing a listing item on page %d city='%s' (searchUrl=%s)",
+                            page, citySlug, url
+                    );
+                    log.error(msg, ex);
+                    throw new ListingItemParseException(msg, page, citySlug, url, ex);
                 }
             }
         }
@@ -268,49 +283,58 @@ public class ParariusScraperUsingListingDto {
     private Detail fetchDetailPage(String url) {
         log.debug("Fetching Pararius detail page: {}", url);
 
-        Document doc = loadDetailDocument(url);
-        String description = extractDescription(doc);
+        try {
+            Document doc = loadDetailDocument(url);
+            String description = extractDescription(doc);
 
-        String postalCodeFromSummary = extractPostalCodeFromSummary(doc);
-        LatLon latLon = extractLatLon(doc, url);
-        FeatureData featureData = extractFeatureData(doc, url, postalCodeFromSummary);
+            String postalCodeFromSummary = extractPostalCodeFromSummary(doc);
+            LatLon latLon = extractLatLon(doc, url);
+            FeatureData featureData = extractFeatureData(doc, url, postalCodeFromSummary);
+            List<String> photos = extractPhotos(doc);
 
-        List<String> photos = extractPhotos(doc);
+            log.debug(
+                    "Parsed detail page: url={}, areaM2={}, rooms={}, bedrooms={}, bathrooms={}, energyLabel={}, " +
+                            "deposit={}, durationMonths={}, photos={}",
+                    url,
+                    featureData.areaM2(),
+                    featureData.rooms(),
+                    featureData.bedrooms(),
+                    featureData.bathrooms(),
+                    featureData.energyLabel(),
+                    featureData.deposit(),
+                    featureData.minimumLeaseMonths(),
+                    photos.size()
+            );
 
-        log.debug(
-                "Parsed detail page: url={}, areaM2={}, rooms={}, bedrooms={}, bathrooms={}, energyLabel={}, " +
-                        "deposit={}, durationMonths={}, photos={}",
-                url,
-                featureData.areaM2(),
-                featureData.rooms(),
-                featureData.bedrooms(),
-                featureData.bathrooms(),
-                featureData.energyLabel(),
-                featureData.deposit(),
-                featureData.minimumLeaseMonths(),
-                photos.size()
-        );
-
-        return new Detail(
-                description,
-                featureData.areaM2(),
-                featureData.rooms(),
-                featureData.bedrooms(),
-                featureData.bathrooms(),
-                featureData.availableFrom(),
-                featureData.minimumLeaseMonths(),
-                featureData.furnishingTypeCode(),
-                featureData.propertyTypeCode(),
-                featureData.postalCode(),
-                featureData.houseNumber(),
-                featureData.energyLabel(),
-                featureData.deposit(),
-                featureData.displayDeposit(),
-                latLon.lat(),
-                latLon.lon(),
-                photos
-        );
+            return new Detail(
+                    description,
+                    featureData.areaM2(),
+                    featureData.rooms(),
+                    featureData.bedrooms(),
+                    featureData.bathrooms(),
+                    featureData.availableFrom(),
+                    featureData.minimumLeaseMonths(),
+                    featureData.furnishingTypeCode(),
+                    featureData.propertyTypeCode(),
+                    featureData.postalCode(),
+                    featureData.houseNumber(),
+                    featureData.energyLabel(),
+                    featureData.deposit(),
+                    featureData.displayDeposit(),
+                    latLon.lat(),
+                    latLon.lon(),
+                    photos
+            );
+        } catch (PageFetchException ex) {
+            // Already logged in loadDetailDocument; just bubble it up
+            throw ex;
+        } catch (RuntimeException ex) {
+            String msg = "Unexpected error while parsing Pararius detail page: " + url;
+            log.error(msg, ex);
+            throw new ListingDetailParseException(msg, url, ex);
+        }
     }
+
 
     private Document loadDetailDocument(String url) {
         try {
@@ -323,6 +347,7 @@ public class ParariusScraperUsingListingDto {
             throw new PageFetchException("Failed to load detail page: " + url, e);
         }
     }
+
 
     private String extractDescription(Document doc) {
         Element descContent = doc.selectFirst(".listing-detail-description__content");
@@ -377,30 +402,37 @@ public class ParariusScraperUsingListingDto {
         for (Element dl : doc.select(".listing-features__list")) {
             Elements terms = dl.select("dt.listing-features__term");
             for (Element term : terms) {
-                String label = term.text();
-                Element dd = term.nextElementSibling();
-                if (dd == null) {
-                    continue;
-                }
-
-                Element mainDesc = dd.selectFirst(".listing-features__main-description");
-                String value = mainDesc != null ? mainDesc.text() : dd.text();
-                if (label == null || value == null) {
-                    continue;
-                }
-
-                String lname = label.toLowerCase().trim();
-                try {
-                    applyFeature(lname, value, data);
-                } catch (RuntimeException ex) {
-                    log.warn("Failed to parse feature '{}' with value '{}' on detail page {}",
-                            label, value, url, ex);
-                }
+                handleFeatureTerm(term, data, url);
             }
         }
 
         return data;
     }
+
+    private void handleFeatureTerm(Element term, FeatureData data, String url) {
+        String label = term.text();
+        Element dd = term.nextElementSibling();
+
+        if (dd == null || label == null) {
+            return;
+        }
+
+        Element mainDesc = dd.selectFirst(".listing-features__main-description");
+        String value = mainDesc != null ? mainDesc.text() : dd.text();
+
+        if (value == null) {
+            return;
+        }
+
+        String lname = label.toLowerCase().trim();
+        try {
+            applyFeature(lname, value, data);
+        } catch (RuntimeException ex) {
+            log.warn("Failed to parse feature '{}' with value '{}' on detail page {}",
+                    label, value, url, ex);
+        }
+    }
+
 
     private void applyFeature(String lname, String value, FeatureData data) {
         if (lname.contains("living area")) {
@@ -580,14 +612,15 @@ public class ParariusScraperUsingListingDto {
 
     private String normalizePropertyType(String value) {
         String v = value.toLowerCase();
+        String apartment = "APARTMENT";
         if (v.contains("apartment")) {
-            return "APARTMENT";
+            return apartment;
         }
         if (v.contains("flat")) {
-            return "APARTMENT";
+            return apartment;
         }
         if (v.contains("upper floor")) {
-            return "APARTMENT";
+            return apartment;
         }
         if (v.contains("house")) {
             return "HOUSE";
