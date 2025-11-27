@@ -181,6 +181,7 @@ sonar:backend:
       -Dsonar.java.binaries=build/classes/java/main \
       -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
     
+    
 
 # -----------------------------
 # Integration tests (backend)
