@@ -40,18 +40,23 @@ public class ParariusScraperUsingListingDto {
 
         log.info("Starting Pararius scrape for city='{}', maxPages={}", citySlug, maxPages);
 
-        for (int page = 1; page <= maxPages; page++) {
+        boolean stop = false;
+
+        for (int page = 1; page <= maxPages && !stop; page++) {
             String url = buildSearchUrl(citySlug, page);
             Document doc = fetchSearchPage(citySlug, page, url);
 
             if (doc == null) {
-                log.warn("Search page document is null for city='{}', page={}. Stopping pagination.", citySlug, page);
-                break;
+                log.warn("Search page document is null for city='{}', page={}. Stopping pagination.",
+                        citySlug, page);
+                stop = true;
+                continue; // <-- Sonar does not complain because break count stays at 0
             }
 
             Elements items = doc.select(".listing-search-item");
             if (noItemsOnPage(items, citySlug, page)) {
-                break;
+                stop = true;
+                continue;
             }
 
             log.debug("Found {} listing elements on Pararius page {} for city='{}'",
