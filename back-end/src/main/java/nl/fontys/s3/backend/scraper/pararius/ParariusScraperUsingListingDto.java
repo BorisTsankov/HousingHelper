@@ -74,7 +74,10 @@ public class ParariusScraperUsingListingDto {
             log.error("Failed to fetch Pararius page {} for city='{}' (url={})",
                     page, citySlug, url, e);
             throw new PageFetchException(
-                    "Unable to fetch Pararius page " + page + " for city '" + citySlug + "' (url=" + url + ")",
+                    "Unable to fetch Pararius page " + page + " for city '" + citySlug + "'",
+                    url,
+                    page,
+                    citySlug,
                     e
             );
         }
@@ -372,7 +375,11 @@ public class ParariusScraperUsingListingDto {
                     .get();
         } catch (java.io.IOException e) {
             log.error("Failed to load detail page: {}", url, e);
-            throw new PageFetchException("Failed to load detail page: " + url, e);
+            throw new PageFetchException(
+                    "Failed to load detail page: " + url,
+                    url,
+                    e
+            );
         }
     }
 
