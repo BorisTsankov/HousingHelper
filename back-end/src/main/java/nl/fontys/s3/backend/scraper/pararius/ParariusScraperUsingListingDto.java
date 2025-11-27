@@ -41,65 +41,93 @@ public class ParariusScraperUsingListingDto {
         log.info("Starting Pararius scrape for city='{}', maxPages={}", citySlug, maxPages);
 
         for (int page = 1; page <= maxPages; page++) {
-            String url = BASE_URL + "/apartments/" + citySlug + "/page-" + page;
-            Document doc;
-
-            try {
-                log.debug("Fetching Pararius search page {} for city='{}' -> {}", page, citySlug, url);
-                doc = Jsoup.connect(url)
-                        .userAgent("Mozilla/5.0 (compatible; ParariusScraper/1.0)")
-                        .timeout(15000)
-                        .get();
-            } catch (java.io.IOException e) {
-                log.error("Failed to fetch Pararius page {} for city='{}' (url={})",
-                        page, citySlug, url, e);
-
-                throw new PageFetchException(
-                        "Unable to fetch Pararius page " + page + " for city '" + citySlug + "' (url=" + url + ")",
-                        e
-                );
-            }
+            String url = buildSearchUrl(citySlug, page);
+            Document doc = fetchSearchPage(citySlug, page, url);
 
             Elements items = doc.select(".listing-search-item");
-
-            if (items.isEmpty()) {
-                log.warn("No listing items found on Pararius page {} for city='{}'. Stopping pagination.", page, citySlug);
+            if (noItemsOnPage(items, citySlug, page)) {
                 break;
             }
 
-            log.debug("Found {} listing elements on Pararius page {} for city='{}'", items.size(), page, citySlug);
+            log.debug("Found {} listing elements on Pararius page {} for city='{}'",
+                    items.size(), page, citySlug);
 
-            for (Element item : items) {
-                try {
-                    ListingDto dto = parseItemToDto(item);
-                    if (dto != null) {
-                        result.add(dto);
-                    } else {
-                        log.warn("parseItemToDto returned null for an item on page {} city='{}' (searchUrl={})",
-                                page, citySlug, url);
-                    }
-                } catch (ListingDetailParseException | PageFetchException ex) {
-                    // Detail/parsing errors that we consider fatal for this run:
-                    String msg = String.format(
-                            "Fatal error while parsing listing detail on page %d city='%s' (searchUrl=%s)",
-                            page, citySlug, url
-                    );
-                    log.error(msg, ex);
-                    throw ex; // propagate as-is (already has context)
-                } catch (RuntimeException ex) {
-                    // Truly unexpected stuff – rethrow with context
-                    String msg = String.format(
-                            "Unexpected error while parsing a listing item on page %d city='%s' (searchUrl=%s)",
-                            page, citySlug, url
-                    );
-                    log.error(msg, ex);
-                    throw new ListingItemParseException(msg, page, citySlug, url, ex);
-                }
-            }
+            processPageItems(items, citySlug, page, url, result);
         }
 
         log.info("Finished Pararius scrape for city='{}'. Total listings scraped: {}", citySlug, result.size());
         return result;
+    }
+
+    private String buildSearchUrl(String citySlug, int page) {
+        return BASE_URL + "/apartments/" + citySlug + "/page-" + page;
+    }
+
+    private Document fetchSearchPage(String citySlug, int page, String url) {
+        try {
+            log.debug("Fetching Pararius search page {} for city='{}' -> {}", page, citySlug, url);
+            return Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (compatible; ParariusScraper/1.0)")
+                    .timeout(15000)
+                    .get();
+        } catch (java.io.IOException e) {
+            log.error("Failed to fetch Pararius page {} for city='{}' (url={})",
+                    page, citySlug, url, e);
+            throw new PageFetchException(
+                    "Unable to fetch Pararius page " + page + " for city '" + citySlug + "' (url=" + url + ")",
+                    e
+            );
+        }
+    }
+
+    private boolean noItemsOnPage(Elements items, String citySlug, int page) {
+        if (items.isEmpty()) {
+            log.warn("No listing items found on Pararius page {} for city='{}'. Stopping pagination.", page, citySlug);
+            return true;
+        }
+        return false;
+    }
+
+    private void processPageItems(Elements items,
+                                  String citySlug,
+                                  int page,
+                                  String url,
+                                  List<ListingDto> result) {
+        for (Element item : items) {
+            parseAndAddItem(item, citySlug, page, url, result);
+        }
+    }
+
+    private void parseAndAddItem(Element item,
+                                 String citySlug,
+                                 int page,
+                                 String url,
+                                 List<ListingDto> result) {
+        try {
+            ListingDto dto = parseItemToDto(item);
+            if (dto != null) {
+                result.add(dto);
+            } else {
+                log.warn("parseItemToDto returned null for an item on page {} city='{}' (searchUrl={})",
+                        page, citySlug, url);
+            }
+        } catch (ListingDetailParseException | PageFetchException ex) {
+            // Detail/parsing errors that we consider fatal for this run:
+            String msg = String.format(
+                    "Fatal error while parsing listing detail on page %d city='%s' (searchUrl=%s)",
+                    page, citySlug, url
+            );
+            log.error(msg, ex);
+            throw ex; // propagate as-is (already has context)
+        } catch (RuntimeException ex) {
+            // Truly unexpected stuff – rethrow with context
+            String msg = String.format(
+                    "Unexpected error while parsing a listing item on page %d city='%s' (searchUrl=%s)",
+                    page, citySlug, url
+            );
+            log.error(msg, ex);
+            throw new ListingItemParseException(msg, page, citySlug, url, ex);
+        }
     }
 
     private ListingDto parseItemToDto(Element item) {

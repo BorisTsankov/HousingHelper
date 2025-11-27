@@ -229,11 +229,14 @@ public class ParariusIngestFromDtoService {
         try {
             return objectMapper.writeValueAsString(dto);
         } catch (JsonProcessingException e) {
+            // Either log this exception and handle it, or rethrow it with some contextual information.
             log.error("Failed to serialize ListingDto to JSON for externalId={} url={}",
                     dto.externalId(), dto.canonicalUrl(), e);
 
             throw new ListingSerializationException(
                     "Failed to serialize ListingDto for externalId=" + dto.externalId(),
+                    dto.externalId(),
+                    dto.canonicalUrl(),
                     e
             );
         }
@@ -241,22 +244,31 @@ public class ParariusIngestFromDtoService {
 
     private String computeContentHash(ListingDto dto) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            String json = toJson(dto); // may already throw ListingSerializationException
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(json.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hashBytes);
+        } catch (ListingSerializationException ex) {
+            // Already logged & contextual – just bubble up
+            throw ex;
+        }  catch (NoSuchAlgorithmException e) {
+        log.error("Failed to compute content hash for externalId={} url={}",
+                dto.externalId(), dto.canonicalUrl(), e);
 
-            String raw = (dto.canonicalUrl() == null ? "" : dto.canonicalUrl())
-                    + "|" + (dto.title() == null ? "" : dto.title())
-                    + "|" + (dto.city() == null ? "" : dto.city())
-                    + "|" + (dto.rentAmount() == null ? "" : dto.rentAmount().toPlainString());
-
-            byte[] digest = md.digest(raw.getBytes(StandardCharsets.UTF_8));
-
-            return HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Failed to compute content hash for externalId={} url={}",
+        throw new ContentHashComputationException(
+                "Failed to compute content hash for externalId=" + dto.externalId(),
+                dto.externalId(),
+                dto.canonicalUrl(),
+                e
+        );
+    } catch (RuntimeException e) {
+            log.error("Unexpected error while computing content hash for externalId={} url={}",
                     dto.externalId(), dto.canonicalUrl(), e);
 
             throw new ContentHashComputationException(
-                    "Failed to compute content hash for externalId=" + dto.externalId(),
+                    "Unexpected error while computing content hash for externalId=" + dto.externalId(),
+                    dto.externalId(),
+                    dto.canonicalUrl(),
                     e
             );
         }
