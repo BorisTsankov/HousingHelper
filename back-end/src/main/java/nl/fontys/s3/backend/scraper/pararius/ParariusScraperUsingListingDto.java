@@ -648,6 +648,9 @@ public class ParariusScraperUsingListingDto {
 
     private String normalizeFurnishing(String value) {
         String v = value.toLowerCase();
+        if (v.contains("unfurnished")) {
+            return "UNFURNISHED";
+        }
         if (v.contains("upholstered")) {
             return "SEMI_FURNISHED";   // Pararius term
         }
@@ -656,9 +659,6 @@ public class ParariusScraperUsingListingDto {
         }
         if (v.contains("furnished")) {
             return "FURNISHED";
-        }
-        if (v.contains("unfurnished")) {
-            return "UNFURNISHED";
         }
         return null;
     }
