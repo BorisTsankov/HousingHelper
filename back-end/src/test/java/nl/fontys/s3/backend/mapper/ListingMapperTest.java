@@ -2,18 +2,26 @@ package nl.fontys.s3.backend.mapper;
 
 import nl.fontys.s3.backend.dto.ListingDto;
 import nl.fontys.s3.backend.entity.Listing;
+import nl.fontys.s3.backend.entity.ListingPhoto;
 import nl.fontys.s3.backend.model.ListingModel;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ListingMapperTest {
 
+    private String formatCurrency(String value) {
+        return NumberFormat.getCurrencyInstance(Locale.GERMANY)
+                .format(new BigDecimal(value));
+    }
+
+    // --------- ENTITY -> MODEL ------------
 
     @Test
     void toModel_returnsNullWhenEntityNull() {
@@ -53,6 +61,10 @@ class ListingMapperTest {
         entity.setPhotosCount(8);
         entity.setCanonicalUrl("http://example.com");
         entity.setExternalId("ABC123");
+        entity.setEnergyLabel("A+");
+
+        // No status / propertyType / furnishingType / rentPeriod / source set
+        // and no photos list -> should remain null in model
 
         ListingModel model = ListingMapper.toModel(entity);
 
@@ -86,14 +98,44 @@ class ListingMapperTest {
         assertThat(model.getPhotosCount()).isEqualTo(8);
         assertThat(model.getCanonicalUrl()).isEqualTo("http://example.com");
         assertThat(model.getExternalId()).isEqualTo("ABC123");
+        assertThat(model.getEnergyLabel()).isEqualTo("A+");
 
+        // Not set on entity → should be null
         assertThat(model.getStatus()).isNull();
         assertThat(model.getPropertyType()).isNull();
         assertThat(model.getFurnishingType()).isNull();
         assertThat(model.getRentPeriod()).isNull();
         assertThat(model.getSourceName()).isNull();
+        assertThat(model.getPhotoUrls()).isNull();
     }
 
+    @Test
+    void toModel_mapsListingPhotosToPhotoUrls() {
+        Listing listing = new Listing();
+        listing.setId(1L);
+
+        ListingPhoto p1 = new ListingPhoto();
+        p1.setPhotoUrl("http://img/1.jpg");
+        p1.setListing(listing);
+
+        ListingPhoto p2 = new ListingPhoto();
+        p2.setPhotoUrl("http://img/2.jpg");
+        p2.setListing(listing);
+
+        listing.setPhotos(List.of(p1, p2));
+        listing.setPhotosCount(2);
+
+        ListingModel model = ListingMapper.toModel(listing);
+
+        assertThat(model.getPhotoUrls())
+                .isNotNull()
+                .containsExactly("http://img/1.jpg", "http://img/2.jpg");
+
+        // photosCount should still come from entity, not from the photoUrls size
+        assertThat(model.getPhotosCount()).isEqualTo(2);
+    }
+
+    // --------- MODEL -> DTO ------------
 
     @Test
     void toListingDto_returnsNullWhenModelNull() {
@@ -119,9 +161,8 @@ class ListingMapperTest {
         assertThat(dto.image()).isEqualTo("img.png");
         assertThat(dto.location()).isEqualTo("Rotterdam");
 
-        NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.GERMANY);
-        String expectedRent = nf.format(new BigDecimal("1500.00"));
-        String expectedDeposit = nf.format(new BigDecimal("3000.00"));
+        String expectedRent = formatCurrency("1500.00");
+        String expectedDeposit = formatCurrency("3000.00");
 
         assertThat(dto.displayPrice()).isEqualTo(expectedRent + "/mo");
         assertThat(dto.displayDeposit()).isEqualTo(expectedDeposit);
@@ -207,5 +248,30 @@ class ListingMapperTest {
 
         assertThat(dto.displayDeposit()).isNull();
         assertThat(dto.deposit()).isNull();
+    }
+
+    @Test
+    void toListingDto_photoUrlsDefaultsToEmptyListWhenModelHasNull() {
+        ListingModel m = new ListingModel();
+        m.setId(42L);
+        m.setPhotoUrls(null);
+
+        ListingDto dto = ListingMapper.toListingDto(m);
+
+        assertThat(dto.photoUrls())
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    void toListingDto_photoUrlsCopiedWhenPresent() {
+        ListingModel m = new ListingModel();
+        m.setId(42L);
+        m.setPhotoUrls(List.of("http://img/1.jpg", "http://img/2.jpg"));
+
+        ListingDto dto = ListingMapper.toListingDto(m);
+
+        assertThat(dto.photoUrls())
+                .containsExactly("http://img/1.jpg", "http://img/2.jpg");
     }
 }

@@ -47,11 +47,12 @@ class ParariusIngestFromDtoServiceTests {
     @Test
     void ingest_throwsWhenListingSourceMissing() {
         ListingDto dto = mock(ListingDto.class);
+        List<ListingDto> listings = List.of(dto);
 
         when(listingSourceRepository.findByCode("PARARIUS"))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.ingest(List.of(dto)))
+        assertThatThrownBy(() -> service.ingest(listings))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("ListingSource PARARIUS not found");
 
@@ -61,6 +62,7 @@ class ParariusIngestFromDtoServiceTests {
     @Test
     void ingest_throwsWhenActiveStatusMissing() {
         ListingDto dto = mock(ListingDto.class);
+        List<ListingDto> listings = List.of(dto);
         ListingSource source = new ListingSource();
 
         when(listingSourceRepository.findByCode("PARARIUS"))
@@ -68,7 +70,7 @@ class ParariusIngestFromDtoServiceTests {
         when(listingStatusRepository.findByCode("ACTIVE"))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.ingest(List.of(dto)))
+        assertThatThrownBy(() -> service.ingest(listings))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("ListingStatus ACTIVE not found");
 
@@ -81,6 +83,7 @@ class ParariusIngestFromDtoServiceTests {
         ListingDto dto = mock(ListingDto.class);
         ListingSource source = new ListingSource();
         ListingStatus active = new ListingStatus();
+        List<ListingDto> listings = List.of(dto);
 
         when(listingSourceRepository.findByCode("PARARIUS"))
                 .thenReturn(Optional.of(source));
@@ -89,7 +92,7 @@ class ParariusIngestFromDtoServiceTests {
         when(listingStatusRepository.findByCode("REMOVED"))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.ingest(List.of(dto)))
+        assertThatThrownBy(() -> service.ingest(listings))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("ListingStatus REMOVED not found");
 

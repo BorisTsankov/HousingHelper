@@ -149,43 +149,82 @@ class ParariusScraperUsingListingDtoTests {
 
             List<ListingDto> results = scraper.scrapeCity(citySlug, maxPages);
 
+            // 1st assertion: list size
             assertThat(results).hasSize(1);
+
             ListingDto dto = results.get(0);
 
-            // from list page
-            assertThat(dto.title()).isEqualTo("Nice apartment");
-            assertThat(dto.rentAmount()).isEqualByComparingTo(new BigDecimal("1234"));
-            assertThat(dto.city()).isEqualTo("Eindhoven");
-            assertThat(dto.street()).isEqualTo("Main Street");
-            assertThat(dto.image()).isEqualTo("https://img/listing-main.jpg");
-            assertThat(dto.canonicalUrl()).isEqualTo(detailUrl);
-            assertThat(dto.externalId()).isEqualTo("apartment-for-rent/eindhoven/test-slug");
+            // 2nd assertion: fields from list page
+            assertThat(dto)
+                    .extracting(
+                            ListingDto::title,
+                            ListingDto::rentAmount,
+                            ListingDto::city,
+                            ListingDto::street,
+                            ListingDto::image,
+                            ListingDto::canonicalUrl,
+                            ListingDto::externalId
+                    )
+                    .containsExactly(
+                            "Nice apartment",
+                            new BigDecimal("1234"),
+                            "Eindhoven",
+                            "Main Street",
+                            "https://img/listing-main.jpg",
+                            detailUrl,
+                            "apartment-for-rent/eindhoven/test-slug"
+                    );
 
-            // from detail page
-            assertThat(dto.description()).isEqualTo("Big and sunny");
-            assertThat(dto.areaM2()).isEqualByComparingTo(new BigDecimal("80"));
-            assertThat(dto.rooms()).isEqualByComparingTo(new BigDecimal("3"));
-            assertThat(dto.bedrooms()).isEqualByComparingTo(new BigDecimal("2"));
-            assertThat(dto.bathrooms()).isEqualByComparingTo(new BigDecimal("1"));
-            assertThat(dto.energyLabel()).isEqualTo("A");
-            assertThat(dto.propertyType()).isEqualTo("APARTMENT");
-            assertThat(dto.furnishingType()).isEqualTo("FURNISHED");
-            assertThat(dto.deposit()).isEqualByComparingTo(new BigDecimal("2000"));
-            assertThat(dto.postalCode()).isEqualTo("5611 AB");
-            assertThat(dto.houseNumber()).isEqualTo("12");
-            assertThat(dto.country()).isEqualTo("NL");
+            // 3rd assertion: fields from detail page
+            assertThat(dto)
+                    .extracting(
+                            ListingDto::description,
+                            ListingDto::areaM2,
+                            ListingDto::rooms,
+                            ListingDto::bedrooms,
+                            ListingDto::bathrooms,
+                            ListingDto::energyLabel,
+                            ListingDto::propertyType,
+                            ListingDto::furnishingType,
+                            ListingDto::deposit,
+                            ListingDto::postalCode,
+                            ListingDto::houseNumber,
+                            ListingDto::country,
+                            ListingDto::availableFrom,
+                            ListingDto::minimumLeaseMonths,
+                            ListingDto::availableUntil
+                    )
+                    .containsExactly(
+                            "Big and sunny",
+                            new BigDecimal("80"),
+                            new BigDecimal("3"),
+                            new BigDecimal("2"),
+                            new BigDecimal("1"),
+                            "A",
+                            "APARTMENT",
+                            "FURNISHED",
+                            new BigDecimal("2000"),
+                            "5611 AB",
+                            "12",
+                            "NL",
+                            LocalDate.of(2025, 12, 1),
+                            12,
+                            LocalDate.of(2026, 12, 1)
+                    );
 
-            assertThat(dto.availableFrom()).isEqualTo(LocalDate.of(2025, 12, 1));
-            assertThat(dto.minimumLeaseMonths()).isEqualTo(12);
-            assertThat(dto.availableUntil()).isEqualTo(LocalDate.of(2026, 12, 1));
+            // 4th assertion: geo coords
+            assertThat(dto)
+                    .extracting(ListingDto::lat, ListingDto::lon)
+                    .containsExactly(51.23, 5.12);
 
-            assertThat(dto.lat()).isEqualTo(51.23);
-            assertThat(dto.lon()).isEqualTo(5.12);
+            // 5th assertion: photos
+            assertThat(dto.photoUrls())
+                    .containsExactly(
+                            "https://img/detail1.jpg",
+                            "https://img/detail2.jpg"
+                    );
 
-            assertThat(dto.photoUrls()).containsExactly(
-                    "https://img/detail1.jpg",
-                    "https://img/detail2.jpg"
-            );
+            // 6th assertion: photos count
             assertThat(dto.photosCount()).isEqualTo(2);
         }
     }
