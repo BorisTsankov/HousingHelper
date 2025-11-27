@@ -230,23 +230,33 @@ public class ParariusIngestFromDtoService {
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize ListingDto to JSON for externalId={} url={}",
                     dto.externalId(), dto.canonicalUrl(), e);
-            throw new RuntimeException("Failed to serialize ListingDto to JSON", e);
+
+            throw new ListingSerializationException(
+                    "Failed to serialize ListingDto for externalId=" + dto.externalId(),
+                    e
+            );
         }
     }
+
 
     private String computeContentHash(ListingDto dto) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
+
             String raw = (dto.canonicalUrl() == null ? "" : dto.canonicalUrl())
                     + "|" + (dto.title() == null ? "" : dto.title())
                     + "|" + (dto.city() == null ? "" : dto.city())
                     + "|" + (dto.rentAmount() == null ? "" : dto.rentAmount().toPlainString());
-            byte[] digest = md.digest(raw.getBytes());
-            return HexFormat.of().formatHex(digest);
+
+            return HexFormat.of().formatHex(md.digest(raw.getBytes()));
         } catch (Exception e) {
             log.error("Failed to compute content hash for externalId={} url={}",
                     dto.externalId(), dto.canonicalUrl(), e);
-            throw new RuntimeException("Failed to compute content hash", e);
+
+            throw new ContentHashComputationException(
+                    "Failed to compute content hash for externalId=" + dto.externalId(),
+                    e
+            );
         }
     }
 }

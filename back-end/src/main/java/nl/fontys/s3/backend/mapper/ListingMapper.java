@@ -77,7 +77,7 @@ public final class ListingMapper {
         if (l.getPhotos() != null && !l.getPhotos().isEmpty()) {
             List<String> photoUrls = l.getPhotos().stream()
                     .map(ListingPhoto::getPhotoUrl)
-                    .collect(Collectors.toList());
+                    .toList();
             m.setPhotoUrls(photoUrls);
         }
 
