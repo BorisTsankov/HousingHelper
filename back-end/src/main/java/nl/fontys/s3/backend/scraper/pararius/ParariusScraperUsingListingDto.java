@@ -252,7 +252,7 @@ public class ParariusScraperUsingListingDto {
         if (text == null) {
             return null;
         }
-        String digits = text.replaceAll("[^0-9]", "");
+        String digits = text.replaceAll("\\D", "");
         if (digits.isEmpty()) {
             log.debug("Failed to parse price from text='{}'", text);
             return null;
@@ -268,9 +268,53 @@ public class ParariusScraperUsingListingDto {
     private Detail fetchDetailPage(String url) {
         log.debug("Fetching Pararius detail page: {}", url);
 
-        Document doc;
+        Document doc = loadDetailDocument(url);
+        String description = extractDescription(doc);
+
+        String postalCodeFromSummary = extractPostalCodeFromSummary(doc);
+        LatLon latLon = extractLatLon(doc, url);
+        FeatureData featureData = extractFeatureData(doc, url, postalCodeFromSummary);
+
+        List<String> photos = extractPhotos(doc);
+
+        log.debug(
+                "Parsed detail page: url={}, areaM2={}, rooms={}, bedrooms={}, bathrooms={}, energyLabel={}, " +
+                        "deposit={}, durationMonths={}, photos={}",
+                url,
+                featureData.areaM2(),
+                featureData.rooms(),
+                featureData.bedrooms(),
+                featureData.bathrooms(),
+                featureData.energyLabel(),
+                featureData.deposit(),
+                featureData.minimumLeaseMonths(),
+                photos.size()
+        );
+
+        return new Detail(
+                description,
+                featureData.areaM2(),
+                featureData.rooms(),
+                featureData.bedrooms(),
+                featureData.bathrooms(),
+                featureData.availableFrom(),
+                featureData.minimumLeaseMonths(),
+                featureData.furnishingTypeCode(),
+                featureData.propertyTypeCode(),
+                featureData.postalCode(),
+                featureData.houseNumber(),
+                featureData.energyLabel(),
+                featureData.deposit(),
+                featureData.displayDeposit(),
+                latLon.lat(),
+                latLon.lon(),
+                photos
+        );
+    }
+
+    private Document loadDetailDocument(String url) {
         try {
-            doc = Jsoup.connect(url)
+            return Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (compatible; ParariusScraper/1.0)")
                     .timeout(15000)
                     .get();
@@ -278,38 +322,32 @@ public class ParariusScraperUsingListingDto {
             log.error("Failed to load detail page: {}", url, e);
             throw new PageFetchException("Failed to load detail page: " + url, e);
         }
+    }
 
-        String description;
+    private String extractDescription(Document doc) {
         Element descContent = doc.selectFirst(".listing-detail-description__content");
         if (descContent != null) {
-            description = descContent.text();
-        } else {
-            description = text(doc, ".listing-detail-description, .listing-detail__description");
+            return descContent.text();
+        }
+        return text(doc, ".listing-detail-description, .listing-detail__description");
+    }
+
+    private String extractPostalCodeFromSummary(Document doc) {
+        String summaryLocation = text(doc, ".listing-detail-summary__location");
+        if (summaryLocation == null) {
+            return null;
         }
 
-        BigDecimal areaM2 = null;
-        BigDecimal rooms = null;
-        BigDecimal bedrooms = null;
-        BigDecimal bathrooms = null;
-        LocalDate availableFrom = null;
-        Integer minimumLeaseMonths = null;
-        String furnishingTypeCode = null;
-        String propertyTypeCode = null;
-        String postalCode = null;
-        String houseNumber = null;
-        String energyLabel = null;
-        BigDecimal deposit = null;
-        String displayDeposit = null;
+        Matcher m = POSTCODE_PATTERN.matcher(summaryLocation);
+        if (m.find()) {
+            return m.group(1).trim();
+        }
+        return null;
+    }
+
+    private LatLon extractLatLon(Document doc, String url) {
         Double lat = null;
         Double lon = null;
-
-        String summaryLocation = text(doc, ".listing-detail-summary__location");
-        if (summaryLocation != null) {
-            Matcher m = POSTCODE_PATTERN.matcher(summaryLocation);
-            if (m.find()) {
-                postalCode = m.group(1).trim();
-            }
-        }
 
         Element mapEl = doc.selectFirst("wc-detail-map[data-latitude][data-longitude]");
         if (mapEl != null) {
@@ -326,6 +364,15 @@ public class ParariusScraperUsingListingDto {
                 log.warn("Failed to parse lat/lon from detail map on {}", url, ex);
             }
         }
+
+        return new LatLon(lat, lon);
+    }
+
+    private record LatLon(Double lat, Double lon) {}
+
+    private FeatureData extractFeatureData(Document doc, String url, String initialPostalCode) {
+        FeatureData data = new FeatureData();
+        data.setPostalCode(initialPostalCode);
 
         for (Element dl : doc.select(".listing-features__list")) {
             Elements terms = dl.select("dt.listing-features__term");
@@ -344,32 +391,7 @@ public class ParariusScraperUsingListingDto {
 
                 String lname = label.toLowerCase().trim();
                 try {
-                    if (lname.contains("living area")) {
-                        areaM2 = parseNumber(value);
-                    } else if (lname.contains("number of rooms")) {
-                        rooms = parseNumber(value);
-                    } else if (lname.contains("number of bedrooms")) {
-                        bedrooms = parseNumber(value);
-                    } else if (lname.contains("number of bathrooms")) {
-                        bathrooms = parseNumber(value);
-                    } else if (lname.contains("available")) {
-                        availableFrom = parseAvailableDate(value);
-                    } else if (lname.contains("energy rating")) {
-                        energyLabel = value.trim();
-                    } else if (lname.contains("type of house")) {
-                        propertyTypeCode = normalizePropertyType(value);
-                    } else if (lname.contains("interior") || lname.contains("furnishing")) {
-                        furnishingTypeCode = normalizeFurnishing(value);
-                    } else if (lname.contains("postal code")) {
-                        postalCode = value.trim();
-                    } else if (lname.contains("house number")) {
-                        houseNumber = value.trim();
-                    } else if (lname.contains("deposit")) {
-                        deposit = parseNumber(value);
-                        displayDeposit = value.trim();
-                    } else if (lname.contains("duration")) {
-                        minimumLeaseMonths = parseDurationMonths(value);
-                    }
+                    applyFeature(lname, value, data);
                 } catch (RuntimeException ex) {
                     log.warn("Failed to parse feature '{}' with value '{}' on detail page {}",
                             label, value, url, ex);
@@ -377,62 +399,113 @@ public class ParariusScraperUsingListingDto {
             }
         }
 
+        return data;
+    }
+
+    private void applyFeature(String lname, String value, FeatureData data) {
+        if (lname.contains("living area")) {
+            data.setAreaM2(parseNumber(value));
+        } else if (lname.contains("number of rooms")) {
+            data.setRooms(parseNumber(value));
+        } else if (lname.contains("number of bedrooms")) {
+            data.setBedrooms(parseNumber(value));
+        } else if (lname.contains("number of bathrooms")) {
+            data.setBathrooms(parseNumber(value));
+        } else if (lname.contains("available")) {
+            data.setAvailableFrom(parseAvailableDate(value));
+        } else if (lname.contains("energy rating")) {
+            data.setEnergyLabel(value.trim());
+        } else if (lname.contains("type of house")) {
+            data.setPropertyTypeCode(normalizePropertyType(value));
+        } else if (lname.contains("interior") || lname.contains("furnishing")) {
+            data.setFurnishingTypeCode(normalizeFurnishing(value));
+        } else if (lname.contains("postal code")) {
+            data.setPostalCode(value.trim());
+        } else if (lname.contains("house number")) {
+            data.setHouseNumber(value.trim());
+        } else if (lname.contains("deposit")) {
+            data.setDeposit(parseNumber(value));
+            data.setDisplayDeposit(value.trim());
+        } else if (lname.contains("duration")) {
+            data.setMinimumLeaseMonths(parseDurationMonths(value));
+        }
+    }
+
+    private static final class FeatureData {
+        private BigDecimal areaM2;
+        private BigDecimal rooms;
+        private BigDecimal bedrooms;
+        private BigDecimal bathrooms;
+        private LocalDate availableFrom;
+        private Integer minimumLeaseMonths;
+        private String furnishingTypeCode;
+        private String propertyTypeCode;
+        private String postalCode;
+        private String houseNumber;
+        private String energyLabel;
+        private BigDecimal deposit;
+        private String displayDeposit;
+
+        public BigDecimal areaM2() { return areaM2; }
+        public BigDecimal rooms() { return rooms; }
+        public BigDecimal bedrooms() { return bedrooms; }
+        public BigDecimal bathrooms() { return bathrooms; }
+        public LocalDate availableFrom() { return availableFrom; }
+        public Integer minimumLeaseMonths() { return minimumLeaseMonths; }
+        public String furnishingTypeCode() { return furnishingTypeCode; }
+        public String propertyTypeCode() { return propertyTypeCode; }
+        public String postalCode() { return postalCode; }
+        public String houseNumber() { return houseNumber; }
+        public String energyLabel() { return energyLabel; }
+        public BigDecimal deposit() { return deposit; }
+        public String displayDeposit() { return displayDeposit; }
+
+        public void setAreaM2(BigDecimal v) { this.areaM2 = v; }
+        public void setRooms(BigDecimal v) { this.rooms = v; }
+        public void setBedrooms(BigDecimal v) { this.bedrooms = v; }
+        public void setBathrooms(BigDecimal v) { this.bathrooms = v; }
+        public void setAvailableFrom(LocalDate v) { this.availableFrom = v; }
+        public void setMinimumLeaseMonths(Integer v) { this.minimumLeaseMonths = v; }
+        public void setFurnishingTypeCode(String v) { this.furnishingTypeCode = v; }
+        public void setPropertyTypeCode(String v) { this.propertyTypeCode = v; }
+        public void setPostalCode(String v) { this.postalCode = v; }
+        public void setHouseNumber(String v) { this.houseNumber = v; }
+        public void setEnergyLabel(String v) { this.energyLabel = v; }
+        public void setDeposit(BigDecimal v) { this.deposit = v; }
+        public void setDisplayDeposit(String v) { this.displayDeposit = v; }
+    }
+
+    private List<String> extractPhotos(Document doc) {
         List<String> photos = new ArrayList<>();
 
         Element carousel = doc.selectFirst("wc-carrousel.carrousel--listing-detail");
         if (carousel != null) {
             for (Element img : carousel.select("img.picture__image")) {
-                String src = img.absUrl("src");
-                if (src.startsWith("http") && !photos.contains(src)) {
-                    photos.add(src);
-                }
+                addPhotoIfValid(photos, img.absUrl("src"));
             }
 
             for (Element template : carousel.select("wc-picture > template")) {
                 for (Element img : template.select("img.picture__image")) {
-                    String src = img.absUrl("src");
-                    if (src.startsWith("http") && !photos.contains(src)) {
-                        photos.add(src);
-                    }
+                    addPhotoIfValid(photos, img.absUrl("src"));
                 }
             }
         }
 
         if (photos.isEmpty()) {
             for (Element img : doc.select(".gallery img, .listing-detail__gallery img")) {
-                String src = img.absUrl("src");
-                if (!src.isBlank() && src.startsWith("http") && !photos.contains(src)) {
-                    photos.add(src);
-                }
+                addPhotoIfValid(photos, img.absUrl("src"));
             }
         }
 
-        log.debug(
-                "Parsed detail page: url={}, areaM2={}, rooms={}, bedrooms={}, bathrooms={}, energyLabel={}, " +
-                        "deposit={}, durationMonths={}, photos={}",
-                url, areaM2, rooms, bedrooms, bathrooms, energyLabel, deposit, minimumLeaseMonths, photos.size()
-        );
-
-        return new Detail(
-                description,
-                areaM2,
-                rooms,
-                bedrooms,
-                bathrooms,
-                availableFrom,
-                minimumLeaseMonths,
-                furnishingTypeCode,
-                propertyTypeCode,
-                postalCode,
-                houseNumber,
-                energyLabel,
-                deposit,
-                displayDeposit,
-                lat,
-                lon,
-                photos
-        );
+        return photos;
     }
+
+    private void addPhotoIfValid(List<String> photos, String src) {
+        if (src != null && !src.isBlank() && src.startsWith("http") && !photos.contains(src)) {
+            photos.add(src);
+        }
+    }
+
 
     private BigDecimal parseNumber(String text) {
         if (text == null) {

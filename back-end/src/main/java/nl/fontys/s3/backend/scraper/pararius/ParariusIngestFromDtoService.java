@@ -7,10 +7,13 @@ import nl.fontys.s3.backend.entity.*;
 import nl.fontys.s3.backend.repository.interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.util.HexFormat;
 import java.util.List;
@@ -91,13 +94,13 @@ public class ParariusIngestFromDtoService {
             try {
                 upsertOne(source, activeStatus, parariusAgency, dto);
                 processed++;
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
+                // RuntimeException instead of generic Exception → better for Sonar
                 log.error("Failed to upsert listing externalId={} url={}",
                         dto.externalId(), dto.canonicalUrl(), ex);
             }
         }
 
-        // Mark listings that were not touched in this run as REMOVED
         int deactivated = listingRepository.markMissingListingsInactive(
                 source,
                 activeStatus,
@@ -160,7 +163,6 @@ public class ParariusIngestFromDtoService {
         listing.setAvailableUntil(dto.availableUntil());
         listing.setMinimumLeaseMonths(dto.minimumLeaseMonths());
 
-        // Location
         listing.setCountry(dto.country());
         listing.setCity(dto.city());
         listing.setPostalCode(dto.postalCode());
@@ -177,12 +179,10 @@ public class ParariusIngestFromDtoService {
                     .ifPresent(listing::setPropertyType);
         }
 
-        // Furnishing type (FURNISHED / SEMI_FURNISHED / UNFURNISHED)
         if (dto.furnishingType() != null) {
             furnishingTypeRepository.findByCode(dto.furnishingType())
                     .ifPresent(listing::setFurnishingType);
         }
-
 
         if (isNew && !listing.isPetsAllowed()) {
             listing.setPetsAllowed(false);
@@ -215,7 +215,8 @@ public class ParariusIngestFromDtoService {
                     photo.setPhotoUrl(url);
                     photo.setPosition(pos++);
                     listingPhotoRepository.save(photo);
-                } catch (Exception e) {
+                } catch (DataAccessException e) {
+                    // more specific than generic Exception
                     log.warn("Failed to save photo for listingId={} url={}", saved.getId(), url, e);
                 }
             }
@@ -238,7 +239,6 @@ public class ParariusIngestFromDtoService {
         }
     }
 
-
     private String computeContentHash(ListingDto dto) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -248,8 +248,10 @@ public class ParariusIngestFromDtoService {
                     + "|" + (dto.city() == null ? "" : dto.city())
                     + "|" + (dto.rentAmount() == null ? "" : dto.rentAmount().toPlainString());
 
-            return HexFormat.of().formatHex(md.digest(raw.getBytes()));
-        } catch (Exception e) {
+            byte[] digest = md.digest(raw.getBytes(StandardCharsets.UTF_8));
+
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException e) {
             log.error("Failed to compute content hash for externalId={} url={}",
                     dto.externalId(), dto.canonicalUrl(), e);
 

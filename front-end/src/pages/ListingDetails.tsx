@@ -83,7 +83,6 @@ export default function ListingDetails() {
 
   const address = useMemo(() => (data ? joinAddress(data) : ""), [data]);
 
-  // ✅ Always run this hook in the same place
   const photos: string[] = useMemo(() => {
     if (!data) return [];
     if (data.photoUrls && data.photoUrls.length > 0) return data.photoUrls;
@@ -91,10 +90,8 @@ export default function ListingDetails() {
     return [];
   }, [data]);
 
-  // ✅ Also always in the same place
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Optional: reset index when listing changes
   useEffect(() => {
     setCurrentIndex(0);
   }, [data?.id]);
@@ -320,7 +317,14 @@ export default function ListingDetails() {
   );
 }
 
-function Row({ label, value }: { label: string; value?: string | number | null }) {
+// ---------- Reusable components ----------
+
+type RowProps = Readonly<{
+  label: string;
+  value?: string | number | null;
+}>;
+
+function Row({ label, value }: RowProps) {
   if (value == null || value === "") return null;
   return (
     <div className="flex items-center justify-between gap-4">
@@ -330,43 +334,45 @@ function Row({ label, value }: { label: string; value?: string | number | null }
   );
 }
 
-function SectionCard({
-  children,
-  className = "",
-}: React.PropsWithChildren<{ className?: string }>) {
+type SectionCardProps = Readonly<
+  React.PropsWithChildren<{
+    className?: string;
+  }>
+>;
+
+function SectionCard({ children, className = "" }: SectionCardProps) {
   return <section className={`rounded-2xl border bg-white p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
-function FactsBar({
-  price,
-  areaM2,
-  bedrooms,
-  bathrooms,
-}: {
+type FactsBarProps = Readonly<{
   price?: string | number | null;
   areaM2?: number | null;
   bedrooms?: number | null;
   bathrooms?: number | null;
-}) {
+}>;
+
+function FactsBar({ price, areaM2, bedrooms, bathrooms }: FactsBarProps) {
   const items: Array<{ key: string; icon: React.ReactNode; label: string } | null> = [
     price != null && price !== ""
       ? { key: String(price), icon: <Euro className="h-4 w-4" />, label: `${price}` }
       : null,
-    areaM2 ? { key: `area-${areaM2}`, icon: <Ruler className="h-4 w-4" />, label: `${areaM2} m²` } : null,
-    bedrooms != null
-      ? {
+    areaM2
+      ? { key: `area-${areaM2}`, icon: <Ruler className="h-4 w-4" />, label: `${areaM2} m²` }
+      : null,
+    bedrooms == null
+      ? null
+      : {
           key: `bed-${bedrooms}`,
           icon: <Bed className="h-4 w-4" />,
           label: `${bedrooms} bed${bedrooms === 1 ? "" : "s"}`,
-        }
-      : null,
-    bathrooms != null
-      ? {
+        },
+    bathrooms == null
+      ? null
+      : {
           key: `bath-${bathrooms}`,
           icon: <Bath className="h-4 w-4" />,
           label: `${bathrooms} bath${bathrooms === 1 ? "" : "s"}`,
-        }
-      : null,
+        },
   ];
 
   const visible = items.filter(Boolean) as Array<{ key: string; icon: React.ReactNode; label: string }>;
@@ -389,7 +395,12 @@ function FactsBar({
   );
 }
 
-function DetailItem({ label, value }: { label: string; value?: string | number | null }) {
+type DetailItemProps = Readonly<{
+  label: string;
+  value?: string | number | null;
+}>;
+
+function DetailItem({ label, value }: DetailItemProps) {
   if (value == null || value === "") return null;
   return (
     <div className="flex items-baseline gap-2">

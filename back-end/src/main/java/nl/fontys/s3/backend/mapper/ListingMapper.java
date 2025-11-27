@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 public final class ListingMapper {
     private ListingMapper() {}
