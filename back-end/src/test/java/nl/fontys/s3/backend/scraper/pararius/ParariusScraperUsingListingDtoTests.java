@@ -506,13 +506,13 @@ class ParariusScraperUsingListingDtoTests {
                 doc
         );
 
-        // We expect only unique, http-prefixed urls
-        assertThat(photos).contains(
-                "https://img/detail1.jpg",
-                "https://img/detail2.jpg"
-        );
-        // gallery should not be used because carousel already had photos
-        assertThat(photos).doesNotContain("https://img/gallery1.jpg");
+        assertThat(photos)
+                .contains(
+                        "https://img/detail1.jpg",
+                        "https://img/detail2.jpg"
+                )
+                // gallery should not be used because carousel already had photos
+                .doesNotContain("https://img/gallery1.jpg");
     }
 
     @Test
