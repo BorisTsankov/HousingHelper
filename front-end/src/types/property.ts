@@ -44,4 +44,6 @@ export type Property = {
 
   externalId?: string | null;
   source?: string | null;
+
+  photoUrls?: string[];
 };

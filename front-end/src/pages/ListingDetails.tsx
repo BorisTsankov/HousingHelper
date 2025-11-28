@@ -11,6 +11,8 @@ import {
   ExternalLink,
   ImageIcon,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import type { Property } from "type";
@@ -49,6 +51,7 @@ function dateOrUndef(v?: string | null) {
 
 export default function ListingDetails() {
   const { id } = useParams<{ id: string }>();
+
   const [data, setData] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +82,20 @@ export default function ListingDetails() {
   }, [id]);
 
   const address = useMemo(() => (data ? joinAddress(data) : ""), [data]);
+
+  const photos: string[] = useMemo(() => {
+    if (!data) return [];
+    if (data.photoUrls && data.photoUrls.length > 0) return data.photoUrls;
+    if (data.image) return [data.image];
+    return [];
+  }, [data]);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [data?.id]);
+
   const price = data?.displayPrice ?? data?.price ?? undefined;
   const deposit = data?.displayDeposit ?? formatMoney(data?.deposit ?? null) ?? undefined;
 
@@ -115,24 +132,92 @@ export default function ListingDetails() {
 
   if (!data) return null;
 
+  const hasPhotos = photos.length > 0;
+  const mainPhoto = hasPhotos ? photos[Math.min(currentIndex, photos.length - 1)] : null;
+  const photoCount = data.photosCount ?? photos.length;
+
+  const goPrev = () => {
+    if (!hasPhotos) return;
+    setCurrentIndex((i) => (i - 1 + photos.length) % photos.length);
+  };
+
+  const goNext = () => {
+    if (!hasPhotos) return;
+    setCurrentIndex((i) => (i + 1) % photos.length);
+  };
+
   return (
     <>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-b from-white via-white to-gray-50">
         <div className="mx-auto max-w-6xl p-4 md:p-6">
-
           <div className="flex flex-col md:flex-row md:items-start gap-6">
             <div className="md:w-2/3 w-full">
-              <div className="relative overflow-hidden rounded-2xl shadow-sm">
-                <img src={data.image} alt={data.title} className="w-full h-full object-cover aspect-[16/10]" />
-                {Boolean(data.photosCount) && (
-                  <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-                    <ImageIcon className="h-3.5 w-3.5" /> {data.photosCount}
+              {/* 🖼️ PHOTO GALLERY */}
+              <div className="relative overflow-hidden rounded-2xl shadow-sm bg-gray-100">
+                {mainPhoto ? (
+                  <>
+                    <img
+                      src={mainPhoto}
+                      alt={data.title}
+                      className="w-full h-full object-cover aspect-[16/10]"
+                    />
+
+                    {photos.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={goPrev}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white shadow-md hover:bg-black/70"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={goNext}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white shadow-md hover:bg-black/70"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
+
+                    {photoCount > 0 && (
+                      <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+                        <ImageIcon className="h-3.5 w-3.5" /> {photoCount}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="aspect-[16/10] flex items-center justify-center text-gray-400">
+                    <ImageIcon className="h-8 w-8" />
                   </div>
                 )}
               </div>
 
-              <FactsBar price={price} areaM2={data?.areaM2} bedrooms={data?.bedrooms} bathrooms={data?.bathrooms} />
+              {photos.length > 1 && (
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                  {photos.map((url, idx) => (
+                    <button
+                      key={url + idx}
+                      type="button"
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-xl border ${
+                        idx === currentIndex ? "border-blue-500 ring-2 ring-blue-300" : "border-gray-200"
+                      }`}
+                    >
+                      <img src={url} alt="" className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <FactsBar
+                price={price}
+                areaM2={data?.areaM2}
+                bedrooms={data?.bedrooms}
+                bathrooms={data?.bathrooms}
+              />
             </div>
 
             <aside className="md:w-1/3 w-full md:sticky md:top-6">
@@ -154,9 +239,15 @@ export default function ListingDetails() {
                   {price && <Row label="Rent" value={price} />}
                   {data.rentPeriod && <Row label="Period" value={data.rentPeriod} />}
                   {deposit && <Row label="Deposit" value={deposit} />}
-                  {data.minimumLeaseMonths && <Row label="Min. lease" value={`${data.minimumLeaseMonths} months`} />}
-                  {data.availableFrom && <Row label="Available from" value={dateOrUndef(data.availableFrom)} />}
-                  {data.availableUntil && <Row label="Available until" value={dateOrUndef(data.availableUntil)} />}
+                  {data.minimumLeaseMonths && (
+                    <Row label="Min. lease" value={`${data.minimumLeaseMonths} months`} />
+                  )}
+                  {data.availableFrom && (
+                    <Row label="Available from" value={dateOrUndef(data.availableFrom)} />
+                  )}
+                  {data.availableUntil && (
+                    <Row label="Available until" value={dateOrUndef(data.availableUntil)} />
+                  )}
                 </div>
 
                 {data.canonicalUrl && (
@@ -195,7 +286,9 @@ export default function ListingDetails() {
           {data.description && (
             <SectionCard className="mt-6">
               <h2 className="text-lg font-semibold">Description</h2>
-              <p className="mt-2 whitespace-pre-line leading-relaxed text-gray-700">{data.description}</p>
+              <p className="mt-2 whitespace-pre-line leading-relaxed text-gray-700">
+                {data.description}
+              </p>
             </SectionCard>
           )}
 
@@ -224,7 +317,14 @@ export default function ListingDetails() {
   );
 }
 
-function Row({ label, value }: { label: string; value?: string | number | null }) {
+// ---------- Reusable components ----------
+
+type RowProps = Readonly<{
+  label: string;
+  value?: string | number | null;
+}>;
+
+function Row({ label, value }: RowProps) {
   if (value == null || value === "") return null;
   return (
     <div className="flex items-center justify-between gap-4">
@@ -234,16 +334,45 @@ function Row({ label, value }: { label: string; value?: string | number | null }
   );
 }
 
-function SectionCard({ children, className = "" }: React.PropsWithChildren<{ className?: string }>) {
+type SectionCardProps = Readonly<
+  React.PropsWithChildren<{
+    className?: string;
+  }>
+>;
+
+function SectionCard({ children, className = "" }: SectionCardProps) {
   return <section className={`rounded-2xl border bg-white p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
-function FactsBar({ price, areaM2, bedrooms, bathrooms }: { price?: string | number | null; areaM2?: number | null; bedrooms?: number | null; bathrooms?: number | null }) {
+type FactsBarProps = Readonly<{
+  price?: string | number | null;
+  areaM2?: number | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+}>;
+
+function FactsBar({ price, areaM2, bedrooms, bathrooms }: FactsBarProps) {
   const items: Array<{ key: string; icon: React.ReactNode; label: string } | null> = [
-    price != null && price !== "" ? { key: String(price), icon: <Euro className="h-4 w-4" />, label: `${price}` } : null,
-    areaM2 ? { key: `area-${areaM2}`, icon: <Ruler className="h-4 w-4" />, label: `${areaM2} m²` } : null,
-    bedrooms != null ? { key: `bed-${bedrooms}`, icon: <Bed className="h-4 w-4" />, label: `${bedrooms} bed${bedrooms === 1 ? "" : "s"}` } : null,
-    bathrooms != null ? { key: `bath-${bathrooms}`, icon: <Bath className="h-4 w-4" />, label: `${bathrooms} bath${bathrooms === 1 ? "" : "s"}` } : null,
+    price != null && price !== ""
+      ? { key: String(price), icon: <Euro className="h-4 w-4" />, label: `${price}` }
+      : null,
+    areaM2
+      ? { key: `area-${areaM2}`, icon: <Ruler className="h-4 w-4" />, label: `${areaM2} m²` }
+      : null,
+    bedrooms == null
+      ? null
+      : {
+          key: `bed-${bedrooms}`,
+          icon: <Bed className="h-4 w-4" />,
+          label: `${bedrooms} bed${bedrooms === 1 ? "" : "s"}`,
+        },
+    bathrooms == null
+      ? null
+      : {
+          key: `bath-${bathrooms}`,
+          icon: <Bath className="h-4 w-4" />,
+          label: `${bathrooms} bath${bathrooms === 1 ? "" : "s"}`,
+        },
   ];
 
   const visible = items.filter(Boolean) as Array<{ key: string; icon: React.ReactNode; label: string }>;
@@ -253,7 +382,10 @@ function FactsBar({ price, areaM2, bedrooms, bathrooms }: { price?: string | num
     <div className="mt-3 rounded-2xl border bg-white/80 backdrop-blur p-3">
       <ul className="flex flex-wrap items-center gap-2">
         {visible.map((it) => (
-          <li key={it.key} className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <li
+            key={it.key}
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
             {it.icon}
             <span>{it.label}</span>
           </li>
@@ -263,7 +395,12 @@ function FactsBar({ price, areaM2, bedrooms, bathrooms }: { price?: string | num
   );
 }
 
-function DetailItem({ label, value }: { label: string; value?: string | number | null }) {
+type DetailItemProps = Readonly<{
+  label: string;
+  value?: string | number | null;
+}>;
+
+function DetailItem({ label, value }: DetailItemProps) {
   if (value == null || value === "") return null;
   return (
     <div className="flex items-baseline gap-2">
