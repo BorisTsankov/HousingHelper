@@ -350,14 +350,13 @@ docker:ecr-backend:
     - docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_BACKEND_REPO:${CI_COMMIT_SHORT_SHA}"
 
     - |
-      if [ "$CI_COMMIT_BRANCH" = "dev" || "$CI_COMMIT_BRANCH" = "main" ]; then
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
         echo "Pushing backend image to ECR (branch tag: $CI_COMMIT_BRANCH)..."
         docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_BACKEND_REPO:${CI_COMMIT_BRANCH}"
       fi
 
   extends:
     - .dev-main-only-rules
-
 
 
 docker:ecr-frontend:
@@ -384,14 +383,12 @@ docker:ecr-frontend:
     - docker build -t "$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}" front-end
 
     - echo "Tagging frontend image for ECR (commit SHA)..."
-    - docker tag "$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}" \
-      "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}"
+    - docker tag "$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}"
 
     - |
       if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
         echo "Tagging frontend image for ECR (branch tag: $CI_COMMIT_BRANCH)..."
-        docker tag "$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}" \
-          "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_REPO:${CI_COMMIT_BRANCH}"
+        docker tag "$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_REPO:${CI_COMMIT_BRANCH}"
       fi
 
     - echo "Pushing frontend image to ECR (commit SHA)..."
