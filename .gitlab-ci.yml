@@ -4,6 +4,8 @@ stages:
   - sonar
   - integration-test
   - docker
+  - docker-aws
+
   - deploy
 
 variables:
@@ -304,6 +306,108 @@ docker:build-frontend:
     - |
       if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
         docker push "$DOCKERHUB_USERNAME/housinghelper-frontend:${CI_COMMIT_BRANCH}"
+      fi
+
+  extends:
+    - .dev-main-only-rules
+
+
+docker:ecr-backend:
+  stage: docker-aws
+  image: docker:24.0.9
+  services:
+    - name: docker:24.0.9-dind
+      alias: docker
+      command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_DRIVER: overlay2
+    DOCKER_CONFIG: "/tmp/docker"
+  needs:
+    - sonar:backend
+    - integration-test:backend
+  script:
+    - apk add --no-cache aws-cli
+
+    - echo "Logging in to Amazon ECR..."
+    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" \
+      | docker login \
+      --username AWS \
+      --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+
+    - echo "Building backend image for ECR..."
+    - docker build -t "$ECR_BACKEND_REPO:${CI_COMMIT_SHORT_SHA}" back-end
+
+    - echo "Tagging backend image for ECR (commit SHA)..."
+    - docker tag "$ECR_BACKEND_REPO:${CI_COMMIT_SHORT_SHA}" \
+      "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_BACKEND_REPO:${CI_COMMIT_SHORT_SHA}"
+
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        echo "Tagging backend image for ECR (branch tag: $CI_COMMIT_BRANCH)..."
+        docker tag "$ECR_BACKEND_REPO:${CI_COMMIT_SHORT_SHA}" \
+          "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_BACKEND_REPO:${CI_COMMIT_BRANCH}"
+      fi
+
+    - echo "Pushing backend image to ECR (commit SHA)..."
+    - docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_BACKEND_REPO:${CI_COMMIT_SHORT_SHA}"
+
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        echo "Pushing backend image to ECR (branch tag: $CI_COMMIT_BRANCH)..."
+        docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_BACKEND_REPO:${CI_COMMIT_BRANCH}"
+      fi
+
+  extends:
+    - .dev-main-only-rules
+
+
+
+docker:ecr-frontend:
+  stage: docker-aws
+  image: docker:24.0.9
+  services:
+    - name: docker:24.0.9-dind
+      alias: docker
+      command: ["--tls=false", "--host=tcp://0.0.0.0:2375"]
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_DRIVER: overlay2
+    DOCKER_CONFIG: "/tmp/docker"
+  needs:
+    - sonar:frontend
+  script:
+    - apk add --no-cache aws-cli
+
+    - echo "Logging in to Amazon ECR..."
+    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" \
+      | docker login \
+      --username AWS \
+      --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+
+    - echo "Building frontend image for ECR..."
+    - docker build -t "$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}" front-end
+
+    - echo "Tagging frontend image for ECR (commit SHA)..."
+    - docker tag "$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}" \
+      "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}"
+
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        echo "Tagging frontend image for ECR (branch tag: $CI_COMMIT_BRANCH)..."
+        docker tag "$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}" \
+          "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_REPO:${CI_COMMIT_BRANCH}"
+      fi
+
+    - echo "Pushing frontend image to ECR (commit SHA)..."
+    - docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_REPO:${CI_COMMIT_SHORT_SHA}"
+
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        echo "Pushing frontend image to ECR (branch tag: $CI_COMMIT_BRANCH)..."
+        docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_REPO:${CI_COMMIT_BRANCH}"
       fi
 
   extends:
